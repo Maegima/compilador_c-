@@ -138,16 +138,4 @@ Parser em execução...
             Id: a Line 45
             Const: 2
           Id: ok Line 45
-        Id: output Line 46
-        Assign to: a
-          Id: a Line 47
-          Id: output Line 47
-            Id: a Line 47
-        Id: output Line 48
-          Id: a Line 48
-            Const: 2
-        Assign to: i
-          Id: i Line 49
-          Op: +
-            Id: i Line 49
-            Const: 1
+        Id: output Line 4

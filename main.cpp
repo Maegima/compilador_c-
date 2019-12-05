@@ -50,6 +50,7 @@ int main(){
   abrirArq();
   raiz = parse();
   printTree(raiz);
+  buildSymtab(raiz);
   fecharArq();
   return 0;
 }

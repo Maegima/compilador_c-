@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "iostream": "cpp",
+        "globals.h": "c",
+        "util.h": "c",
+        "parser.tab.h": "c"
+    }
+}
