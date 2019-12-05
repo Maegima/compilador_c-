@@ -45,22 +45,21 @@ static void nullProc(TreeNode * t)
  * identifiers stored in t into 
  * the symbol table 
  */
-static void insertNode( TreeNode * t)
-{ switch (t->nodekind)
-  { case StmtK:
-      switch (t->kind.stmt)
-      { case AssignK:
-        case ReadK:
-          if (st_lookup(t->attr.name) == -1)
-          /* not yet in table, so treat as new definition */
-            st_insert(t->attr.name,t->lineno,location++);
-          else
-          /* already in table, so ignore location, 
-             add line number of use only */ 
-            st_insert(t->attr.name,t->lineno,0);
-          break;
-        default:
-          break;
+static void insertNode( TreeNode * t){ 
+    switch (t->nodekind){ 
+        case StmtK:
+            switch (t->kind.stmt){ 
+                case AssignK:
+                if (st_lookup(t->attr.name) == -1)
+                /* not yet in table, so treat as new definition */
+                    st_insert(t->attr.name,t->lineno,location++);
+                else
+                /* already in table, so ignore location, 
+                    add line number of use only */ 
+                    st_insert(t->attr.name,t->lineno,0);
+                break;
+                default:
+                break;
       }
       break;
     case ExpK:
@@ -110,7 +109,7 @@ static void checkNode(TreeNode * t)
           if ((t->child[0]->type != Integer) ||
               (t->child[1]->type != Integer))
             typeError(t,"Op applied to non-integer");
-          if ((t->attr.op == EQ) || (t->attr.op == LT))
+          if ((t->attr.op == EQUAL) || (t->attr.op == SLT))
             t->type = Boolean;
           else
             t->type = Integer;
@@ -133,11 +132,7 @@ static void checkNode(TreeNode * t)
           if (t->child[0]->type != Integer)
             typeError(t->child[0],"assignment of non-integer value");
           break;
-        case WriteK:
-          if (t->child[0]->type != Integer)
-            typeError(t->child[0],"write of non-integer value");
-          break;
-        case RepeatK:
+        case WhileK:
           if (t->child[1]->type == Integer)
             typeError(t->child[1],"repeat test is not Boolean");
           break;

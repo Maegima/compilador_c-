@@ -1,0 +1,153 @@
+
+Parser em execução...
+  Type: INT Line 1
+    Id: a Line 1
+      Const: 11230
+  Type: INT Line 3
+    Id: minloc Line 3
+      Type: INT Line 3
+        Id: a Line 3
+      Type: INT Line 3
+        Id: low Line 3
+      Type: INT Line 3
+        Id: high Line 3
+      Type: INT Line 4
+        Id: i Line 4
+      Type: INT Line 4
+        Id: x Line 4
+      Type: INT Line 4
+        Id: k Line 4
+      Assign to: a
+        Id: a Line 5
+        Id: b Line 7
+      Assign to: k
+        Id: k Line 8
+        Id: low Line 8
+      Assign to: x
+        Id: x Line 9
+        Id: a Line 9
+          Id: low Line 9
+      Assign to: i
+        Id: i Line 10
+        Op: +
+          Id: low Line 10
+          Const: 1
+      While
+        Op: <
+          Id: i Line 11
+          Id: high Line 11
+        If
+          Op: <
+            Id: a Line 12
+              Id: i Line 12
+            Id: x Line 12
+          Assign to: x
+            Id: x Line 13
+            Id: a Line 13
+              Id: i Line 13
+          Assign to: k
+            Id: k Line 14
+            Id: i Line 14
+        Assign to: i
+          Id: i Line 16
+          Op: +
+            Id: i Line 16
+            Const: 1
+      Return
+        Id: k Line 18
+  Type: VOID Line 21
+    Id: sort Line 21
+      Type: INT Line 21
+        Id: b Line 21
+      Type: INT Line 21
+        Id: low Line 21
+      Type: INT Line 21
+        Id: high Line 21
+      Type: INT Line 22
+        Id: i Line 22
+      Type: INT Line 22
+        Id: k Line 22
+      Assign to: i
+        Id: i Line 23
+        Id: low Line 23
+      While
+        Op: <=
+          Id: i Line 24
+          Op: -
+            Id: high Line 24
+            Const: 1
+        Type: INT Line 25
+          Id: t Line 25
+        Assign to: k
+          Id: k Line 26
+          Id: minloc Line 26
+            Id: a Line 26
+            Id: i Line 26
+            Id: high Line 26
+        Assign to: t
+          Id: t Line 27
+          Id: a Line 27
+            Id: k Line 27
+        Assign to: a
+          Id: a Line 28
+            Id: k Line 28
+          Id: a Line 28
+            Id: i Line 28
+        Assign to: a
+          Id: a Line 29
+            Id: i Line 29
+          Id: t Line 29
+        Assign to: i
+          Id: i Line 30
+          Op: +
+            Id: i Line 30
+            Const: 1
+  Type: VOID Line 34
+    Id: main Line 34
+      Type: INT Line 36
+        Id: i Line 36
+      Assign to: i
+        Id: i Line 37
+        Const: 0
+      While
+        Op: <
+          Id: i Line 38
+          Const: 10
+        Assign to: vet
+          Id: vet Line 39
+            Id: i Line 39
+          Id: input Line 39
+        Assign to: i
+          Id: i Line 40
+          Op: +
+            Id: i Line 40
+            Const: 1
+      Id: sort Line 42
+        Id: vet Line 42
+        Const: 0
+        Const: 10
+      Assign to: i
+        Id: i Line 43
+        Const: 0
+      While
+        Op: <
+          Id: i Line 44
+          Const: 10
+        Id: output Line 45
+          Assign to: a
+            Id: a Line 45
+            Const: 2
+          Id: ok Line 45
+        Id: output Line 46
+        Assign to: a
+          Id: a Line 47
+          Id: output Line 47
+            Id: a Line 47
+        Id: output Line 48
+          Id: a Line 48
+            Const: 2
+        Assign to: i
+          Id: i Line 49
+          Op: +
+            Id: i Line 49
+            Const: 1

@@ -27,7 +27,7 @@ static TreeNode * factor(void);
 
 static void syntaxError(char * message)
 { fprintf(listing,"\n>>> ");
-  fprintf(listing,"Syntax error at line %d: %s",lineno,message);
+  fprintf(listing,"Syntax error at line %d: %s",line_counter,message);
   Error = TRUE;
 }
 

@@ -30,10 +30,10 @@ extern void fecharArq();
 #endif
 
 /* allocate global variables */
-int lineno = 0;
-FILE * source;
+int line_counter = 0;
+FILE * source = NULL;
 FILE * listing = stdout;
-FILE * code;
+FILE * code = NULL;
 
 /* allocate and set tracing flags */
 int EchoSource = FALSE;

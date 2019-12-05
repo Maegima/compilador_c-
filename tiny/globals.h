@@ -56,14 +56,14 @@ extern FILE* source; /* source code text file */
 extern FILE* listing; /* listing output text file */
 extern FILE* code; /* code text file for TM simulator */
 
-extern int lineno; /* source line number for listing */
+extern int line_counter; /* source line number for listing */
 
 /**************************************************/
 /***********   Syntax tree for parsing ************/
 /**************************************************/
 
 typedef enum {StmtK,ExpK} NodeKind;
-typedef enum {IfK,RepeatK,AssignK,ReadK,WriteK} StmtKind;
+typedef enum {IfK,WhileK,AssignK,ReturnK} StmtKind;
 typedef enum {OpK,ConstK,IdK,TypeK} ExpKind;
 
 /* ExpType is used for type checking */

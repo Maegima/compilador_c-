@@ -13,12 +13,14 @@ using namespace std;
 
 #define YYSTYPE TreeNode *
 static char * savedName; /* for use in assignments */
-static int savedLineNo;  /* ditto */
+static int savedConst;
+int scope = 0;
 static TreeNode * savedTree; /* stores syntax tree for later return */
 
-extern "C" int yylex(void);
+int yylex(void);
 extern int getLineCounter();
 extern char* yytext;
+extern int line_counter;
 
 
 void yyerror(char *);
@@ -57,72 +59,279 @@ declaracao_lista: declaracao_lista declaracao
 }
 | declaracao { $$ = $1; }
 ;
-declaracao: var_declaracao { $$ = $1; } | fun_declaracao { $$ = $1; }
+declaracao: var_declaracao { $$ = $1; scope = 0; } | fun_declaracao { $$ = $1; }
 ;
-var_declaracao: tipo_especificador ID { savedName = copyString(yytext); } SEMICOLON 
+var_declaracao: tipo_especificador identificador SEMICOLON 
 {
     $$ = $1;
-    $$->child[0] = newExpNode(IdK); 
-    $$->child[0]->attr.name = savedName; 
+    $$->child[0] = $2;
 } 
-| tipo_especificador ID { savedName = copyString(yytext); } OBRACT NUM CBRACT SEMICOLON
+| tipo_especificador identificador OBRACT numero CBRACT SEMICOLON 
+{ 
+    $$ = $1;
+    $$->child[0] = $2;
+    $$->child[0]->child[0] = $4;
+} 
+;
+identificador: ID 
+{ 
+    $$ = newExpNode(IdK);
+    $$->attr.name = copyString(yytext);
+}
+;
+numero: NUM 
+{ 
+    $$ = newExpNode(ConstK);
+    $$->attr.val = atoi(yytext);
+}
+;
+tipo_especificador: INT 
+{ 
+    $$ = newExpNode(TypeK);
+    $$->attr.name = (char*) malloc(sizeof(char)*4);
+    memcpy($$->attr.name, "INT\0", 4);
+} 
+| VOID 
+{ 
+    $$ = newExpNode(TypeK);
+    $$->attr.name = (char*) malloc(sizeof(char)*5);
+    memcpy($$->attr.name, "VOID\0", 4); 
+}
+;
+fun_declaracao: tipo_especificador identificador OPAREN params CPAREN composto_decl
 {
     $$ = $1;
-    $$->child[0] = newExpNode(IdK);
-    $$->child[0]->attr.name = savedName; 
-    $$->child[0]->child[0] = newExpNode(ConstK);
-    $$->child[0]->child[0]->attr.val = atoi("10"); 
+    $$->child[0] = $2;
+    $$->child[0]->child[0] = $4;
+    $$->child[0]->child[1] = $6;
+    /*printf("params:\n");
+    printTree($4);
+    printf("compos:\n");
+    printTree($6);*/
+}
+;
+params: param_lista { $$ = $1; } | VOID { $$ = NULL; }
+;
+param_lista: param_lista COMMA param
+{ 
+   YYSTYPE t = $1;
+    if (t != NULL) { 
+        while (t->sibling != NULL)
+            t = t->sibling;
+        t->sibling = $3;
+        $$ = $1; 
+    }
+    else $$ = $3;
+}
+| param { $$ = $1; }
+;
+param: tipo_especificador identificador 
+{  
+    $$ = $1;
+    $$->child[0] = $2;
 } 
+| tipo_especificador identificador OBRACT CBRACT
+{ 
+    $$ = $1;
+    $$->child[0] = $2; 
+}
 ;
-tipo_especificador: INT { $$ = newExpNode(TypeK); } | VOID { $$ = newExpNode(TypeK); }
+composto_decl: OBRACE local_declaracoes statement_lista CBRACE
+{ 
+    YYSTYPE t = $2;
+    if(t != NULL){
+        while(t->sibling != NULL)
+            t = t->sibling;
+        t->sibling = $3;
+        $$ = $2;
+    }
+    else $$ = $3;
+}
 ;
-fun_declaracao: tipo_especificador ID OPAREN params CPAREN composto_decl
+local_declaracoes: local_declaracoes var_declaracao
+{
+
+    YYSTYPE t = $1;
+    if(t != NULL){
+        while(t->sibling != NULL)
+            t = t->sibling;
+        t->sibling = $2;
+        $$ = $1;
+    }
+    else $$ = $2;
+}
+| { $$ = NULL; }
 ;
-params: param_lista | VOID
+statement_lista: statement_lista statement
+{
+    YYSTYPE t = $1;
+    if(t != NULL){
+        while(t->sibling != NULL)
+            t = t->sibling;
+        t->sibling = $2;
+        $$ = $1;
+    }
+    else $$ = $2;
+} 
+| { $$ = NULL; }
 ;
-param_lista: param_lista COMMA param | param
+statement: expressao_decl { $$ = $1; }
+| composto_decl { $$ = $1; }
+| selecao_decl { $$ = $1; }
+| iteracao_decl { $$ = $1; }
+| retorno_decl { $$ = $1; }
 ;
-param: tipo_especificador ID | tipo_especificador ID OBRACT CBRACT
+expressao_decl: expressao SEMICOLON { $$ = $1; }
+| SEMICOLON
 ;
-composto_decl: OBRACE local_declaracoes statement_lista  CBRACE
-;
-local_declaracoes: local_declaracoes var_declaracao |
-;
-statement_lista: statement_lista statement |
-;
-statement: expressao_decl | composto_decl | selecao_decl | iteracao_decl | retorno_decl
-;
-expressao_decl: expressao SEMICOLON | SEMICOLON
-;
-selecao_decl: IF OPAREN expressao CPAREN statement | ID OPAREN expressao CPAREN statement ELSE statement
+selecao_decl: IF OPAREN expressao CPAREN statement 
+{ 
+    $$ = newStmtNode(IfK);
+    $$->child[0] = $3;
+    $$->child[1] = $5;
+}
+| IF OPAREN expressao CPAREN statement ELSE statement
+{ 
+    $$ = newStmtNode(IfK);
+    $$->child[0] = $3;
+    $$->child[1] = $5;
+    $$->child[2] = $7;
+}
 ;
 iteracao_decl: WHILE OPAREN expressao CPAREN statement
+{
+    $$ = newStmtNode(WhileK);
+    $$->child[0] = $3;
+    $$->child[1] = $5;
+}
 ;
 retorno_decl: RETURN SEMICOLON | RETURN expressao SEMICOLON
+{
+    $$ = newStmtNode(ReturnK);
+    $$->child[0] = $2;
+}
 ;
-expressao: var ATRIB expressao | simples_expressao
+expressao: var ATRIB expressao
+{
+    $$ = newStmtNode(AssignK);
+    $$->attr.name = $1->attr.name;
+    $$->child[0] = $1;
+    $$->child[1] = $3;
+} 
+| simples_expressao { $$ = $1; }
 ;
-var: ID | ID OBRACT expressao CBRACT
+var: identificador { $$ = $1; } 
+| identificador OBRACT expressao CBRACT
+{
+    $$ = $1;
+    $$->child[0] = $3;
+}
 ;
-simples_expressao: soma_expressao relacional soma_expressao | soma_expressao
+simples_expressao: soma_expressao relacional soma_expressao 
+{
+    $$ = $2;
+    $$->child[0] = $1;
+    $$->child[1] = $3;
+}
+| soma_expressao { $$ = $1; }
 ;
-relacional: SLTE | SLT | SGT | SGTE | EQUAL | DIFFERENT
+relacional: SLTE 
+{ 
+    $$ = newExpNode(OpK);
+    $$->attr.op = SLTE; 
+} 
+| SLT 
+{ 
+    $$ = newExpNode(OpK);
+    $$->attr.op = SLT;
+} 
+| SGT 
+{
+    $$ = newExpNode(OpK);
+    $$->attr.op = SGT;
+} 
+| SGTE 
+{
+    $$ = newExpNode(OpK);
+    $$->attr.op = SGTE; 
+} 
+| EQUAL 
+{
+    $$ = newExpNode(OpK);
+    $$->attr.op = EQUAL;
+} 
+| DIFFERENT 
+{
+    $$ = newExpNode(OpK);
+    $$->attr.op = DIFFERENT;
+} 
 ;
-soma_expressao: soma_expressao soma termo | termo
+soma_expressao: soma_expressao soma termo
+{
+    $$ = $2;
+    $$->child[0] = $1;
+    $$->child[1] = $3;
+} 
+| termo { $$ = $1; }
 ;
-soma: ADD | SUB
+soma: ADD
+{ 
+    $$ = newExpNode(OpK);
+    $$->attr.op = ADD; 
+} 
+| SUB 
+{ 
+    $$ = newExpNode(OpK);
+    $$->attr.op = SUB; 
+}
 ;
-termo: termo mult fator | fator
+termo: termo mult fator
+{
+    $$ = $2;
+    $$->child[0] = $1;
+    $$->child[1] = $3;
+}  
+| fator { $$ = $1; }
 ;
-mult: MULT | DIV
 ;
-fator: OPAREN expressao CPAREN | var | ativacao | NUM
+mult: MULT
+{ 
+    $$ = newExpNode(OpK);
+    $$->attr.op = MULT; 
+} 
+| DIV
+{ 
+    $$ = newExpNode(OpK);
+    $$->attr.op = DIV; 
+} 
 ;
-ativacao: ID OPAREN simples_expressao CPAREN | ID OPAREN args CPAREN
+fator: OPAREN expressao CPAREN { $$ = $2; } | var { $$ = $1; } | ativacao { $$ = $1; } | numero { $$ = $1; }
 ;
-args: arg_lista |
+ativacao: identificador OPAREN simples_expressao CPAREN 
+{ 
+    $$ = $1;
+    $$->child[0] = $3;
+} 
+| identificador OPAREN args CPAREN 
+{ 
+    $$ = $1; 
+    $$->child[0] = $3;
+}
 ;
-arg_lista: arg_lista COMMA expressao | expressao
+args: arg_lista { $$ = $1; } | { $$ = NULL; }
+;
+arg_lista: arg_lista COMMA expressao
+{
+    YYSTYPE t = $1;
+    if(t != NULL){
+        while(t->sibling != NULL)
+            t = t->sibling;
+        t->sibling = $3;
+        $$ = $1;
+    }
+    else $$ = $3;
+}
+| expressao { $$ = $1; }
 ;
 %%
 
@@ -135,8 +344,8 @@ void yyerror(char * msg)
 /* yylex calls getToken to make Yacc/Bison output
  * compatible with ealier versions of the TINY scanner
  */
-/*static int yylex(void)
-{ return getToken(); }*/
+int yylex(void)
+{ return getToken(); }
 
 TreeNode * parse(void)
 { yyparse();

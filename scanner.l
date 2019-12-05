@@ -48,18 +48,17 @@ extern YYSTYPE yylval;
 #define ERR                 331
 #define IGN                 332
 */
-int line_counter = 1;
 
 int getLineCounter(){
     return line_counter;
 }
 
 void abrirArq(){
-  yyin = fopen("entrada.txt", "r");
+  source = fopen("entrada.txt", "r");
 }
 
 void fecharArq(){
-    fclose(yyin);
+    fclose(source);
 }
 
 int FreakShow (){
@@ -110,26 +109,6 @@ while                                 return WHILE;
 {LETTER}+({LETTER}|{DIGIT}|{OTHER})*  return FreakShow();
 {OTHER}+({LETTER}|{DIGIT})*{OTHER}*   return FreakShow();
 %%
-
-TokenType getToken(void)
-{ static int firstTime = TRUE;
-  TokenType currentToken;
-  if (firstTime)
-  { firstTime = FALSE;
-    lineno++;
-    yyin = source;
-    yyout = listing;
-  }
-  currentToken = yylex();
-  strncpy(tokenString,yytext,MAXTOKENLEN);
-  if (TraceScan) {
-    fprintf(listing,"\t%d: ",lineno);
-    printToken(currentToken,tokenString);
-  }
-  return currentToken;
-}
-
-
 
 // int main(int argc, char *argv[])
 // {
@@ -201,3 +180,23 @@ TokenType getToken(void)
 //   }
 //   return(0);
 // }
+
+TokenType getToken(void)
+{ 
+    static int firstTime = TRUE;
+    TokenType currentToken = 0;
+    if (firstTime)
+    { 
+        firstTime = FALSE;
+        line_counter++;
+        yyin = source;
+        yyout = listing;
+    }
+    currentToken = yylex();
+    strncpy(tokenString,yytext,MAXTOKENLEN);
+    if (TraceScan) {
+        fprintf(listing,"\t%d: ",line_counter);
+        printToken(currentToken,tokenString);
+    }
+    return currentToken;
+}

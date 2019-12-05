@@ -23,7 +23,11 @@ void printToken( TokenType token, const char* tokenString )
       break;
     case ATRIB: fprintf(listing,":=\n"); break;
     case SLT: fprintf(listing,"<\n"); break;
+    case SLTE: fprintf(listing,"<=\n"); break;
+    case SGT: fprintf(listing,">\n"); break;
+    case SGTE: fprintf(listing,"<=\n"); break;
     case EQUAL: fprintf(listing,"=\n"); break;
+    case DIFFERENT: fprintf(listing,"!=\n"); break;
     case OPAREN: fprintf(listing,"(\n"); break;
     case CPAREN: fprintf(listing,")\n"); break;
     case SEMICOLON: fprintf(listing,";\n"); break;
@@ -56,13 +60,13 @@ TreeNode * newStmtNode(StmtKind kind)
 { TreeNode * t = (TreeNode *) malloc(sizeof(TreeNode));
   int i;
   if (t==NULL)
-    fprintf(listing,"Out of memory error at line %d\n",lineno);
+    fprintf(listing,"Out of memory error at line %d\n",line_counter);
   else {
     for (i=0;i<MAXCHILDREN;i++) t->child[i] = NULL;
     t->sibling = NULL;
     t->nodekind = StmtK;
     t->kind.stmt = kind;
-    t->lineno = lineno;
+    t->lineno = line_counter;
   }
   return t;
 }
@@ -74,13 +78,13 @@ TreeNode * newExpNode(ExpKind kind)
 { TreeNode * t = (TreeNode *) malloc(sizeof(TreeNode));
   int i;
   if (t==NULL)
-    fprintf(listing,"Out of memory error at line %d\n",lineno);
+    fprintf(listing,"Out of memory error at line %d\n",line_counter);
   else {
     for (i=0;i<MAXCHILDREN;i++) t->child[i] = NULL;
     t->sibling = NULL;
     t->nodekind = ExpK;
     t->kind.exp = kind;
-    t->lineno = lineno;
+    t->lineno = line_counter;
     t->type = Void;
   }
   return t;
@@ -96,7 +100,7 @@ char * copyString(char * s)
   n = strlen(s)+1;
   t = (char*) malloc(n);
   if (t==NULL)
-    fprintf(listing,"Out of memory error at line %d\n",lineno);
+    fprintf(listing,"Out of memory error at line %d\n",line_counter);
   else strcpy(t,s);
   return t;
 }
@@ -130,17 +134,14 @@ void printTree( TreeNode * tree )
         case IfK:
           fprintf(listing,"If\n");
           break;
-        case RepeatK:
-          fprintf(listing,"Repeat\n");
+        case WhileK:
+          fprintf(listing,"While\n");
           break;
         case AssignK:
           fprintf(listing,"Assign to: %s\n",tree->attr.name);
           break;
-        case ReadK:
-          fprintf(listing,"Read: %s\n",tree->attr.name);
-          break;
-        case WriteK:
-          fprintf(listing,"Write\n");
+        case ReturnK:
+          fprintf(listing,"Return\n");
           break;
         default:
           fprintf(listing,"Unknown ExpNode kind\n");
@@ -157,10 +158,10 @@ void printTree( TreeNode * tree )
           fprintf(listing,"Const: %d\n",tree->attr.val);
           break;
         case IdK:
-          fprintf(listing,"Id: %s\n",tree->attr.name);
+          fprintf(listing,"Id: %s Line %d\n",tree->attr.name, tree->lineno);
           break;
         case TypeK:
-          fprintf(listing,"Type: %s\n",tree->attr.name);
+          fprintf(listing,"Type: %s Line %d\n",tree->attr.name, tree->lineno);
           break;
         default:
           fprintf(listing,"Unknown ExpNode kind\n");
