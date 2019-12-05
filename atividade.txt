@@ -1,0 +1,4 @@
+--> Preparar uma entrada para o bison
+O bison (arquivo.y) para gerar um parser lara a linguagem c-, Usar a GLC pronta para o C- (vide no arquivo de descrição do projeto, disponivel no moodle.
+--> Usar o arquivo.l já criado para o analizador léxico de c-.
+--> Lembre-se que arquivos .y e .l trabalham de forma integrada.
