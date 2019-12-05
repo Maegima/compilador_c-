@@ -32,7 +32,7 @@ extern void fecharArq();
 /* allocate global variables */
 int lineno = 0;
 FILE * source;
-FILE * listing;
+FILE * listing = stdout;
 FILE * code;
 
 /* allocate and set tracing flags */
@@ -45,9 +45,11 @@ int TraceCode = FALSE;
 int Error = FALSE;
 
 int main(){
+  TreeNode *raiz;
   cout << "\nParser em execução...\n";
   abrirArq();
-  parse();
+  raiz = parse();
+  printTree(raiz);
   fecharArq();
   return 0;
 }

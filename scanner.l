@@ -7,6 +7,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "parser.tab.h"
+#include "tiny/globals.h"
+#include "tiny/util.h"
+#include "tiny/scan.h"
+/* lexeme of identifier or reserved word */
+char tokenString[MAXTOKENLEN+1];
 extern YYSTYPE yylval;
 /*
 #define IF                  300
@@ -105,6 +110,24 @@ while                                 return WHILE;
 {LETTER}+({LETTER}|{DIGIT}|{OTHER})*  return FreakShow();
 {OTHER}+({LETTER}|{DIGIT})*{OTHER}*   return FreakShow();
 %%
+
+TokenType getToken(void)
+{ static int firstTime = TRUE;
+  TokenType currentToken;
+  if (firstTime)
+  { firstTime = FALSE;
+    lineno++;
+    yyin = source;
+    yyout = listing;
+  }
+  currentToken = yylex();
+  strncpy(tokenString,yytext,MAXTOKENLEN);
+  if (TraceScan) {
+    fprintf(listing,"\t%d: ",lineno);
+    printToken(currentToken,tokenString);
+  }
+  return currentToken;
+}
 
 
 

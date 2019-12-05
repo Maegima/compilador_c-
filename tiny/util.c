@@ -15,26 +15,22 @@
 void printToken( TokenType token, const char* tokenString )
 { switch (token)
   { case IF:
-    case THEN:
     case ELSE:
-    case END:
-    case REPEAT:
-    case UNTIL:
-    case READ:
-    case WRITE:
+    case RETURN:
+    case WHILE:
       fprintf(listing,
          "reserved word: %s\n",tokenString);
       break;
-    case ASSIGN: fprintf(listing,":=\n"); break;
-    case LT: fprintf(listing,"<\n"); break;
-    case EQ: fprintf(listing,"=\n"); break;
-    case LPAREN: fprintf(listing,"(\n"); break;
-    case RPAREN: fprintf(listing,")\n"); break;
-    case SEMI: fprintf(listing,";\n"); break;
-    case PLUS: fprintf(listing,"+\n"); break;
-    case MINUS: fprintf(listing,"-\n"); break;
-    case TIMES: fprintf(listing,"*\n"); break;
-    case OVER: fprintf(listing,"/\n"); break;
+    case ATRIB: fprintf(listing,":=\n"); break;
+    case SLT: fprintf(listing,"<\n"); break;
+    case EQUAL: fprintf(listing,"=\n"); break;
+    case OPAREN: fprintf(listing,"(\n"); break;
+    case CPAREN: fprintf(listing,")\n"); break;
+    case SEMICOLON: fprintf(listing,";\n"); break;
+    case ADD: fprintf(listing,"+\n"); break;
+    case SUB: fprintf(listing,"-\n"); break;
+    case MULT: fprintf(listing,"*\n"); break;
+    case DIV: fprintf(listing,"/\n"); break;
     case ENDFILE: fprintf(listing,"EOF\n"); break;
     case NUM:
       fprintf(listing,
@@ -44,7 +40,7 @@ void printToken( TokenType token, const char* tokenString )
       fprintf(listing,
           "ID, name= %s\n",tokenString);
       break;
-    case ERROR:
+    case ERR:
       fprintf(listing,
           "ERROR: %s\n",tokenString);
       break;
@@ -98,7 +94,7 @@ char * copyString(char * s)
   char * t;
   if (s==NULL) return NULL;
   n = strlen(s)+1;
-  t = malloc(n);
+  t = (char*) malloc(n);
   if (t==NULL)
     fprintf(listing,"Out of memory error at line %d\n",lineno);
   else strcpy(t,s);
@@ -108,7 +104,7 @@ char * copyString(char * s)
 /* Variable indentno is used by printTree to
  * store current number of spaces to indent
  */
-static indentno = 0;
+static int indentno = 0;
 
 /* macros to increase/decrease indentation */
 #define INDENT indentno+=2
@@ -162,6 +158,9 @@ void printTree( TreeNode * tree )
           break;
         case IdK:
           fprintf(listing,"Id: %s\n",tree->attr.name);
+          break;
+        case TypeK:
+          fprintf(listing,"Type: %s\n",tree->attr.name);
           break;
         default:
           fprintf(listing,"Unknown ExpNode kind\n");

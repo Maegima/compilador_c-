@@ -18,28 +18,25 @@ static TreeNode * savedTree; /* stores syntax tree for later return */
 
 extern "C" int yylex(void);
 extern int getLineCounter();
+extern char* yytext;
 
 
 void yyerror(char *);
 %}
 
 %start programa
-%token IF            
-%token ELSE          
+%token IF ELSE WHILE         
 %token INT VOID           
 %token RETURN               
-%token WHILE         
 %left ADD SUB           
 %left MULT DIV           
 %token SLT SLTE SGT SGTE EQUAL DIFFERENT     
 %token ATRIB                       
+%token OPAREN CPAREN
 %token OBRACT CBRACT        
 %token OBRACE CBRACE        
-%token OPAREN CPAREN
-%token ID            
-%token NUM         
-%token SEMICOLON
-%token COMMA
+%token ID NUM         
+%token SEMICOLON COMMA
 %token OCOM CCOM                              
 %token COM           
 %token ERR                      
@@ -62,9 +59,22 @@ declaracao_lista: declaracao_lista declaracao
 ;
 declaracao: var_declaracao { $$ = $1; } | fun_declaracao { $$ = $1; }
 ;
-var_declaracao: tipo_especificador ID SEMICOLON | tipo_especificador ID OBRACT NUM CBRACT SEMICOLON
+var_declaracao: tipo_especificador ID { savedName = copyString(yytext); } SEMICOLON 
+{
+    $$ = $1;
+    $$->child[0] = newExpNode(IdK); 
+    $$->child[0]->attr.name = savedName; 
+} 
+| tipo_especificador ID { savedName = copyString(yytext); } OBRACT NUM CBRACT SEMICOLON
+{
+    $$ = $1;
+    $$->child[0] = newExpNode(IdK);
+    $$->child[0]->attr.name = savedName; 
+    $$->child[0]->child[0] = newExpNode(ConstK);
+    $$->child[0]->child[0]->attr.val = atoi("10"); 
+} 
 ;
-tipo_especificador: INT | VOID
+tipo_especificador: INT { $$ = newExpNode(TypeK); } | VOID { $$ = newExpNode(TypeK); }
 ;
 fun_declaracao: tipo_especificador ID OPAREN params CPAREN composto_decl
 ;
@@ -116,14 +126,19 @@ arg_lista: arg_lista COMMA expressao | expressao
 ;
 %%
 
-TreeNode * parse(void)
-{ yyparse();
-  return savedTree;
-}
-
 void yyerror(char * msg)
 {
   extern char* yytext;
   cout << msg << ": " << yytext << " " << yylval << " " << yychar << " line " << getLineCounter() << endl;
 }
 
+/* yylex calls getToken to make Yacc/Bison output
+ * compatible with ealier versions of the TINY scanner
+ */
+/*static int yylex(void)
+{ return getToken(); }*/
+
+TreeNode * parse(void)
+{ yyparse();
+  return savedTree;
+}
