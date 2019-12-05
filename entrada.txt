@@ -2,9 +2,6 @@ int a [11230];
 
 int minloc ( int a[], int low, int high )
 {	int i; int x; int k;
-	a 
-    =
-    b;
     k = low;
 	x = a[low];
 	i = low + 1;
@@ -34,6 +31,14 @@ void sort( int b[], int low, int high)
 void main(void)
 {
 	int i;
+    int i;
+    int
+
+    i
+    ;
+    int 
+    a
+    ;
 	i = 0;
 	while (i < 10){
 		vet[i] = input();

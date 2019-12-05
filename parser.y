@@ -13,12 +13,12 @@ using namespace std;
 
 #define YYSTYPE TreeNode *
 static char * savedName; /* for use in assignments */
-static int savedConst;
-int scope = 0;
+static char * scope;
+static int sc = 1;
+static int savedLine;
 static TreeNode * savedTree; /* stores syntax tree for later return */
 
 int yylex(void);
-extern int getLineCounter();
 extern char* yytext;
 extern int line_counter;
 
@@ -59,24 +59,33 @@ declaracao_lista: declaracao_lista declaracao
 }
 | declaracao { $$ = $1; }
 ;
-declaracao: var_declaracao { $$ = $1; scope = 0; } | fun_declaracao { $$ = $1; }
+declaracao: var_declaracao { sc = 1; $$ = $1; } | fun_declaracao { sc = 1; $$ = $1; }
 ;
 var_declaracao: tipo_especificador identificador SEMICOLON 
 {
     $$ = $1;
     $$->child[0] = $2;
+    $2->decl_line = $2->lineno;
 } 
 | tipo_especificador identificador OBRACT numero CBRACT SEMICOLON 
 { 
     $$ = $1;
     $$->child[0] = $2;
     $$->child[0]->child[0] = $4;
+    $2->decl_line = $2->lineno;
 } 
 ;
 identificador: ID 
 { 
     $$ = newExpNode(IdK);
     $$->attr.name = copyString(yytext);
+    if(sc){
+        scope = copyString($$->attr.name);
+        $$->scope = (char*) malloc(sizeof(char)*7);
+        memcpy($$->scope, "GLOBAL\0", 7);
+        sc = 0;
+    }
+    else $$->scope = scope;
 }
 ;
 numero: NUM 
@@ -104,6 +113,7 @@ fun_declaracao: tipo_especificador identificador OPAREN params CPAREN composto_d
     $$->child[0] = $2;
     $$->child[0]->child[0] = $4;
     $$->child[0]->child[1] = $6;
+    $2->decl_line = $2->lineno;
     /*printf("params:\n");
     printTree($4);
     printf("compos:\n");
@@ -129,11 +139,13 @@ param: tipo_especificador identificador
 {  
     $$ = $1;
     $$->child[0] = $2;
+    $2->decl_line = line_counter;
 } 
 | tipo_especificador identificador OBRACT CBRACT
 { 
     $$ = $1;
     $$->child[0] = $2; 
+    $2->decl_line = line_counter;
 }
 ;
 composto_decl: OBRACE local_declaracoes statement_lista CBRACE
@@ -150,7 +162,6 @@ composto_decl: OBRACE local_declaracoes statement_lista CBRACE
 ;
 local_declaracoes: local_declaracoes var_declaracao
 {
-
     YYSTYPE t = $1;
     if(t != NULL){
         while(t->sibling != NULL)
@@ -215,6 +226,7 @@ expressao: var ATRIB expressao
 {
     $$ = newStmtNode(AssignK);
     $$->attr.name = $1->attr.name;
+    $$->scope = scope;
     $$->child[0] = $1;
     $$->child[1] = $3;
 } 
@@ -338,7 +350,7 @@ arg_lista: arg_lista COMMA expressao
 void yyerror(char * msg)
 {
   extern char* yytext;
-  cout << msg << ": " << yytext << " " << yylval << " " << yychar << " line " << getLineCounter() << endl;
+  cout << msg << ": " << yytext << " " << yylval << " " << yychar << " line " << line_counter << endl;
 }
 
 /* yylex calls getToken to make Yacc/Bison output

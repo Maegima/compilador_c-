@@ -49,10 +49,6 @@ extern YYSTYPE yylval;
 #define IGN                 332
 */
 
-int getLineCounter(){
-    return line_counter;
-}
-
 void abrirArq(){
   source = fopen("entrada.txt", "r");
 }

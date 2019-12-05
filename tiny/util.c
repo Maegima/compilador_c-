@@ -67,6 +67,7 @@ TreeNode * newStmtNode(StmtKind kind)
     t->nodekind = StmtK;
     t->kind.stmt = kind;
     t->lineno = line_counter;
+    t->decl_line = -1;
   }
   return t;
 }
@@ -86,6 +87,7 @@ TreeNode * newExpNode(ExpKind kind)
     t->kind.exp = kind;
     t->lineno = line_counter;
     t->type = Void;
+    t->decl_line = -1;
   }
   return t;
 }

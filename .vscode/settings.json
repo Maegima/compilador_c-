@@ -3,6 +3,7 @@
         "iostream": "cpp",
         "globals.h": "c",
         "util.h": "c",
-        "parser.tab.h": "c"
+        "parser.tab.h": "c",
+        "symtab.h": "c"
     }
 }

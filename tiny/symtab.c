@@ -48,6 +48,7 @@ typedef struct LineListRec
 typedef struct BucketListRec
    { char * name;
      LineList lines;
+     LineList decl_line;
      int memloc ; /* memory location for variable */
      struct BucketListRec * next;
    } * BucketList;
@@ -60,7 +61,7 @@ static BucketList hashTable[SIZE];
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert( char * name, int lineno, int loc )
+void st_insert( char * name, int lineno, int decl_line, int loc )
 { int h = hash(name);
   BucketList l =  hashTable[h];
   while ((l != NULL) && (strcmp(name,l->name) != 0))
@@ -72,6 +73,12 @@ void st_insert( char * name, int lineno, int loc )
     l->lines->lineno = lineno;
     l->memloc = loc;
     l->lines->next = NULL;
+    if(decl_line > -1){
+        l->decl_line = (LineList) malloc(sizeof(struct LineListRec));
+        l->decl_line->lineno = decl_line;
+        l->decl_line->next = NULL;
+    }
+    else l->decl_line = NULL;
     l->next = hashTable[h];
     hashTable[h] = l; }
   else /* found in table, so just add line number */
@@ -80,6 +87,26 @@ void st_insert( char * name, int lineno, int loc )
     t->next = (LineList) malloc(sizeof(struct LineListRec));
     t->next->lineno = lineno;
     t->next->next = NULL;
+    if(decl_line > -1){
+        LineList p;
+        p = (LineList) malloc(sizeof(struct LineListRec));
+        p->lineno = decl_line;
+        p->next = NULL;
+        t = l->decl_line;
+        if(t != NULL){
+            while (t->next != NULL) t = t->next;
+            t->next = p;
+        }
+        else l->decl_line = p;
+        
+
+        //t = l->decl_line;
+        //while (t != NULL){ 
+        //    printf("%d ", t->lineno);
+        //    t = t->next;
+        //}
+        //printf("\n");
+    }
   }
 } /* st_insert */
 
@@ -100,16 +127,48 @@ int st_lookup ( char * name )
  * to the listing file
  */
 void printSymTab(FILE * listing)
-{ int i;
-  fprintf(listing,"Variable Name  Location   Line Numbers\n");
-  fprintf(listing,"-------------  --------   ------------\n");
+{ int i, padding = 2, count;
   for (i=0;i<SIZE;++i)
   { if (hashTable[i] != NULL)
     { BucketList l = hashTable[i];
       while (l != NULL)
-      { LineList t = l->lines;
+      { 
+        count = 0;
+        LineList s = l->decl_line;
+        while (s != NULL){
+            count++;
+            s = s->next;
+        }
+        padding = (count > padding) ? count : padding;
+        l = l->next;
+      }
+    }
+  }
+  fprintf(listing,"Variable Name  Location  Declaration");
+  for(int j = 2; j < padding; j++) fprintf(listing, "     "); 
+  fprintf(listing, "  Line Numbers\n");
+  fprintf(listing,"-------------  --------  -----------");
+  for(int j = 2; j < padding; j++) fprintf(listing, "-----");
+  fprintf(listing,"  -------------\n");
+  for (i=0;i<SIZE;++i)
+  { if (hashTable[i] != NULL)
+    { BucketList l = hashTable[i];
+      while (l != NULL)
+      { 
+        LineList t = l->lines;
+        LineList r = l->decl_line;
         fprintf(listing,"%-14s ",l->name);
         fprintf(listing,"%-8d  ",l->memloc);
+        for(int j = 0; j < padding; j++){
+            if(r != NULL){
+                fprintf(listing, "%-4d ", r->lineno);
+                r = r->next;
+            }
+            else{
+                fprintf(listing, "     ");
+            }
+        }
+        fprintf(listing, " ");
         while (t != NULL)
         { fprintf(listing,"%4d ",t->lineno);
           t = t->next;

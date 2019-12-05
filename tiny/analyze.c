@@ -41,22 +41,39 @@ static void nullProc(TreeNode * t)
   else return;
 }
 
+char *idScopeName(const char* scope, const char *name){
+    char *scopeName;
+    int len1, len2;
+    len1 = strlen(scope);
+    len2 = strlen(name);
+    scopeName = (char*) malloc(sizeof(char)*(len1+len2+2));
+    memcpy(scopeName, scope, len1);
+    memcpy(scopeName+len1, " ", 1);
+    memcpy(scopeName+len1+1, name, len2+1);
+    return scopeName;
+}
+
 /* Procedure insertNode inserts 
  * identifiers stored in t into 
  * the symbol table 
  */
 static void insertNode( TreeNode * t){ 
+    char *name;
+    int n;
     switch (t->nodekind){ 
         case StmtK:
         switch (t->kind.stmt){ 
             case AssignK:
-            if (st_lookup(t->attr.name) == -1)
-            /* not yet in table, so treat as new definition */
-                st_insert(t->attr.name,t->lineno,location++);
-            else
-            /* already in table, so ignore location, 
-                add line number of use only */ 
-                st_insert(t->attr.name,t->lineno,0);
+            // name = idScopeName(name, t->attr.name);
+            // if (st_lookup(name) == -1)
+            // /* not yet in table, so treat as new definition */
+            //     st_insert(name,t->lineno,location++);
+            // else{
+            // /* already in table, so ignore location, 
+            //     add line number of use only */ 
+            //     st_insert(name,t->lineno,0);
+            //     free(name);
+            // }
             break;
             case ReturnK:
             case IfK:
@@ -67,13 +84,14 @@ static void insertNode( TreeNode * t){
         case ExpK:
         switch (t->kind.exp){ 
             case IdK:
-                if (st_lookup(t->attr.name) == -1)
+                name = idScopeName(t->scope, t->attr.name);
+                if (st_lookup(name) == -1)
                 /* not yet in table, so treat as new definition */
-                    st_insert(t->attr.name,t->lineno,location++);
+                    st_insert(name,t->lineno,t->decl_line,location++);
                 else
                 /* already in table, so ignore location, 
                     add line number of use only */ 
-                    st_insert(t->attr.name,t->lineno,0);
+                    st_insert(name,t->lineno,t->decl_line,0);
             break;
             case ConstK:
             case TypeK:
@@ -90,7 +108,6 @@ static void insertNode( TreeNode * t){
  */
 void buildSymtab(TreeNode * syntaxTree)
 { 
-    fprintf(listing,"\nBuild Symbol table:\n\n");
     traverse(syntaxTree,insertNode,nullProc);
     if (TraceAnalyze)
     { 
