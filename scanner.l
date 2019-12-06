@@ -49,8 +49,8 @@ extern YYSTYPE yylval;
 #define IGN                 332
 */
 
-void abrirArq(){
-  source = fopen("entrada.txt", "r");
+void abrirArq(char *arq){
+  source = fopen(arq, "r");
 }
 
 void fecharArq(){

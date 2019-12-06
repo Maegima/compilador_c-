@@ -1,4 +1,4 @@
-int a [11230];
+int a[12345];
 
 int minloc ( int a[], int low, int high )
 {	int i; int x; int k;
@@ -10,6 +10,9 @@ int minloc ( int a[], int low, int high )
 			x = a[i];
 			k = i;
 		}
+        else{
+            x = x + x;
+        }
 		i = i + 1;
 	}
 	return k;
@@ -31,6 +34,7 @@ void sort( int b[], int low, int high)
 void main(void)
 {
 	int i;
+    int vet[10];
 	i = 0;
 	while (i < 10){
 		vet[i] = input();
@@ -39,9 +43,6 @@ void main(void)
 	sort(vet,0,10);
 	i = 0;
 	while (i < 10){
-		output(a = 2, ok);
-        output();
-        a = output(a);
         output(a[2]);
 		i = i + 1;
 	}

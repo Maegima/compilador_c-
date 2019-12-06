@@ -270,17 +270,21 @@ void notVoidVariable(FILE * listing){
 
 void variableNotDeclared(FILE * listing){ 
     int i;
+    char *name;
     for (i = 0; i < SIZE; i++){ 
         if (hashTable[i] != NULL){ 
             BucketList l = hashTable[i];
             while (l != NULL){ 
                 LineList s = l->lines;
                 while (s != NULL){
+                    name = idScopeName("GLOBAL", l->idName);
                     if(!l->decl_line && !l->func){
-                        fprintf(listing,"erro no escopo ");
-                        printScope(l->name, listing);
-                        fprintf(listing," na linha %d: variável %s não declarada.\n",
-                        s->lineno, l->idName);
+                        if(st_lookup(name) == -1){
+                            fprintf(listing,"erro no escopo ");
+                            printScope(l->name, listing);
+                            fprintf(listing," na linha %d: variável %s não declarada.\n",
+                            s->lineno, l->idName);
+                        }
                     }
                     s = s->next;
                 }

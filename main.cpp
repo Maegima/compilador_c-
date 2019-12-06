@@ -1,9 +1,8 @@
 #include <iostream>
 using namespace std;
 
-extern void abrirArq();
+extern void abrirArq(char *arq);
 extern void fecharArq();
-
 #include "tiny/globals.h"
 
 /* set NO_PARSE to TRUE to get a scanner-only compiler */
@@ -46,14 +45,17 @@ int Error = FALSE;
 
 extern void semantical(FILE *listing);
 
-int main(){
+int main(int argc, char **argv){
   TreeNode *raiz;
   cout << "\nParser em execução...\n";
-  abrirArq();
+  if(argc < 3) return 1; 
+  abrirArq(argv[1]);
+  code = fopen(argv[2], "w");
   raiz = parse();
   printTree(raiz);
   buildSymtab(raiz);
   semantical(listing);
+  codeGen(raiz, argv[2]);
   fecharArq();
   return 0;
 }

@@ -74,7 +74,7 @@ typedef enum {Void,Integer} ExpType;
 typedef struct treeNode
    { struct treeNode * child[MAXCHILDREN];
      struct treeNode * sibling;
-     int lineno, decl_line, func, atrib;
+     int lineno, decl_line, func, atrib, decl;
      NodeKind nodekind;
      char *scope;
      union { StmtKind stmt; ExpKind exp;} kind;

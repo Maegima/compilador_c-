@@ -12,12 +12,12 @@
 /* Procedure emitComment prints a comment line 
  * with comment c in the code file
  */
-void emitComment( char * c )
+void emitComment(const char * c )
 { if (TraceCode) fprintf(code,"* %s\n",c);}
 
-/* Procedure emit emit Quadruple prints a 
+/* Procedure emitQuadruple prints a 
  * quadruple.
  */
-void emitQuadruple(char *op, char *first, char *second, char *third){
+void emitQuadruple(const char *op,const char *first, const char *second, const char *third){
     fprintf(code,"(%s, %s, %s, %s)\n", op, first, second, third);
 }

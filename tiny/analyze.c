@@ -128,6 +128,16 @@ static void insertNode( TreeNode * t){
  */
 void buildSymtab(TreeNode * syntaxTree)
 { 
+    char *input = (char*) malloc(sizeof(char)*6);
+    char *output = (char*) malloc(sizeof(char)*7);
+    char *G_input = (char*) malloc(sizeof(char)*13);
+    char *G_output = (char*) malloc(sizeof(char)*14);
+    memcpy(input, "input\0", sizeof(char)*6);
+    memcpy(output, "output\0", sizeof(char)*7);
+    memcpy(G_input, "GLOBAL input\0", sizeof(char)*13);
+    memcpy(G_output, "GLOBAL output\0", sizeof(char)*14); 
+    st_insert(G_input,input,0,0,Integer,1,-1,location++);
+    st_insert(G_output,output,0,0,Void,1,-1,location++);
     traverse(syntaxTree,insertNode,nullProc);
     if (TraceAnalyze)
     { 
@@ -136,7 +146,7 @@ void buildSymtab(TreeNode * syntaxTree)
     }
 }
 
-static void typeError(TreeNode * t, char * message)
+static void typeError(TreeNode * t, const char * message)
 { fprintf(listing,"Type error at line %d: %s\n",t->lineno,message);
   Error = TRUE;
 }

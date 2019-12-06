@@ -14,17 +14,27 @@ using namespace std;
 #define YYSTYPE TreeNode *
 static char * savedName; /* for use in assignments */
 static char * scope;
-static char * func[256];
-static ExpType type[256];
-static int id = 0;
 static int sc = 1;
+int func_id = 0;
+char * func[256];
+ExpType type[256];
 static int savedLine;
 static TreeNode * savedTree; /* stores syntax tree for later return */
 
 int yylex(void);
 extern char* yytext;
 extern int line_counter;
+void yyerror(const char *msg);
 
+void init_parse(){
+    func[0] = (char*) malloc(sizeof(char)*6);
+    func[1] = (char*)  malloc(sizeof(char)*7);
+    memcpy(func[0], "input\0", sizeof(char)*6);
+    memcpy(func[1], "output\0", sizeof(char)*7);
+    type[0] = Integer;
+    type[1] = Void;
+    func_id = 2;
+}
 
 void yyerror(char *);
 %}
@@ -70,6 +80,8 @@ var_declaracao: tipo_especificador identificador SEMICOLON
     $$->child[0] = $2;
     $2->decl_line = $2->lineno;
     $2->type = $1->type;
+    $2->decl = 1;
+    $1->decl = 1;
 } 
 | tipo_especificador identificador OBRACT numero CBRACT SEMICOLON 
 { 
@@ -78,6 +90,8 @@ var_declaracao: tipo_especificador identificador SEMICOLON
     $$->child[0]->child[0] = $4;
     $2->decl_line = $2->lineno;
     $2->type = $1->type;
+    $2->decl = 1;
+    $1->decl = 1;
 } 
 ;
 identificador: ID 
@@ -123,10 +137,12 @@ fun_declaracao: tipo_especificador identificador OPAREN params CPAREN composto_d
     $$->child[0]->child[1] = $6;
     $2->decl_line = $2->lineno;
     $2->type = $1->type;
+    if(func_id < 2) init_parse();
     $2->func = 1;
-    func[id] = $2->attr.name;
-    type[id] = $2->type;
-    id++;
+    $2->decl = 1;
+    func[func_id] = $2->attr.name;
+    type[func_id] = $2->type;
+    func_id++;
     /*printf("params:\n");
     printTree($4);
     printf("compos:\n");
@@ -154,6 +170,8 @@ param: tipo_especificador identificador
     $$->child[0] = $2;
     $2->decl_line = $2->lineno;
     $2->type = $1->type;
+    $2->decl = 1;
+    $1->decl = 1;
 } 
 | tipo_especificador identificador OBRACT CBRACT
 { 
@@ -161,6 +179,8 @@ param: tipo_especificador identificador
     $$->child[0] = $2; 
     $2->decl_line = $2->lineno;
     $2->type = $1->type;
+    $2->decl = 1;
+    $1->decl = 1;
 }
 ;
 composto_decl: OBRACE local_declaracoes statement_lista CBRACE
@@ -352,7 +372,7 @@ ativacao: identificador OPAREN simples_expressao CPAREN
     $$->child[0] = $3;
     $1->func = 1;
     ExpType t = Void;
-    for(int i = 0; i < id; i++){
+    for(int i = 0; i < func_id; i++){
         if( strcmp($1->attr.name, func[i]) == 0 ){
             t = type[i];
             break;
@@ -366,7 +386,7 @@ ativacao: identificador OPAREN simples_expressao CPAREN
     $$->child[0] = $3;
     $1->func = 1;
     ExpType t = Void;
-    for(int i = 0; i < id; i++){
+    for(int i = 0; i < func_id; i++){
         if( strcmp($1->attr.name, func[i]) == 0 ){
             t = type[i];
             break;
@@ -392,7 +412,7 @@ arg_lista: arg_lista COMMA expressao
 ;
 %%
 
-void yyerror(char * msg)
+void yyerror(const char * msg)
 {
   extern char* yytext;
   cout << msg << ": " << yytext << " " << yylval << " " << yychar << " line " << line_counter << endl;

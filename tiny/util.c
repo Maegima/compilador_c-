@@ -71,6 +71,7 @@ TreeNode * newStmtNode(StmtKind kind)
     t->decl_line = -1;
     t->func = 0;
     t->atrib = 0;
+    t->decl = 0;
   }
   return t;
 }
@@ -93,6 +94,7 @@ TreeNode * newExpNode(ExpKind kind)
     t->decl_line = -1;
     t->func = 0;
     t->atrib = 0;
+    t->decl = 0;
   }
   return t;
 }
