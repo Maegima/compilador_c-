@@ -1,13 +1,13 @@
 {
     "files.associations": {
         "iostream": "cpp",
-        "globals.h": "c",
-        "util.h": "c",
-        "parser.tab.h": "c",
-        "symtab.h": "c",
-        "random": "c",
-        "analyze.h": "c",
-        "code.h": "c",
-        "cgen.h": "c"
+        "globals.h": "cpp",
+        "util.h": "cpp",
+        "parser.tab.h": "cpp",
+        "symtab.h": "cpp",
+        "random": "cpp",
+        "analyze.h": "cpp",
+        "code.h": "cpp",
+        "cgen.h": "cpp"
     }
 }

@@ -13,4 +13,9 @@
  */
 TreeNode * parse(void);
 
+/* function initParser initialize
+ * parser variables
+ */
+void initParser();
+
 #endif

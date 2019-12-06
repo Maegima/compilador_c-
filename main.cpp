@@ -53,7 +53,7 @@ int main(int argc, char **argv){
   TreeNode *raiz;
   cout << "\nParser em execução...\n"; 
   if(argc == 1) return 1;
-  abrirArq(argv[1]);
+  source = fopen(argv[1], "r");
   if(argc > 2)
     symbtree = fopen(argv[2], "w");
   if(argc > 3)
@@ -68,6 +68,5 @@ int main(int argc, char **argv){
   }
   if(!erro)
     codeGen(raiz, "code.txt");
-  fecharArq();
   return 0;
 }

@@ -1,3 +1,7 @@
+/* comentario
+**
+** /
+*asdasd/dasdasd * /
 int a[12345];
 
 int minloc ( int a[], int low, int high )

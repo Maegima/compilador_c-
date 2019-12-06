@@ -27,7 +27,7 @@ extern int line_counter;
 extern int erro;
 void yyerror(const char *msg);
 
-void init_parse(){
+void initParse(){
     func[0] = (char*) malloc(sizeof(char)*6);
     func[1] = (char*)  malloc(sizeof(char)*7);
     memcpy(func[0], "input\0", sizeof(char)*6);
@@ -138,7 +138,6 @@ fun_declaracao: tipo_especificador identificador OPAREN params CPAREN composto_d
     $$->child[0]->child[1] = $6;
     $2->decl_line = $2->lineno;
     $2->type = $1->type;
-    if(func_id < 2) init_parse();
     $2->func = 1;
     $2->decl = 1;
     func[func_id] = $2->attr.name;
@@ -423,10 +422,13 @@ void yyerror(const char * msg)
 /* yylex calls getToken to make Yacc/Bison output
  * compatible with ealier versions of the TINY scanner
  */
-int yylex(void)
-{ return getToken(); }
+int yylex(void){ 
+    return getToken(); 
+}
 
-TreeNode * parse(void)
-{ yyparse();
-  return savedTree;
+TreeNode * parse(void){ 
+    initScanner();
+    initParse();
+    yyparse();
+    return savedTree;
 }
