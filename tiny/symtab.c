@@ -1,7 +1,3 @@
-/*  
-    Andre Lucas 112175 
-    Maria Luisa 111859
-*/
 /****************************************************/
 /* File: symtab.c                                   */
 /* Symbol table implementation for the TINY compiler*/

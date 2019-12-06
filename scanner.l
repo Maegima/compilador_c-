@@ -1,8 +1,3 @@
-/*  
-    Andre Lucas 112175 
-    Maria Luisa 111859
-*/
-
 %{
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,7 +1,3 @@
-/*  
-    Andre Lucas 112175 
-    Maria Luisa 111859
-*/
 /****************************************************/
 /* File: cgen.c                                     */
 /* The code generator implementation                */

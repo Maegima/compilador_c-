@@ -1,7 +1,3 @@
-/*  
-    Andre Lucas 112175 
-    Maria Luisa 111859
-*/
 /****************************************************/
 /* File: cgen.h                                     */
 /* The code generator interface to the TINY compiler*/
