@@ -8,8 +8,6 @@
 #ifndef _SCAN_H_
 #define _SCAN_H_
 
-#include "globals.h"
-
 /* function getToken returns the 
  * next token in source file
  */

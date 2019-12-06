@@ -1,5 +1,5 @@
 %{
-//GLC para gerar parser para calculadora simples
+//GLC para gerar parser para a linguagem c-
 
 #include <iostream>
 using namespace std;
@@ -36,8 +36,6 @@ void initParse(){
     type[1] = Void;
     func_id = 2;
 }
-
-void yyerror(char *);
 %}
 
 %start programa
@@ -58,7 +56,7 @@ void yyerror(char *);
 %token ERR                      
 
 %%
-programa:	declaracao_lista { savedTree = $1;} 
+programa: declaracao_lista { savedTree = $1;} 
 ;
 declaracao_lista: declaracao_lista declaracao
 { 

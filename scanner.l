@@ -1,7 +1,7 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
-#include "parser.tab.h"
+#include "parser.h"
 #include "tiny/globals.h"
 #include "tiny/util.h"
 #include "tiny/scan.h"
