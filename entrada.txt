@@ -31,14 +31,14 @@ void sort( int b[], int low, int high)
 void main(void)
 {
 	int i;
+    void i;
     int i;
-    int
-
-    i
-    ;
+    int minloc;
     int 
     a
     ;
+    andre();
+    teste = sort();
 	i = 0;
 	while (i < 10){
 		vet[i] = input();

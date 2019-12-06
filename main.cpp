@@ -44,6 +44,8 @@ int TraceCode = FALSE;
 
 int Error = FALSE;
 
+extern void semantical(FILE *listing);
+
 int main(){
   TreeNode *raiz;
   cout << "\nParser em execução...\n";
@@ -51,6 +53,7 @@ int main(){
   raiz = parse();
   printTree(raiz);
   buildSymtab(raiz);
+  semantical(listing);
   fecharArq();
   return 0;
 }

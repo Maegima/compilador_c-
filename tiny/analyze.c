@@ -41,6 +41,7 @@ static void nullProc(TreeNode * t)
   else return;
 }
 
+
 char *idScopeName(const char* scope, const char *name){
     char *scopeName;
     int len1, len2;
@@ -58,23 +59,27 @@ char *idScopeName(const char* scope, const char *name){
  * the symbol table 
  */
 static void insertNode( TreeNode * t){ 
-    char *name;
+    char *name, *func;
     int n;
+    TreeNode *r;
     switch (t->nodekind){ 
         case StmtK:
         switch (t->kind.stmt){ 
             case AssignK:
-            // name = idScopeName(name, t->attr.name);
-            // if (st_lookup(name) == -1)
-            // /* not yet in table, so treat as new definition */
-            //     st_insert(name,t->lineno,location++);
-            // else{
-            // /* already in table, so ignore location, 
-            //     add line number of use only */ 
-            //     st_insert(name,t->lineno,0);
-            //     free(name);
-            // }
-            break;
+                r = t->child[0];
+                if(r){
+                    name = idScopeName(r->scope, r->attr.name);
+                    if (st_lookup(name) == -1)
+                    /* not yet in table, so treat as new definition */
+                        st_insert(name,r->attr.name,r->lineno,-1,t->type,r->func,t->atrib,location++);
+                    else{
+                    /* already in table, so ignore location, 
+                        add line number of use only */ 
+                        st_insert(name,r->attr.name,r->lineno,-1,t->type,r->func,t->atrib,0);
+                        free(name);
+                    }
+                }
+                break;
             case ReturnK:
             case IfK:
             case WhileK:
@@ -87,14 +92,29 @@ static void insertNode( TreeNode * t){
                 name = idScopeName(t->scope, t->attr.name);
                 if (st_lookup(name) == -1)
                 /* not yet in table, so treat as new definition */
-                    st_insert(name,t->lineno,t->decl_line,location++);
-                else
+                    st_insert(name,t->attr.name,t->lineno,t->decl_line,t->type,t->func,-1,location++);
+                else{
                 /* already in table, so ignore location, 
                     add line number of use only */ 
-                    st_insert(name,t->lineno,t->decl_line,0);
+                    st_insert(name,t->attr.name,t->lineno,t->decl_line,t->type,t->func,-1,0);
+                    free(name);
+                }
             break;
             case ConstK:
             case TypeK:
+                // r = t->child[0];
+                // if(r != NULL){
+                //     name = idScopeName(r->scope, r->attr.name);
+                //     if (st_lookup(name) == -1)
+                //     /* not yet in table, so treat as new definition */
+                //         st_insert(name,r->attr.name,r->lineno,r->decl_line,t->type,location++);
+                //     else{
+                //     /* already in table, so ignore location, 
+                //         add line number of use only */ 
+                //         st_insert(name,r->attr.name,r->lineno,r->decl_line,t->type,0);
+                //         free(name);
+                //     }
+                // }
             case OpK:
             default: break;
         }

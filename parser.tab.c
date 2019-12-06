@@ -83,6 +83,9 @@ using namespace std;
 #define YYSTYPE TreeNode *
 static char * savedName; /* for use in assignments */
 static char * scope;
+static char * func[256];
+static ExpType type[256];
+static int id = 0;
 static int sc = 1;
 static int savedLine;
 static TreeNode * savedTree; /* stores syntax tree for later return */
@@ -94,7 +97,7 @@ extern int line_counter;
 
 void yyerror(char *);
 
-#line 98 "parser.tab.c" /* yacc.c:337  */
+#line 101 "parser.tab.c" /* yacc.c:337  */
 # ifndef YY_NULLPTR
 #  if defined __cplusplus
 #   if 201103L <= __cplusplus
@@ -471,13 +474,13 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    47,    47,    49,    60,    62,    62,    64,    70,    78,
-      91,    97,   103,   110,   123,   123,   125,   136,   138,   144,
-     151,   163,   174,   176,   187,   189,   190,   191,   192,   193,
-     195,   196,   198,   204,   212,   219,   219,   225,   233,   235,
-     236,   242,   248,   250,   255,   260,   265,   270,   275,   281,
-     287,   289,   294,   300,   306,   309,   314,   320,   320,   320,
-     320,   322,   327,   333,   333,   335,   346
+       0,    50,    50,    52,    63,    65,    65,    67,    74,    83,
+      96,   103,   110,   118,   136,   136,   138,   149,   151,   158,
+     166,   178,   189,   191,   202,   204,   205,   206,   207,   208,
+     210,   211,   213,   219,   227,   234,   234,   240,   250,   252,
+     257,   264,   271,   273,   278,   283,   288,   293,   298,   304,
+     311,   313,   318,   324,   331,   333,   338,   344,   345,   346,
+     350,   352,   366,   381,   381,   383,   394
 };
 #endif
 
@@ -1332,13 +1335,13 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 47 "parser.y" /* yacc.c:1652  */
+#line 50 "parser.y" /* yacc.c:1652  */
     { savedTree = yyvsp[0];}
-#line 1338 "parser.tab.c" /* yacc.c:1652  */
+#line 1341 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 3:
-#line 50 "parser.y" /* yacc.c:1652  */
+#line 53 "parser.y" /* yacc.c:1652  */
     { 
     YYSTYPE t = yyvsp[-1];
     if (t != NULL) { 
@@ -1349,50 +1352,52 @@ yyreduce:
     }
     else yyval = yyvsp[0];
 }
-#line 1353 "parser.tab.c" /* yacc.c:1652  */
+#line 1356 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 4:
-#line 60 "parser.y" /* yacc.c:1652  */
+#line 63 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[0]; }
-#line 1359 "parser.tab.c" /* yacc.c:1652  */
+#line 1362 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 5:
-#line 62 "parser.y" /* yacc.c:1652  */
+#line 65 "parser.y" /* yacc.c:1652  */
     { sc = 1; yyval = yyvsp[0]; }
-#line 1365 "parser.tab.c" /* yacc.c:1652  */
+#line 1368 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 6:
-#line 62 "parser.y" /* yacc.c:1652  */
+#line 65 "parser.y" /* yacc.c:1652  */
     { sc = 1; yyval = yyvsp[0]; }
-#line 1371 "parser.tab.c" /* yacc.c:1652  */
+#line 1374 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 7:
-#line 65 "parser.y" /* yacc.c:1652  */
+#line 68 "parser.y" /* yacc.c:1652  */
     {
     yyval = yyvsp[-2];
     yyval->child[0] = yyvsp[-1];
     yyvsp[-1]->decl_line = yyvsp[-1]->lineno;
+    yyvsp[-1]->type = yyvsp[-2]->type;
 }
-#line 1381 "parser.tab.c" /* yacc.c:1652  */
+#line 1385 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 8:
-#line 71 "parser.y" /* yacc.c:1652  */
+#line 75 "parser.y" /* yacc.c:1652  */
     { 
     yyval = yyvsp[-5];
     yyval->child[0] = yyvsp[-4];
     yyval->child[0]->child[0] = yyvsp[-2];
     yyvsp[-4]->decl_line = yyvsp[-4]->lineno;
+    yyvsp[-4]->type = yyvsp[-5]->type;
 }
-#line 1392 "parser.tab.c" /* yacc.c:1652  */
+#line 1397 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 9:
-#line 79 "parser.y" /* yacc.c:1652  */
+#line 84 "parser.y" /* yacc.c:1652  */
     { 
     yyval = newExpNode(IdK);
     yyval->attr.name = copyString(yytext);
@@ -1404,68 +1409,76 @@ yyreduce:
     }
     else yyval->scope = scope;
 }
-#line 1408 "parser.tab.c" /* yacc.c:1652  */
+#line 1413 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 10:
-#line 92 "parser.y" /* yacc.c:1652  */
+#line 97 "parser.y" /* yacc.c:1652  */
     { 
     yyval = newExpNode(ConstK);
     yyval->attr.val = atoi(yytext);
+    yyval->type = Integer;
 }
-#line 1417 "parser.tab.c" /* yacc.c:1652  */
+#line 1423 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 11:
-#line 98 "parser.y" /* yacc.c:1652  */
+#line 104 "parser.y" /* yacc.c:1652  */
     { 
     yyval = newExpNode(TypeK);
     yyval->attr.name = (char*) malloc(sizeof(char)*4);
     memcpy(yyval->attr.name, "INT\0", 4);
+    yyval->type = Integer;
 }
-#line 1427 "parser.tab.c" /* yacc.c:1652  */
+#line 1434 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 12:
-#line 104 "parser.y" /* yacc.c:1652  */
+#line 111 "parser.y" /* yacc.c:1652  */
     { 
     yyval = newExpNode(TypeK);
     yyval->attr.name = (char*) malloc(sizeof(char)*5);
-    memcpy(yyval->attr.name, "VOID\0", 4); 
+    memcpy(yyval->attr.name, "VOID\0", 4);
+    yyval->type = Void; 
 }
-#line 1437 "parser.tab.c" /* yacc.c:1652  */
+#line 1445 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 13:
-#line 111 "parser.y" /* yacc.c:1652  */
+#line 119 "parser.y" /* yacc.c:1652  */
     {
     yyval = yyvsp[-5];
     yyval->child[0] = yyvsp[-4];
     yyval->child[0]->child[0] = yyvsp[-2];
     yyval->child[0]->child[1] = yyvsp[0];
     yyvsp[-4]->decl_line = yyvsp[-4]->lineno;
+    yyvsp[-4]->type = yyvsp[-5]->type;
+    yyvsp[-4]->func = 1;
+    func[id] = yyvsp[-4]->attr.name;
+    type[id] = yyvsp[-4]->type;
+    id++;
     /*printf("params:\n");
     printTree($4);
     printf("compos:\n");
     printTree($6);*/
 }
-#line 1453 "parser.tab.c" /* yacc.c:1652  */
+#line 1466 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 14:
-#line 123 "parser.y" /* yacc.c:1652  */
+#line 136 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[0]; }
-#line 1459 "parser.tab.c" /* yacc.c:1652  */
+#line 1472 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 15:
-#line 123 "parser.y" /* yacc.c:1652  */
+#line 136 "parser.y" /* yacc.c:1652  */
     { yyval = NULL; }
-#line 1465 "parser.tab.c" /* yacc.c:1652  */
+#line 1478 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 16:
-#line 126 "parser.y" /* yacc.c:1652  */
+#line 139 "parser.y" /* yacc.c:1652  */
     { 
    YYSTYPE t = yyvsp[-2];
     if (t != NULL) { 
@@ -1476,37 +1489,39 @@ yyreduce:
     }
     else yyval = yyvsp[0];
 }
-#line 1480 "parser.tab.c" /* yacc.c:1652  */
+#line 1493 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 17:
-#line 136 "parser.y" /* yacc.c:1652  */
+#line 149 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[0]; }
-#line 1486 "parser.tab.c" /* yacc.c:1652  */
+#line 1499 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 18:
-#line 139 "parser.y" /* yacc.c:1652  */
+#line 152 "parser.y" /* yacc.c:1652  */
     {  
     yyval = yyvsp[-1];
     yyval->child[0] = yyvsp[0];
-    yyvsp[0]->decl_line = line_counter;
+    yyvsp[0]->decl_line = yyvsp[0]->lineno;
+    yyvsp[0]->type = yyvsp[-1]->type;
 }
-#line 1496 "parser.tab.c" /* yacc.c:1652  */
+#line 1510 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 19:
-#line 145 "parser.y" /* yacc.c:1652  */
+#line 159 "parser.y" /* yacc.c:1652  */
     { 
     yyval = yyvsp[-3];
     yyval->child[0] = yyvsp[-2]; 
-    yyvsp[-2]->decl_line = line_counter;
+    yyvsp[-2]->decl_line = yyvsp[-2]->lineno;
+    yyvsp[-2]->type = yyvsp[-3]->type;
 }
-#line 1506 "parser.tab.c" /* yacc.c:1652  */
+#line 1521 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 20:
-#line 152 "parser.y" /* yacc.c:1652  */
+#line 167 "parser.y" /* yacc.c:1652  */
     { 
     YYSTYPE t = yyvsp[-2];
     if(t != NULL){
@@ -1517,32 +1532,11 @@ yyreduce:
     }
     else yyval = yyvsp[-1];
 }
-#line 1521 "parser.tab.c" /* yacc.c:1652  */
-    break;
-
-  case 21:
-#line 164 "parser.y" /* yacc.c:1652  */
-    {
-    YYSTYPE t = yyvsp[-1];
-    if(t != NULL){
-        while(t->sibling != NULL)
-            t = t->sibling;
-        t->sibling = yyvsp[0];
-        yyval = yyvsp[-1];
-    }
-    else yyval = yyvsp[0];
-}
 #line 1536 "parser.tab.c" /* yacc.c:1652  */
     break;
 
-  case 22:
-#line 174 "parser.y" /* yacc.c:1652  */
-    { yyval = NULL; }
-#line 1542 "parser.tab.c" /* yacc.c:1652  */
-    break;
-
-  case 23:
-#line 177 "parser.y" /* yacc.c:1652  */
+  case 21:
+#line 179 "parser.y" /* yacc.c:1652  */
     {
     YYSTYPE t = yyvsp[-1];
     if(t != NULL){
@@ -1553,318 +1547,368 @@ yyreduce:
     }
     else yyval = yyvsp[0];
 }
+#line 1551 "parser.tab.c" /* yacc.c:1652  */
+    break;
+
+  case 22:
+#line 189 "parser.y" /* yacc.c:1652  */
+    { yyval = NULL; }
 #line 1557 "parser.tab.c" /* yacc.c:1652  */
     break;
 
+  case 23:
+#line 192 "parser.y" /* yacc.c:1652  */
+    {
+    YYSTYPE t = yyvsp[-1];
+    if(t != NULL){
+        while(t->sibling != NULL)
+            t = t->sibling;
+        t->sibling = yyvsp[0];
+        yyval = yyvsp[-1];
+    }
+    else yyval = yyvsp[0];
+}
+#line 1572 "parser.tab.c" /* yacc.c:1652  */
+    break;
+
   case 24:
-#line 187 "parser.y" /* yacc.c:1652  */
+#line 202 "parser.y" /* yacc.c:1652  */
     { yyval = NULL; }
-#line 1563 "parser.tab.c" /* yacc.c:1652  */
+#line 1578 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 25:
-#line 189 "parser.y" /* yacc.c:1652  */
+#line 204 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[0]; }
-#line 1569 "parser.tab.c" /* yacc.c:1652  */
+#line 1584 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 26:
-#line 190 "parser.y" /* yacc.c:1652  */
+#line 205 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[0]; }
-#line 1575 "parser.tab.c" /* yacc.c:1652  */
+#line 1590 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 27:
-#line 191 "parser.y" /* yacc.c:1652  */
+#line 206 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[0]; }
-#line 1581 "parser.tab.c" /* yacc.c:1652  */
+#line 1596 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 28:
-#line 192 "parser.y" /* yacc.c:1652  */
+#line 207 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[0]; }
-#line 1587 "parser.tab.c" /* yacc.c:1652  */
+#line 1602 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 29:
-#line 193 "parser.y" /* yacc.c:1652  */
+#line 208 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[0]; }
-#line 1593 "parser.tab.c" /* yacc.c:1652  */
+#line 1608 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 30:
-#line 195 "parser.y" /* yacc.c:1652  */
+#line 210 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[-1]; }
-#line 1599 "parser.tab.c" /* yacc.c:1652  */
+#line 1614 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 32:
-#line 199 "parser.y" /* yacc.c:1652  */
+#line 214 "parser.y" /* yacc.c:1652  */
     { 
     yyval = newStmtNode(IfK);
     yyval->child[0] = yyvsp[-2];
     yyval->child[1] = yyvsp[0];
 }
-#line 1609 "parser.tab.c" /* yacc.c:1652  */
+#line 1624 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 33:
-#line 205 "parser.y" /* yacc.c:1652  */
+#line 220 "parser.y" /* yacc.c:1652  */
     { 
     yyval = newStmtNode(IfK);
     yyval->child[0] = yyvsp[-4];
     yyval->child[1] = yyvsp[-2];
     yyval->child[2] = yyvsp[0];
 }
-#line 1620 "parser.tab.c" /* yacc.c:1652  */
+#line 1635 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 34:
-#line 213 "parser.y" /* yacc.c:1652  */
+#line 228 "parser.y" /* yacc.c:1652  */
     {
     yyval = newStmtNode(WhileK);
     yyval->child[0] = yyvsp[-2];
     yyval->child[1] = yyvsp[0];
 }
-#line 1630 "parser.tab.c" /* yacc.c:1652  */
+#line 1645 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 36:
-#line 220 "parser.y" /* yacc.c:1652  */
+#line 235 "parser.y" /* yacc.c:1652  */
     {
     yyval = newStmtNode(ReturnK);
     yyval->child[0] = yyvsp[-1];
 }
-#line 1639 "parser.tab.c" /* yacc.c:1652  */
+#line 1654 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 37:
-#line 226 "parser.y" /* yacc.c:1652  */
+#line 241 "parser.y" /* yacc.c:1652  */
     {
     yyval = newStmtNode(AssignK);
     yyval->attr.name = yyvsp[-2]->attr.name;
+    yyval->atrib = 1;
+    yyval->type = (yyvsp[-2]->type == yyvsp[0]->type) ? yyvsp[0]->type : Void;
     yyval->scope = scope;
     yyval->child[0] = yyvsp[-2];
     yyval->child[1] = yyvsp[0];
 }
-#line 1651 "parser.tab.c" /* yacc.c:1652  */
+#line 1668 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 38:
-#line 233 "parser.y" /* yacc.c:1652  */
+#line 250 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[0]; }
-#line 1657 "parser.tab.c" /* yacc.c:1652  */
+#line 1674 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 39:
-#line 235 "parser.y" /* yacc.c:1652  */
-    { yyval = yyvsp[0]; }
-#line 1663 "parser.tab.c" /* yacc.c:1652  */
+#line 253 "parser.y" /* yacc.c:1652  */
+    { 
+    yyval = yyvsp[0];
+    yyval->type = Integer;
+}
+#line 1683 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 40:
-#line 237 "parser.y" /* yacc.c:1652  */
+#line 258 "parser.y" /* yacc.c:1652  */
     {
     yyval = yyvsp[-3];
     yyval->child[0] = yyvsp[-1];
+    yyval->type = Integer;
 }
-#line 1672 "parser.tab.c" /* yacc.c:1652  */
+#line 1693 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 41:
-#line 243 "parser.y" /* yacc.c:1652  */
+#line 265 "parser.y" /* yacc.c:1652  */
     {
     yyval = yyvsp[-1];
     yyval->child[0] = yyvsp[-2];
     yyval->child[1] = yyvsp[0];
+    yyval->type = (yyvsp[-2]->type == yyvsp[0]->type) ? yyvsp[-2]->type : Void;
 }
-#line 1682 "parser.tab.c" /* yacc.c:1652  */
+#line 1704 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 42:
-#line 248 "parser.y" /* yacc.c:1652  */
+#line 271 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[0]; }
-#line 1688 "parser.tab.c" /* yacc.c:1652  */
+#line 1710 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 43:
-#line 251 "parser.y" /* yacc.c:1652  */
+#line 274 "parser.y" /* yacc.c:1652  */
     { 
     yyval = newExpNode(OpK);
     yyval->attr.op = SLTE; 
 }
-#line 1697 "parser.tab.c" /* yacc.c:1652  */
+#line 1719 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 44:
-#line 256 "parser.y" /* yacc.c:1652  */
+#line 279 "parser.y" /* yacc.c:1652  */
     { 
     yyval = newExpNode(OpK);
     yyval->attr.op = SLT;
 }
-#line 1706 "parser.tab.c" /* yacc.c:1652  */
+#line 1728 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 45:
-#line 261 "parser.y" /* yacc.c:1652  */
+#line 284 "parser.y" /* yacc.c:1652  */
     {
     yyval = newExpNode(OpK);
     yyval->attr.op = SGT;
 }
-#line 1715 "parser.tab.c" /* yacc.c:1652  */
+#line 1737 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 46:
-#line 266 "parser.y" /* yacc.c:1652  */
+#line 289 "parser.y" /* yacc.c:1652  */
     {
     yyval = newExpNode(OpK);
     yyval->attr.op = SGTE; 
 }
-#line 1724 "parser.tab.c" /* yacc.c:1652  */
+#line 1746 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 47:
-#line 271 "parser.y" /* yacc.c:1652  */
+#line 294 "parser.y" /* yacc.c:1652  */
     {
     yyval = newExpNode(OpK);
     yyval->attr.op = EQUAL;
 }
-#line 1733 "parser.tab.c" /* yacc.c:1652  */
+#line 1755 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 48:
-#line 276 "parser.y" /* yacc.c:1652  */
+#line 299 "parser.y" /* yacc.c:1652  */
     {
     yyval = newExpNode(OpK);
     yyval->attr.op = DIFFERENT;
 }
-#line 1742 "parser.tab.c" /* yacc.c:1652  */
+#line 1764 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 49:
-#line 282 "parser.y" /* yacc.c:1652  */
+#line 305 "parser.y" /* yacc.c:1652  */
     {
     yyval = yyvsp[-1];
     yyval->child[0] = yyvsp[-2];
     yyval->child[1] = yyvsp[0];
+    yyval->type = (yyvsp[-2]->type == yyvsp[0]->type) ? yyvsp[-2]->type : Void;
 }
-#line 1752 "parser.tab.c" /* yacc.c:1652  */
+#line 1775 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 50:
-#line 287 "parser.y" /* yacc.c:1652  */
+#line 311 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[0]; }
-#line 1758 "parser.tab.c" /* yacc.c:1652  */
+#line 1781 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 51:
-#line 290 "parser.y" /* yacc.c:1652  */
+#line 314 "parser.y" /* yacc.c:1652  */
     { 
     yyval = newExpNode(OpK);
     yyval->attr.op = ADD; 
 }
-#line 1767 "parser.tab.c" /* yacc.c:1652  */
+#line 1790 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 52:
-#line 295 "parser.y" /* yacc.c:1652  */
+#line 319 "parser.y" /* yacc.c:1652  */
     { 
     yyval = newExpNode(OpK);
     yyval->attr.op = SUB; 
 }
-#line 1776 "parser.tab.c" /* yacc.c:1652  */
+#line 1799 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 53:
-#line 301 "parser.y" /* yacc.c:1652  */
+#line 325 "parser.y" /* yacc.c:1652  */
     {
     yyval = yyvsp[-1];
     yyval->child[0] = yyvsp[-2];
     yyval->child[1] = yyvsp[0];
-}
-#line 1786 "parser.tab.c" /* yacc.c:1652  */
-    break;
-
-  case 54:
-#line 306 "parser.y" /* yacc.c:1652  */
-    { yyval = yyvsp[0]; }
-#line 1792 "parser.tab.c" /* yacc.c:1652  */
-    break;
-
-  case 55:
-#line 310 "parser.y" /* yacc.c:1652  */
-    { 
-    yyval = newExpNode(OpK);
-    yyval->attr.op = MULT; 
-}
-#line 1801 "parser.tab.c" /* yacc.c:1652  */
-    break;
-
-  case 56:
-#line 315 "parser.y" /* yacc.c:1652  */
-    { 
-    yyval = newExpNode(OpK);
-    yyval->attr.op = DIV; 
+    yyval->type = (yyvsp[-2]->type == yyvsp[0]->type) ? yyvsp[-2]->type : Void;
 }
 #line 1810 "parser.tab.c" /* yacc.c:1652  */
     break;
 
-  case 57:
-#line 320 "parser.y" /* yacc.c:1652  */
-    { yyval = yyvsp[-1]; }
+  case 54:
+#line 331 "parser.y" /* yacc.c:1652  */
+    { yyval = yyvsp[0]; }
 #line 1816 "parser.tab.c" /* yacc.c:1652  */
     break;
 
-  case 58:
-#line 320 "parser.y" /* yacc.c:1652  */
-    { yyval = yyvsp[0]; }
-#line 1822 "parser.tab.c" /* yacc.c:1652  */
+  case 55:
+#line 334 "parser.y" /* yacc.c:1652  */
+    { 
+    yyval = newExpNode(OpK);
+    yyval->attr.op = MULT; 
+}
+#line 1825 "parser.tab.c" /* yacc.c:1652  */
     break;
 
-  case 59:
-#line 320 "parser.y" /* yacc.c:1652  */
-    { yyval = yyvsp[0]; }
-#line 1828 "parser.tab.c" /* yacc.c:1652  */
-    break;
-
-  case 60:
-#line 320 "parser.y" /* yacc.c:1652  */
-    { yyval = yyvsp[0]; }
+  case 56:
+#line 339 "parser.y" /* yacc.c:1652  */
+    { 
+    yyval = newExpNode(OpK);
+    yyval->attr.op = DIV; 
+}
 #line 1834 "parser.tab.c" /* yacc.c:1652  */
     break;
 
+  case 57:
+#line 344 "parser.y" /* yacc.c:1652  */
+    { yyval = yyvsp[-1]; }
+#line 1840 "parser.tab.c" /* yacc.c:1652  */
+    break;
+
+  case 58:
+#line 345 "parser.y" /* yacc.c:1652  */
+    { yyval = yyvsp[0]; }
+#line 1846 "parser.tab.c" /* yacc.c:1652  */
+    break;
+
+  case 59:
+#line 347 "parser.y" /* yacc.c:1652  */
+    { yyval = yyvsp[0];
+    printf("ativacao %d\n", yyvsp[0]->type);
+}
+#line 1854 "parser.tab.c" /* yacc.c:1652  */
+    break;
+
+  case 60:
+#line 350 "parser.y" /* yacc.c:1652  */
+    { yyval = yyvsp[0]; }
+#line 1860 "parser.tab.c" /* yacc.c:1652  */
+    break;
+
   case 61:
-#line 323 "parser.y" /* yacc.c:1652  */
+#line 353 "parser.y" /* yacc.c:1652  */
     { 
     yyval = yyvsp[-3];
     yyval->child[0] = yyvsp[-1];
+    yyvsp[-3]->func = 1;
+    ExpType t = Void;
+    for(int i = 0; i < id; i++){
+        if( strcmp(yyvsp[-3]->attr.name, func[i]) == 0 ){
+            t = type[i];
+            break;
+        }
+    }
+    yyval->type = t;
 }
-#line 1843 "parser.tab.c" /* yacc.c:1652  */
+#line 1878 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 62:
-#line 328 "parser.y" /* yacc.c:1652  */
+#line 367 "parser.y" /* yacc.c:1652  */
     { 
     yyval = yyvsp[-3]; 
     yyval->child[0] = yyvsp[-1];
+    yyvsp[-3]->func = 1;
+    ExpType t = Void;
+    for(int i = 0; i < id; i++){
+        if( strcmp(yyvsp[-3]->attr.name, func[i]) == 0 ){
+            t = type[i];
+            break;
+        }
+    }
+    yyval->type = t;
 }
-#line 1852 "parser.tab.c" /* yacc.c:1652  */
+#line 1896 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 63:
-#line 333 "parser.y" /* yacc.c:1652  */
+#line 381 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[0]; }
-#line 1858 "parser.tab.c" /* yacc.c:1652  */
+#line 1902 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 64:
-#line 333 "parser.y" /* yacc.c:1652  */
+#line 381 "parser.y" /* yacc.c:1652  */
     { yyval = NULL; }
-#line 1864 "parser.tab.c" /* yacc.c:1652  */
+#line 1908 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 65:
-#line 336 "parser.y" /* yacc.c:1652  */
+#line 384 "parser.y" /* yacc.c:1652  */
     {
     YYSTYPE t = yyvsp[-2];
     if(t != NULL){
@@ -1875,17 +1919,17 @@ yyreduce:
     }
     else yyval = yyvsp[0];
 }
-#line 1879 "parser.tab.c" /* yacc.c:1652  */
+#line 1923 "parser.tab.c" /* yacc.c:1652  */
     break;
 
   case 66:
-#line 346 "parser.y" /* yacc.c:1652  */
+#line 394 "parser.y" /* yacc.c:1652  */
     { yyval = yyvsp[0]; }
-#line 1885 "parser.tab.c" /* yacc.c:1652  */
+#line 1929 "parser.tab.c" /* yacc.c:1652  */
     break;
 
 
-#line 1889 "parser.tab.c" /* yacc.c:1652  */
+#line 1933 "parser.tab.c" /* yacc.c:1652  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2116,7 +2160,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 348 "parser.y" /* yacc.c:1918  */
+#line 396 "parser.y" /* yacc.c:1918  */
 
 
 void yyerror(char * msg)

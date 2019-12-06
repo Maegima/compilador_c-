@@ -11,7 +11,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "globals.h"
 #include "symtab.h"
+#include "analyze.h"
 
 /* SIZE is the size of the hash table */
 #define SIZE 211
@@ -36,6 +38,7 @@ static int hash ( char * key )
  */
 typedef struct LineListRec
    { int lineno;
+     int type;
      struct LineListRec * next;
    } * LineList;
 
@@ -47,7 +50,10 @@ typedef struct LineListRec
  */
 typedef struct BucketListRec
    { char * name;
+     char * idName;
+     int func;
      LineList lines;
+     LineList atrib;
      LineList decl_line;
      int memloc ; /* memory location for variable */
      struct BucketListRec * next;
@@ -61,7 +67,7 @@ static BucketList hashTable[SIZE];
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert( char * name, int lineno, int decl_line, int loc )
+void st_insert( char * name, char *idName, int lineno, int decl_line, int type, int func, int atrib, int loc )
 { int h = hash(name);
   BucketList l =  hashTable[h];
   while ((l != NULL) && (strcmp(name,l->name) != 0))
@@ -69,6 +75,8 @@ void st_insert( char * name, int lineno, int decl_line, int loc )
   if (l == NULL) /* variable not yet in table */
   { l = (BucketList) malloc(sizeof(struct BucketListRec));
     l->name = name;
+    l->idName = idName;
+    l->func = func;
     l->lines = (LineList) malloc(sizeof(struct LineListRec));
     l->lines->lineno = lineno;
     l->memloc = loc;
@@ -76,21 +84,55 @@ void st_insert( char * name, int lineno, int decl_line, int loc )
     if(decl_line > -1){
         l->decl_line = (LineList) malloc(sizeof(struct LineListRec));
         l->decl_line->lineno = decl_line;
+        l->decl_line->type = type;
         l->decl_line->next = NULL;
     }
     else l->decl_line = NULL;
+    if(atrib > -1){
+        l->atrib = (LineList) malloc(sizeof(struct LineListRec));
+        l->atrib->lineno = lineno;
+        l->atrib->type = type;
+        l->atrib->next = NULL;
+    }
+    else l->atrib = NULL;
+    
     l->next = hashTable[h];
     hashTable[h] = l; }
   else /* found in table, so just add line number */
-  { LineList t = l->lines;
-    while (t->next != NULL) t = t->next;
-    t->next = (LineList) malloc(sizeof(struct LineListRec));
-    t->next->lineno = lineno;
-    t->next->next = NULL;
+  { 
+    LineList t;
+    
+    
+    if(atrib > -1){
+        LineList p;
+        p = (LineList) malloc(sizeof(struct LineListRec));
+        p->lineno = lineno;
+        p->type = type;
+        p->next = NULL;
+        t = l->atrib;
+        if(t != NULL){
+            while (t->next != NULL) t = t->next;
+            t->next = p;
+        }
+        else l->atrib = p;
+    } 
+    else{
+        LineList p;
+        p = (LineList) malloc(sizeof(struct LineListRec));
+        p->lineno = lineno;
+        p->next = NULL;
+        t = l->lines;
+        if(t != NULL){
+            while (t->next != NULL) t = t->next;
+            t->next = p;
+        }
+        else l->lines = p;
+    }
     if(decl_line > -1){
         LineList p;
         p = (LineList) malloc(sizeof(struct LineListRec));
         p->lineno = decl_line;
+        p->type = type;
         p->next = NULL;
         t = l->decl_line;
         if(t != NULL){
@@ -98,14 +140,6 @@ void st_insert( char * name, int lineno, int decl_line, int loc )
             t->next = p;
         }
         else l->decl_line = p;
-        
-
-        //t = l->decl_line;
-        //while (t != NULL){ 
-        //    printf("%d ", t->lineno);
-        //    t = t->next;
-        //}
-        //printf("\n");
     }
   }
 } /* st_insert */
@@ -144,11 +178,11 @@ void printSymTab(FILE * listing)
       }
     }
   }
-  fprintf(listing,"Variable Name  Location  Declaration");
-  for(int j = 2; j < padding; j++) fprintf(listing, "     "); 
+  fprintf(listing,"Variable Name        Location  Declaration    ");
+  for(int j = 2; j < padding; j++) fprintf(listing, "         "); 
   fprintf(listing, "  Line Numbers\n");
-  fprintf(listing,"-------------  --------  -----------");
-  for(int j = 2; j < padding; j++) fprintf(listing, "-----");
+  fprintf(listing,"-------------------  --------  ---------------");
+  for(int j = 2; j < padding; j++) fprintf(listing, "---------");
   fprintf(listing,"  -------------\n");
   for (i=0;i<SIZE;++i)
   { if (hashTable[i] != NULL)
@@ -157,15 +191,15 @@ void printSymTab(FILE * listing)
       { 
         LineList t = l->lines;
         LineList r = l->decl_line;
-        fprintf(listing,"%-14s ",l->name);
+        fprintf(listing,"%-20s ",l->name);
         fprintf(listing,"%-8d  ",l->memloc);
         for(int j = 0; j < padding; j++){
             if(r != NULL){
-                fprintf(listing, "%-4d ", r->lineno);
+                fprintf(listing, "%-4d(%d)|", r->lineno, r->type);
                 r = r->next;
             }
             else{
-                fprintf(listing, "     ");
+                fprintf(listing, "       |");
             }
         }
         fprintf(listing, " ");
@@ -179,3 +213,197 @@ void printSymTab(FILE * listing)
     }
   }
 } /* printSymTab */
+
+void printScope(char *name, FILE *listing){
+    int i = 0;
+    while(name[i] != ' '){
+        fprintf(listing, "%c", name[i]);
+        i++;
+    }
+}
+
+void notUniqueVariable(FILE * listing){ 
+    int i, count = 0;
+    for (i = 0; i < SIZE; i++){ 
+        if (hashTable[i] != NULL){ 
+            BucketList l = hashTable[i];
+            while (l != NULL){ 
+                LineList s = l->decl_line;
+                while (s != NULL){
+                    count++;
+                    if(count > 1){
+                        fprintf(listing,"erro no escopo ");
+                        printScope(l->name, listing);
+                        fprintf(listing," na linha %d: declaração inválida de variável %s, já foi declarada previamente.\n",
+                        s->lineno, l->idName);
+                    }
+                    s = s->next;
+                }
+                count = 0;
+                l = l->next;
+            }
+        }
+    }
+}
+
+void notVoidVariable(FILE * listing){ 
+    int i;
+    for (i = 0; i < SIZE; i++){ 
+        if (hashTable[i] != NULL){ 
+            BucketList l = hashTable[i];
+            while (l != NULL){ 
+                LineList s = l->decl_line;
+                while (s != NULL){
+                    if(!l->func && !s->type){
+                        fprintf(listing,"erro no escopo ");
+                        printScope(l->name, listing);
+                        fprintf(listing," na linha %d: declaração inválida de variável %s, void só pode ser usado para declaração de função.\n",
+                        s->lineno, l->idName);
+                    }
+                    s = s->next;
+                }
+                l = l->next;
+            }
+        }
+    }
+}
+
+void variableNotDeclared(FILE * listing){ 
+    int i;
+    for (i = 0; i < SIZE; i++){ 
+        if (hashTable[i] != NULL){ 
+            BucketList l = hashTable[i];
+            while (l != NULL){ 
+                LineList s = l->lines;
+                while (s != NULL){
+                    if(!l->decl_line && !l->func){
+                        fprintf(listing,"erro no escopo ");
+                        printScope(l->name, listing);
+                        fprintf(listing," na linha %d: variável %s não declarada.\n",
+                        s->lineno, l->idName);
+                    }
+                    s = s->next;
+                }
+                l = l->next;
+            }
+        }
+    }
+}
+
+void functionNotDeclared(FILE * listing){ 
+    int i;
+    char *name;
+    for (i = 0; i < SIZE; i++){ 
+        if (hashTable[i] != NULL){ 
+            BucketList l = hashTable[i];
+            while (l != NULL){ 
+                LineList s = l->lines;
+                name = idScopeName("GLOBAL", l->idName);
+                while (s != NULL){
+                    if(l->func && st_lookup(name) == -1 && strcmp(name, l->name) != 0){
+                        fprintf(listing,"erro no escopo ");
+                        printScope(l->name, listing);
+                        fprintf(listing," na linha %d: função %s não declarada.\n",
+                        s->lineno, l->idName);
+                    }
+                    s = s->next;
+                }
+                free(name);
+                l = l->next;
+            }
+        }
+    }
+}
+
+void mainNotDeclared(FILE *listing){
+    int i, erro = 1;
+    char *name;
+    for (i = 0; i < SIZE; i++){ 
+        if (hashTable[i] != NULL){ 
+            BucketList l = hashTable[i];
+            while (l != NULL){ 
+                if(strcmp("GLOBAL main", l->name) == 0 || !erro){
+                    erro = 0;
+                    break;
+                }
+                free(name);
+                l = l->next;
+            }
+        }
+    }
+    if(erro){
+        fprintf(listing, "erro: função main() não declarada.\n");
+    }
+}
+
+void variableIsFunction(FILE *listing){
+    int i, j = 0, k = 0, m;
+    char *name;
+    BucketList func[2*SIZE];
+    BucketList var[2*SIZE];
+    for (i = 0; i < SIZE; i++){ 
+        if (hashTable[i] != NULL){ 
+            BucketList l = hashTable[i];
+            while (l != NULL){ 
+                name = idScopeName("GLOBAL", l->idName);
+                if(strcmp(name, l->name) == 0 && l->func){
+                    func[j] = l;
+                    j++;
+                }
+                else if(!l->func){
+                    var[k] = l;
+                    k++;
+                }
+                free(name);
+                l = l->next;
+            }
+        }
+        
+    }
+    for(i = 0; i < j; i++){
+        for(m = 0; m < k; m++){
+            if(strcmp(var[m]->idName, func[i]->idName) == 0){
+                LineList s = var[m]->decl_line;
+                while(s){
+                    fprintf(listing,"erro no escopo ");
+                    printScope(var[m]->name, listing);
+                    fprintf(listing," na linha %d: %s já foi declarada como nome de função.\n",
+                    s->lineno, var[m]->idName);
+                    s = s->next;
+                }
+            }
+        }
+    }
+}
+
+void voidAtribuition(FILE *listing){
+    int i;
+    for (i = 0; i < SIZE; i++){ 
+        if (hashTable[i] != NULL){ 
+            BucketList l = hashTable[i];
+            while (l != NULL){ 
+                LineList s = l->atrib;
+                while (s != NULL){
+                    if(!s->type){
+                        fprintf(listing,"erro no escopo ");
+                        printScope(l->name, listing);
+                        fprintf(listing," na linha %d: atribuição void em %s.\n",
+                        s->lineno, l->idName);
+                    }
+                    s = s->next;
+                }
+                l = l->next;
+            }
+        }
+    }
+}
+
+void semantical(FILE *listing){
+    notUniqueVariable(listing);
+    notVoidVariable(listing);
+    variableNotDeclared(listing);
+    functionNotDeclared(listing);
+    mainNotDeclared(listing);
+    variableIsFunction(listing);
+    voidAtribuition(listing);
+}

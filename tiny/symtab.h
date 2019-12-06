@@ -14,7 +14,7 @@
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert( char * name, int lineno, int decl_line, int loc );
+void st_insert( char * name, char *idName, int lineno, int decl_line, int type, int func, int atrib, int loc );
 
 /* Function st_lookup returns the memory 
  * location of a variable or -1 if not found
@@ -26,5 +26,7 @@ int st_lookup ( char * name );
  * to the listing file
  */
 void printSymTab(FILE * listing);
+
+void notUniqueVariable(FILE * listing);
 
 #endif

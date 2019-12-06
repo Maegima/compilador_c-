@@ -18,4 +18,6 @@ void buildSymtab(TreeNode *);
  */
 void typeCheck(TreeNode *);
 
+char *idScopeName(const char* scope, const char *name);
+
 #endif

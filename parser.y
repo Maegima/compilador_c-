@@ -14,6 +14,9 @@ using namespace std;
 #define YYSTYPE TreeNode *
 static char * savedName; /* for use in assignments */
 static char * scope;
+static char * func[256];
+static ExpType type[256];
+static int id = 0;
 static int sc = 1;
 static int savedLine;
 static TreeNode * savedTree; /* stores syntax tree for later return */
@@ -66,6 +69,7 @@ var_declaracao: tipo_especificador identificador SEMICOLON
     $$ = $1;
     $$->child[0] = $2;
     $2->decl_line = $2->lineno;
+    $2->type = $1->type;
 } 
 | tipo_especificador identificador OBRACT numero CBRACT SEMICOLON 
 { 
@@ -73,6 +77,7 @@ var_declaracao: tipo_especificador identificador SEMICOLON
     $$->child[0] = $2;
     $$->child[0]->child[0] = $4;
     $2->decl_line = $2->lineno;
+    $2->type = $1->type;
 } 
 ;
 identificador: ID 
@@ -92,6 +97,7 @@ numero: NUM
 { 
     $$ = newExpNode(ConstK);
     $$->attr.val = atoi(yytext);
+    $$->type = Integer;
 }
 ;
 tipo_especificador: INT 
@@ -99,12 +105,14 @@ tipo_especificador: INT
     $$ = newExpNode(TypeK);
     $$->attr.name = (char*) malloc(sizeof(char)*4);
     memcpy($$->attr.name, "INT\0", 4);
+    $$->type = Integer;
 } 
 | VOID 
 { 
     $$ = newExpNode(TypeK);
     $$->attr.name = (char*) malloc(sizeof(char)*5);
-    memcpy($$->attr.name, "VOID\0", 4); 
+    memcpy($$->attr.name, "VOID\0", 4);
+    $$->type = Void; 
 }
 ;
 fun_declaracao: tipo_especificador identificador OPAREN params CPAREN composto_decl
@@ -114,6 +122,11 @@ fun_declaracao: tipo_especificador identificador OPAREN params CPAREN composto_d
     $$->child[0]->child[0] = $4;
     $$->child[0]->child[1] = $6;
     $2->decl_line = $2->lineno;
+    $2->type = $1->type;
+    $2->func = 1;
+    func[id] = $2->attr.name;
+    type[id] = $2->type;
+    id++;
     /*printf("params:\n");
     printTree($4);
     printf("compos:\n");
@@ -139,13 +152,15 @@ param: tipo_especificador identificador
 {  
     $$ = $1;
     $$->child[0] = $2;
-    $2->decl_line = line_counter;
+    $2->decl_line = $2->lineno;
+    $2->type = $1->type;
 } 
 | tipo_especificador identificador OBRACT CBRACT
 { 
     $$ = $1;
     $$->child[0] = $2; 
-    $2->decl_line = line_counter;
+    $2->decl_line = $2->lineno;
+    $2->type = $1->type;
 }
 ;
 composto_decl: OBRACE local_declaracoes statement_lista CBRACE
@@ -226,17 +241,24 @@ expressao: var ATRIB expressao
 {
     $$ = newStmtNode(AssignK);
     $$->attr.name = $1->attr.name;
+    $$->atrib = 1;
+    $$->type = ($1->type == $3->type) ? $3->type : Void;
     $$->scope = scope;
     $$->child[0] = $1;
     $$->child[1] = $3;
 } 
 | simples_expressao { $$ = $1; }
 ;
-var: identificador { $$ = $1; } 
+var: identificador
+{ 
+    $$ = $1;
+    $$->type = Integer;
+} 
 | identificador OBRACT expressao CBRACT
 {
     $$ = $1;
     $$->child[0] = $3;
+    $$->type = Integer;
 }
 ;
 simples_expressao: soma_expressao relacional soma_expressao 
@@ -244,6 +266,7 @@ simples_expressao: soma_expressao relacional soma_expressao
     $$ = $2;
     $$->child[0] = $1;
     $$->child[1] = $3;
+    $$->type = ($1->type == $3->type) ? $1->type : Void;
 }
 | soma_expressao { $$ = $1; }
 ;
@@ -283,6 +306,7 @@ soma_expressao: soma_expressao soma termo
     $$ = $2;
     $$->child[0] = $1;
     $$->child[1] = $3;
+    $$->type = ($1->type == $3->type) ? $1->type : Void;
 } 
 | termo { $$ = $1; }
 ;
@@ -302,9 +326,9 @@ termo: termo mult fator
     $$ = $2;
     $$->child[0] = $1;
     $$->child[1] = $3;
+    $$->type = ($1->type == $3->type) ? $1->type : Void;
 }  
 | fator { $$ = $1; }
-;
 ;
 mult: MULT
 { 
@@ -317,17 +341,41 @@ mult: MULT
     $$->attr.op = DIV; 
 } 
 ;
-fator: OPAREN expressao CPAREN { $$ = $2; } | var { $$ = $1; } | ativacao { $$ = $1; } | numero { $$ = $1; }
+fator: OPAREN expressao CPAREN { $$ = $2; } 
+| var { $$ = $1; } 
+| ativacao 
+{ $$ = $1;
+    printf("ativacao %d\n", $1->type);
+} 
+| numero { $$ = $1; }
 ;
 ativacao: identificador OPAREN simples_expressao CPAREN 
 { 
     $$ = $1;
     $$->child[0] = $3;
+    $1->func = 1;
+    ExpType t = Void;
+    for(int i = 0; i < id; i++){
+        if( strcmp($1->attr.name, func[i]) == 0 ){
+            t = type[i];
+            break;
+        }
+    }
+    $$->type = t;
 } 
 | identificador OPAREN args CPAREN 
 { 
     $$ = $1; 
     $$->child[0] = $3;
+    $1->func = 1;
+    ExpType t = Void;
+    for(int i = 0; i < id; i++){
+        if( strcmp($1->attr.name, func[i]) == 0 ){
+            t = type[i];
+            break;
+        }
+    }
+    $$->type = t;
 }
 ;
 args: arg_lista { $$ = $1; } | { $$ = NULL; }
