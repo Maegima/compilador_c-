@@ -281,7 +281,7 @@ void variableNotDeclared(FILE * listing){
             while (l != NULL){ 
                 LineList s = l->lines;
                 while (s != NULL){
-                    name = idScopeName("GLOBAL", l->idName);
+                    name = uniteStrings("GLOBAL", l->idName);
                     if(!l->decl_line && !l->func){
                         if(st_lookup(name) == -1){
                             fprintf(listing,"Erro semantico no escopo ");
@@ -307,7 +307,7 @@ void functionNotDeclared(FILE * listing){
             BucketList l = hashTable[i];
             while (l != NULL){ 
                 LineList s = l->lines;
-                name = idScopeName("GLOBAL", l->idName);
+                name = uniteStrings("GLOBAL", l->idName);
                 while (s != NULL){
                     if(l->func && st_lookup(name) == -1 && strcmp(name, l->name) != 0){
                         fprintf(listing,"Erro semantico no escopo ");
@@ -356,7 +356,7 @@ void variableIsFunction(FILE *listing){
         if (hashTable[i] != NULL){ 
             BucketList l = hashTable[i];
             while (l != NULL){ 
-                name = idScopeName("GLOBAL", l->idName);
+                name = uniteStrings("GLOBAL", l->idName);
                 if(strcmp(name, l->name) == 0 && l->func){
                     func[j] = l;
                     j++;

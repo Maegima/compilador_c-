@@ -75,10 +75,10 @@ using namespace std;
 
 #define YYPARSER /* distinguishes Yacc output from other code files */
 
-#include "tiny/globals.h"
-#include "tiny/util.h"
-#include "tiny/scan.h"
-#include "tiny/parse.h"
+#include "utils/globals.h"
+#include "utils/util.h"
+#include "utils/scan.h"
+#include "utils/parse.h"
 
 #define YYSTYPE TreeNode *
 static char * savedName; /* for use in assignments */

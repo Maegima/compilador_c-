@@ -3,7 +3,7 @@ using namespace std;
 
 extern void abrirArq(char *arq);
 extern void fecharArq();
-#include "tiny/globals.h"
+#include "utils/globals.h"
 
 /* set NO_PARSE to TRUE to get a scanner-only compiler */
 #define NO_PARSE FALSE
@@ -15,15 +15,15 @@ extern void fecharArq();
  */
 #define NO_CODE FALSE
 
-#include "tiny/util.h"
+#include "utils/util.h"
 #if NO_PARSE
-#include "tiny/scan.h"
+#include "utils/scan.h"
 #else
-#include "tiny/parse.h"
+#include "utils/parse.h"
 #if !NO_ANALYZE
-#include "tiny/analyze.h"
+#include "utils/analyze.h"
 #if !NO_CODE
-#include "tiny/cgen.h"
+#include "utils/cgen.h"
 #endif
 #endif
 #endif

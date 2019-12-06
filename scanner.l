@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "parser.h"
-#include "tiny/globals.h"
-#include "tiny/util.h"
-#include "tiny/scan.h"
+#include "utils/globals.h"
+#include "utils/util.h"
+#include "utils/scan.h"
 
 extern YYSTYPE yylval;
 extern int line_counter;

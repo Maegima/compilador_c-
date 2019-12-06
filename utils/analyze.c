@@ -1,4 +1,3 @@
-
 /**
  * @file analyze.c
  * @author André Lucas Maegima
@@ -46,14 +45,14 @@ static void traverse(TreeNode*t, void(*preProc)(TreeNode*), void(*postProc)(Tree
 static void nullProc(TreeNode * t){ }
 
 /**
- * @brief uniteString junta duas strings em uma 
+ * @brief uniteStrings junta duas strings em uma 
  * separadas por espaço
  * 
  * @param str1 Primeira string 
  * @param str2 Segunda string
  * @return char* Endereço da string resultante
  */
-char *uniteString(const char* str1, const char *str2){
+char *uniteStrings(const char* str1, const char *str2){
     char *scopeName;
     int len1, len2;
     len1 = strlen(str1);
@@ -81,7 +80,7 @@ static void insertNode( TreeNode * t){
             case AssignK:
                 r = t->child[0];
                 if(r){
-                    name = uniteString(r->scope, r->attr.name);
+                    name = uniteStrings(r->scope, r->attr.name);
                     if (st_lookup(name) == -1)
                     /* not yet in table, so treat as new definition */
                         st_insert(name,r->attr.name,r->lineno,-1,t->type,r->func,t->atrib,location++);
@@ -102,7 +101,7 @@ static void insertNode( TreeNode * t){
         case ExpK:
         switch (t->kind.exp){ 
             case IdK:
-                name = uniteString(t->scope, t->attr.name);
+                name = uniteStrings(t->scope, t->attr.name);
                 if (st_lookup(name) == -1)
                 /* not yet in table, so treat as new definition */
                     st_insert(name,t->attr.name,t->lineno,t->decl_line,t->type,t->func,-1,location++);
