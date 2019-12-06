@@ -12,14 +12,12 @@ using namespace std;
 #include "utils/parse.h"
 
 #define YYSTYPE TreeNode *
-static char * savedName; /* for use in assignments */
 static char * scope;
 static int sc = 1;
 int func_id = 0;
 char * func[256];
 ExpType type[256];
-static int savedLine;
-static TreeNode * savedTree; /* stores syntax tree for later return */
+static TreeNode * savedTree; /* raiz da árvore sintática */
 
 int yylex(void);
 extern char* yytext;
@@ -410,20 +408,35 @@ arg_lista: arg_lista COMMA expressao
 ;
 %%
 
+/**
+ * @brief yyerror imprime na tela caso ocorra
+ * algum erro semântico
+ * 
+ * @param msg Mensagem do erro
+ */
 void yyerror(const char * msg)
 {
   extern char* yytext;
   cout << msg << ": " << yytext << " " << yylval << " " << yychar << " line " << line_counter << endl;
   erro = 1;
 }
-
-/* yylex calls getToken to make Yacc/Bison output
- * compatible with ealier versions of the TINY scanner
+ 
+/**
+ * @brief yylex chama a função getToken do parser
+ * para obter o próximo token do arquivo de origem
+ * 
+ * @return int Token do arquivo
  */
 int yylex(void){ 
     return getToken(); 
 }
 
+/**
+ * @brief parse é procedimento que inicia a análise
+ * léxica juntamente com a análise semântica
+ *
+ * @return TreeNode* Raiz da árvore semântica
+ */
 TreeNode * parse(void){ 
     initScanner();
     initParse();

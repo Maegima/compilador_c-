@@ -9,13 +9,23 @@
 extern YYSTYPE yylval;
 extern int line_counter;
 
+/**
+ * @brief initScanner icializa as 
+ * váriaveis do analizador léxico
+ * 
+ */
 void initScanner(){
     yyin = source;
     yyout = listing;
     line_counter = 1;
 }
 
-int FreakShow (){
+/**
+ * @brief FreakShow imprime uma mensagem de
+ * na tela caso ocorra algum erro léxico
+ * 
+ */
+int FreakShow(){
     printf("Erro lexico: %s na linha %d.\n", yytext, line_counter);
     return ERR;
 }
@@ -75,6 +85,12 @@ while                                 return WHILE;
 {OTHER}+({LETTER}|{DIGIT})*{OTHER}*   return FreakShow();
 %%
 
+/**
+ * @brief getToken retorna o próximo token
+ * do arquivo de origem
+ * 
+ * @return TokenType token do arquivo
+ */
 TokenType getToken(void)
 { 
     TokenType currentToken = 0;

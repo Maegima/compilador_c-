@@ -1,20 +1,29 @@
-/****************************************************/
-/* File: parse.h                                    */
-/* The parser interface for the TINY compiler       */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
-/****************************************************/
+/**
+ * @file analyze.h
+ * @author André Lucas Maegima
+ * @brief Interface para o analisador sintática
+ * @version 0.1
+ * @date 2019-12-06
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 
 #ifndef _PARSE_H_
 #define _PARSE_H_
 
-/* Function parse returns the newly 
- * constructed syntax tree
+/**
+ * @brief Parse faz a análise sintática
+ * e cria a árvore de sintática
+ * 
+ * @return TreeNode* Nó raiz da árvore
  */
 TreeNode * parse(void);
 
-/* function initParser initialize
- * parser variables
+/**
+ * @brief initParser inicializa as váriaveis 
+ * do analizador sintática
+ * 
  */
 void initParser();
 
