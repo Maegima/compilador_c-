@@ -1,3 +1,7 @@
+/*  
+    Andre Lucas 112175 
+    Maria Luisa 111859
+*/
 /****************************************************/
 /* File: scan.h                                     */
 /* The scanner interface for the TINY compiler      */

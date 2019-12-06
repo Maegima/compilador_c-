@@ -1,3 +1,7 @@
+/*  
+    Andre Lucas 112175 
+    Maria Luisa 111859
+*/
 #include <iostream>
 using namespace std;
 
@@ -32,6 +36,8 @@ extern void fecharArq();
 int line_counter = 0;
 FILE * source = NULL;
 FILE * listing = stdout;
+FILE * symbtab = stdout;
+FILE * symbtree = stdout;
 FILE * code = stdout;
 
 /* allocate and set tracing flags */
@@ -43,19 +49,29 @@ int TraceCode = FALSE;
 
 int Error = FALSE;
 
-extern void semantical(FILE *listing);
+extern int semantical(FILE *listing);
+int erro = 0;
+
 
 int main(int argc, char **argv){
   TreeNode *raiz;
-  cout << "\nParser em execução...\n";
-  if(argc < 3) return 1; 
+  cout << "\nParser em execução...\n"; 
+  if(argc == 1) return 1;
   abrirArq(argv[1]);
-  code = fopen(argv[2], "w");
+  if(argc > 2)
+    symbtree = fopen(argv[2], "w");
+  if(argc > 3)
+    symbtab = fopen(argv[3], "w");
+  if(argc > 4)
+    code = fopen(argv[4], "w");
   raiz = parse();
-  printTree(raiz);
-  buildSymtab(raiz);
-  semantical(listing);
-  codeGen(raiz, argv[2]);
+  if(!erro){
+    printTree(raiz);
+    buildSymtab(raiz);
+    erro = semantical(listing);
+  }
+  if(!erro)
+    codeGen(raiz, "code.txt");
   fecharArq();
   return 0;
 }

@@ -1,3 +1,7 @@
+/*  
+    Andre Lucas 112175 
+    Maria Luisa 111859
+*/
 /****************************************************/
 /* File: analyze.c                                  */
 /* Semantic analyzer implementation                 */
@@ -5,6 +9,7 @@
 /* Compiler Construction: Principles and Practice   */
 /* Kenneth C. Louden                                */
 /****************************************************/
+
 
 #include "globals.h"
 #include "symtab.h"
@@ -141,13 +146,13 @@ void buildSymtab(TreeNode * syntaxTree)
     traverse(syntaxTree,insertNode,nullProc);
     if (TraceAnalyze)
     { 
-        fprintf(listing,"\nSymbol table:\n\n");
-        printSymTab(listing);
+        fprintf(symbtab,"\nSymbol table:\n\n");
+        printSymTab(symbtab);
     }
 }
 
 static void typeError(TreeNode * t, const char * message)
-{ fprintf(listing,"Type error at line %d: %s\n",t->lineno,message);
+{ fprintf(symbtab,"Type error at line %d: %s\n",t->lineno,message);
   Error = TRUE;
 }
 

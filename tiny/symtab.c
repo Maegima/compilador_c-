@@ -1,3 +1,7 @@
+/*  
+    Andre Lucas 112175 
+    Maria Luisa 111859
+*/
 /****************************************************/
 /* File: symtab.c                                   */
 /* Symbol table implementation for the TINY compiler*/
@@ -21,6 +25,8 @@
 /* SHIFT is the power of two used as multiplier
    in hash function  */
 #define SHIFT 4
+
+int erro_ = 0;
 
 /* the hash function */
 static int hash ( char * key )
@@ -232,10 +238,11 @@ void notUniqueVariable(FILE * listing){
                 while (s != NULL){
                     count++;
                     if(count > 1){
-                        fprintf(listing,"erro no escopo ");
+                        fprintf(listing,"Erro semantico no escopo ");
                         printScope(l->name, listing);
                         fprintf(listing," na linha %d: declaração inválida de variável %s, já foi declarada previamente.\n",
                         s->lineno, l->idName);
+                        erro_ = 1;
                     }
                     s = s->next;
                 }
@@ -255,10 +262,11 @@ void notVoidVariable(FILE * listing){
                 LineList s = l->decl_line;
                 while (s != NULL){
                     if(!l->func && !s->type){
-                        fprintf(listing,"erro no escopo ");
+                        fprintf(listing,"Erro semantico no escopo ");
                         printScope(l->name, listing);
                         fprintf(listing," na linha %d: declaração inválida de variável %s, void só pode ser usado para declaração de função.\n",
                         s->lineno, l->idName);
+                        erro_ = 1;
                     }
                     s = s->next;
                 }
@@ -280,10 +288,11 @@ void variableNotDeclared(FILE * listing){
                     name = idScopeName("GLOBAL", l->idName);
                     if(!l->decl_line && !l->func){
                         if(st_lookup(name) == -1){
-                            fprintf(listing,"erro no escopo ");
+                            fprintf(listing,"Erro semantico no escopo ");
                             printScope(l->name, listing);
                             fprintf(listing," na linha %d: variável %s não declarada.\n",
                             s->lineno, l->idName);
+                            erro_ = 1;
                         }
                     }
                     s = s->next;
@@ -305,10 +314,11 @@ void functionNotDeclared(FILE * listing){
                 name = idScopeName("GLOBAL", l->idName);
                 while (s != NULL){
                     if(l->func && st_lookup(name) == -1 && strcmp(name, l->name) != 0){
-                        fprintf(listing,"erro no escopo ");
+                        fprintf(listing,"Erro semantico no escopo ");
                         printScope(l->name, listing);
                         fprintf(listing," na linha %d: função %s não declarada.\n",
                         s->lineno, l->idName);
+                        erro_ = 1;
                     }
                     s = s->next;
                 }
@@ -320,14 +330,14 @@ void functionNotDeclared(FILE * listing){
 }
 
 void mainNotDeclared(FILE *listing){
-    int i, erro = 1;
+    int i, error = 1;
     char *name;
     for (i = 0; i < SIZE; i++){ 
         if (hashTable[i] != NULL){ 
             BucketList l = hashTable[i];
             while (l != NULL){ 
-                if(strcmp("GLOBAL main", l->name) == 0 || !erro){
-                    erro = 0;
+                if(strcmp("GLOBAL main", l->name) == 0 || !error){
+                    error = 0;
                     break;
                 }
                 free(name);
@@ -335,8 +345,9 @@ void mainNotDeclared(FILE *listing){
             }
         }
     }
-    if(erro){
-        fprintf(listing, "erro: função main() não declarada.\n");
+    if(error){
+        fprintf(listing, "Erro semantico: função main() não declarada.\n");
+        erro_ = 1;
     }
 }
 
@@ -369,11 +380,12 @@ void variableIsFunction(FILE *listing){
             if(strcmp(var[m]->idName, func[i]->idName) == 0){
                 LineList s = var[m]->decl_line;
                 while(s){
-                    fprintf(listing,"erro no escopo ");
+                    fprintf(listing,"Erro semantico no escopo ");
                     printScope(var[m]->name, listing);
                     fprintf(listing," na linha %d: %s já foi declarada como nome de função.\n",
                     s->lineno, var[m]->idName);
                     s = s->next;
+                    erro_ = 1;
                 }
             }
         }
@@ -389,10 +401,11 @@ void voidAtribuition(FILE *listing){
                 LineList s = l->atrib;
                 while (s != NULL){
                     if(!s->type){
-                        fprintf(listing,"erro no escopo ");
+                        fprintf(listing,"Erro semantico no escopo ");
                         printScope(l->name, listing);
                         fprintf(listing," na linha %d: atribuição void em %s.\n",
                         s->lineno, l->idName);
+                        erro_ = 1;
                     }
                     s = s->next;
                 }
@@ -402,7 +415,7 @@ void voidAtribuition(FILE *listing){
     }
 }
 
-void semantical(FILE *listing){
+int semantical(FILE *listing){
     notUniqueVariable(listing);
     notVoidVariable(listing);
     variableNotDeclared(listing);
@@ -410,4 +423,5 @@ void semantical(FILE *listing){
     mainNotDeclared(listing);
     variableIsFunction(listing);
     voidAtribuition(listing);
+    return erro_;
 }

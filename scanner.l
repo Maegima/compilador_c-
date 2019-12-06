@@ -58,7 +58,7 @@ void fecharArq(){
 }
 
 int FreakShow (){
-    printf("Erro: %s na linha %d.\n", yytext, line_counter);
+    printf("Erro lexico: %s na linha %d.\n", yytext, line_counter);
     return ERR;
 }
 
@@ -96,7 +96,19 @@ while                                 return WHILE;
 "["                                   return OBRACT;
 "]"                                   return CBRACT;
 \n                                    line_counter++;
-"/*"                                  return OCOM;
+"/*"                                  {
+                                        char c1, c2;
+                                        do{ 
+                                            c1 = yyinput();
+                                            LABEL00:
+                                            if (c1 == EOF) break;
+                                            if (c1 == '\n') line_counter++;
+                                        } 
+                                        while (c1 != '*');
+                                        c2 = yyinput();
+                                        if(c2 == EOF) c2 = '/';
+                                        if(c2 != '/') goto LABEL00;
+                                      }
 "*/"                                  return CCOM;
 \r
 \t

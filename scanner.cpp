@@ -548,7 +548,7 @@ void fecharArq(){
 }
 
 int FreakShow (){
-    printf("Erro: %s na linha %d.\n", yytext, line_counter);
+    printf("Erro lexico: %s na linha %d.\n", yytext, line_counter);
     return ERR;
 }
 
@@ -978,49 +978,61 @@ line_counter++;
 case 29:
 YY_RULE_SETUP
 #line 99 "scanner.l"
-return OCOM;
+{
+                                        char c1, c2;
+                                        do{ 
+                                            c1 = yyinput();
+                                            LABEL00:
+                                            if (c1 == EOF) break;
+                                            if (c1 == '\n') line_counter++;
+                                        } 
+                                        while (c1 != '*');
+                                        c2 = yyinput();
+                                        if(c2 == EOF) c2 = '/';
+                                        if(c2 != '/') goto LABEL00;
+                                      }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 100 "scanner.l"
+#line 112 "scanner.l"
 return CCOM;
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 101 "scanner.l"
+#line 113 "scanner.l"
 
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 102 "scanner.l"
+#line 114 "scanner.l"
 
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 103 "scanner.l"
+#line 115 "scanner.l"
 
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 104 "scanner.l"
+#line 116 "scanner.l"
 return FreakShow();
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 105 "scanner.l"
+#line 117 "scanner.l"
 return FreakShow();
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 106 "scanner.l"
+#line 118 "scanner.l"
 return FreakShow();
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 107 "scanner.l"
+#line 119 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1019 "scanner.cpp"
+#line 1031 "scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2025,7 +2037,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 107 "scanner.l"
+#line 119 "scanner.l"
 
 
 // int main(int argc, char *argv[])

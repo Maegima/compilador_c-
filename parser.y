@@ -1,3 +1,7 @@
+/*  
+    Andre Lucas 112175 
+    Maria Luisa 111859
+*/
 %{
 //GLC para gerar parser para calculadora simples
 
@@ -24,6 +28,7 @@ static TreeNode * savedTree; /* stores syntax tree for later return */
 int yylex(void);
 extern char* yytext;
 extern int line_counter;
+extern int erro;
 void yyerror(const char *msg);
 
 void init_parse(){
@@ -416,6 +421,7 @@ void yyerror(const char * msg)
 {
   extern char* yytext;
   cout << msg << ": " << yytext << " " << yylval << " " << yychar << " line " << line_counter << endl;
+  erro = 1;
 }
 
 /* yylex calls getToken to make Yacc/Bison output

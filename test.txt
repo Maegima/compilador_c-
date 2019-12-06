@@ -1,3 +1,7 @@
+/*  
+    Andre Lucas 112175 
+    Maria Luisa 111859
+*/
 int a [11230];
 
 int minloc ( int a[], int low, int high )
@@ -28,7 +32,7 @@ void sort( int b[], int low, int high)
 	}
 }
 
-int main(void)
+int maind(void)
 {
 	int i;
     void i;
@@ -44,7 +48,7 @@ int main(void)
 		vet[i] = input();
 		i = i + 1;
 	}
-	sort(1,0,10);
+	sort(vet,0,10);
 	i = 0;
 	while (i < 10){
 		output(a = 2, ok);

@@ -1,3 +1,7 @@
+/*  
+    Andre Lucas 112175 
+    Maria Luisa 111859
+*/
 /****************************************************/
 /* File: util.c                                     */
 /* Utility function implementation                  */
@@ -10,7 +14,7 @@
 #include "util.h"
 
 /* Procedure printToken prints a token 
- * and its lexeme to the listing file
+ * and its lexeme to the symbtree file
  */
 void printToken( TokenType token, const char* tokenString )
 { switch (token)
@@ -18,38 +22,38 @@ void printToken( TokenType token, const char* tokenString )
     case ELSE:
     case RETURN:
     case WHILE:
-      fprintf(listing,
+      fprintf(symbtree,
          "reserved word: %s\n",tokenString);
       break;
-    case ATRIB: fprintf(listing,":=\n"); break;
-    case SLT: fprintf(listing,"<\n"); break;
-    case SLTE: fprintf(listing,"<=\n"); break;
-    case SGT: fprintf(listing,">\n"); break;
-    case SGTE: fprintf(listing,"<=\n"); break;
-    case EQUAL: fprintf(listing,"=\n"); break;
-    case DIFFERENT: fprintf(listing,"!=\n"); break;
-    case OPAREN: fprintf(listing,"(\n"); break;
-    case CPAREN: fprintf(listing,")\n"); break;
-    case SEMICOLON: fprintf(listing,";\n"); break;
-    case ADD: fprintf(listing,"+\n"); break;
-    case SUB: fprintf(listing,"-\n"); break;
-    case MULT: fprintf(listing,"*\n"); break;
-    case DIV: fprintf(listing,"/\n"); break;
-    case ENDFILE: fprintf(listing,"EOF\n"); break;
+    case ATRIB: fprintf(symbtree,":=\n"); break;
+    case SLT: fprintf(symbtree,"<\n"); break;
+    case SLTE: fprintf(symbtree,"<=\n"); break;
+    case SGT: fprintf(symbtree,">\n"); break;
+    case SGTE: fprintf(symbtree,"<=\n"); break;
+    case EQUAL: fprintf(symbtree,"=\n"); break;
+    case DIFFERENT: fprintf(symbtree,"!=\n"); break;
+    case OPAREN: fprintf(symbtree,"(\n"); break;
+    case CPAREN: fprintf(symbtree,")\n"); break;
+    case SEMICOLON: fprintf(symbtree,";\n"); break;
+    case ADD: fprintf(symbtree,"+\n"); break;
+    case SUB: fprintf(symbtree,"-\n"); break;
+    case MULT: fprintf(symbtree,"*\n"); break;
+    case DIV: fprintf(symbtree,"/\n"); break;
+    case ENDFILE: fprintf(symbtree,"EOF\n"); break;
     case NUM:
-      fprintf(listing,
+      fprintf(symbtree,
           "NUM, val= %s\n",tokenString);
       break;
     case ID:
-      fprintf(listing,
+      fprintf(symbtree,
           "ID, name= %s\n",tokenString);
       break;
     case ERR:
-      fprintf(listing,
+      fprintf(symbtree,
           "ERROR: %s\n",tokenString);
       break;
     default: /* should never happen */
-      fprintf(listing,"Unknown token: %d\n",token);
+      fprintf(symbtree,"Unknown token: %d\n",token);
   }
 }
 
@@ -60,7 +64,7 @@ TreeNode * newStmtNode(StmtKind kind)
 { TreeNode * t = (TreeNode *) malloc(sizeof(TreeNode));
   int i;
   if (t==NULL)
-    fprintf(listing,"Out of memory error at line %d\n",line_counter);
+    fprintf(symbtree,"Out of memory error at line %d\n",line_counter);
   else {
     for (i=0;i<MAXCHILDREN;i++) t->child[i] = NULL;
     t->sibling = NULL;
@@ -83,7 +87,7 @@ TreeNode * newExpNode(ExpKind kind)
 { TreeNode * t = (TreeNode *) malloc(sizeof(TreeNode));
   int i;
   if (t==NULL)
-    fprintf(listing,"Out of memory error at line %d\n",line_counter);
+    fprintf(symbtree,"Out of memory error at line %d\n",line_counter);
   else {
     for (i=0;i<MAXCHILDREN;i++) t->child[i] = NULL;
     t->sibling = NULL;
@@ -109,7 +113,7 @@ char * copyString(char * s)
   n = strlen(s)+1;
   t = (char*) malloc(n);
   if (t==NULL)
-    fprintf(listing,"Out of memory error at line %d\n",line_counter);
+    fprintf(symbtree,"Out of memory error at line %d\n",line_counter);
   else strcpy(t,s);
   return t;
 }
@@ -127,11 +131,11 @@ static int indentno = 0;
 static void printSpaces(void)
 { int i;
   for (i=0;i<indentno;i++)
-    fprintf(listing," ");
+    fprintf(symbtree," ");
 }
 
 /* procedure printTree prints a syntax tree to the 
- * listing file using indentation to indicate subtrees
+ * symbtree file using indentation to indicate subtrees
  */
 void printTree( TreeNode * tree )
 { int i;
@@ -141,43 +145,43 @@ void printTree( TreeNode * tree )
     if (tree->nodekind==StmtK)
     { switch (tree->kind.stmt) {
         case IfK:
-          fprintf(listing,"If\n");
+          fprintf(symbtree,"If\n");
           break;
         case WhileK:
-          fprintf(listing,"While\n");
+          fprintf(symbtree,"While\n");
           break;
         case AssignK:
-          fprintf(listing,"Assign to: %s\n",tree->attr.name);
+          fprintf(symbtree,"Assign to: %s\n",tree->attr.name);
           break;
         case ReturnK:
-          fprintf(listing,"Return\n");
+          fprintf(symbtree,"Return\n");
           break;
         default:
-          fprintf(listing,"Unknown ExpNode kind\n");
+          fprintf(symbtree,"Unknown ExpNode kind\n");
           break;
       }
     }
     else if (tree->nodekind==ExpK)
     { switch (tree->kind.exp) {
         case OpK:
-          fprintf(listing,"Op: ");
+          fprintf(symbtree,"Op: ");
           printToken(tree->attr.op,"\0");
           break;
         case ConstK:
-          fprintf(listing,"Const: %d\n",tree->attr.val);
+          fprintf(symbtree,"Const: %d\n",tree->attr.val);
           break;
         case IdK:
-          fprintf(listing,"Id: %s\n",tree->attr.name);
+          fprintf(symbtree,"Id: %s\n",tree->attr.name);
           break;
         case TypeK:
-          fprintf(listing,"Type: %s\n",tree->attr.name);
+          fprintf(symbtree,"Type: %s\n",tree->attr.name);
           break;
         default:
-          fprintf(listing,"Unknown ExpNode kind\n");
+          fprintf(symbtree,"Unknown ExpNode kind\n");
           break;
       }
     }
-    else fprintf(listing,"Unknown node kind\n");
+    else fprintf(symbtree,"Unknown node kind\n");
     for (i=0;i<MAXCHILDREN;i++)
          printTree(tree->child[i]);
     tree = tree->sibling;

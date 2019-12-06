@@ -1,3 +1,7 @@
+/*  
+    Andre Lucas 112175 
+    Maria Luisa 111859
+*/
 /****************************************************/
 /* File: analyze.h                                  */
 /* Semantic analyzer interface for TINY compiler    */

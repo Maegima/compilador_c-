@@ -1,5 +1,9 @@
 #!/bin/sh
-out_file="scanner.cpp"
+#  
+#    Andre Lucas 112175 
+#    Maria Luisa 111859
+#
+#
 rm compilador
 echo gerando scanner.c ...
 flex -o scanner.cpp scanner.l
