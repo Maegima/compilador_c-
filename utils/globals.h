@@ -1,12 +1,13 @@
-/****************************************************/
-/* File: globals.h                                  */
-/* Yacc/Bison Version                               */
-/* Global types and vars for TINY compiler          */
-/* must come before other include files             */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
-/****************************************************/
-
+/**
+ * @file globals.h
+ * @author André Lucas Maegima
+ * @brief Definições de tipos e variáveis globais
+ * @version 0.1
+ * @date 2019-12-06
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
@@ -26,7 +27,7 @@
 
 #ifndef YYPARSER
 
-/* the name of the following file may change */
+/* nome do header do parser criado pelo bison */
 #include "../parser.h"
 
 /* ENDFILE is implicitly defined by Yacc/Bison,
@@ -44,24 +45,21 @@
 #define TRUE 1
 #endif
 
-/* MAXRESERVED = the number of reserved words */
-#define MAXRESERVED 8
-
 /* Yacc/Bison generates its own integer values
  * for tokens
  */
 typedef int TokenType; 
 
-extern FILE* source; /* source code text file */
-extern FILE* listing; /* listing output text file */
-extern FILE* code; /* code text file for TM simulator */
-extern FILE* symbtree;
-extern FILE *symbtab;
+extern FILE* source; /* arquivo de origem */
+extern FILE* listing; /* arquivo para saída */
+extern FILE* code; /* arquivo para saída do código intermediário */
+extern FILE* symbtree; /* arquivo para saída da árvore sintática */
+extern FILE *symbtab; /* arquivo para sída da tabela de simbolos */
 
-extern int line_counter; /* source line number for listing */
+extern int line_counter; /* linha atual do arquivo de origem */
 
 /**************************************************/
-/***********   Syntax tree for parsing ************/
+/******  Definições para árvore sintática *********/
 /**************************************************/
 
 typedef enum {StmtK,ExpK} NodeKind;
@@ -83,11 +81,11 @@ typedef struct treeNode
      union { TokenType op;
              int val;
              char * name; } attr;
-     ExpType type; /* for type checking of exps */
+     ExpType type;
    } TreeNode;
 
 /**************************************************/
-/***********   Flags for tracing       ************/
+/***********   Flags para o rastreamento   ********/
 /**************************************************/
 
 /* EchoSource = TRUE causes the source program to
