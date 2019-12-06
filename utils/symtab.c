@@ -17,7 +17,7 @@
 #include "symtab.h"
 #include "analyze.h"
 
-/* SIZE é o tamanho da tabela hash */
+/** @brief SIZE é o tamanho da tabela hash */
 #define SIZE 211
 
 /** @brief SHIFT é a potência de dois usada como multiplicador
@@ -38,7 +38,7 @@ static int hash(char *key){
     return temp;
 }
 
-/* @brief Lista encadeada de linhas */
+/** @brief Lista encadeada de linhas */
 typedef struct LineListRec{
     int lineno;
     int type;
@@ -161,17 +161,11 @@ void st_insert(char *name, char *idName, int lineno, int decl_line, int type, in
 }
 
 /**
- * @brief Procedimento st_insert insere ou 
- * atualiza um dado na tabela de simbolos
+ * @brief Função st_lookup procura na tabela
+ * de símbolos por um dado
  * 
- * @param name Nome
- * @param idName escopo
- * @param lineno linha
- * @param decl_line linha de declaração
- * @param type tipo
- * @param func se é função
- * @param atrib se é atribuição
- * @param loc localização na memória
+ * @param name Id do dado a ser procurado
+ * @return int Localização do dado
  */
 int st_lookup(char *name){
     int h = hash(name);

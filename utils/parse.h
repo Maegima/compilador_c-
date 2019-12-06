@@ -1,5 +1,5 @@
 /**
- * @file analyze.h
+ * @file parse.h
  * @author André Lucas Maegima
  * @brief Interface para o analisador sintática
  * @version 0.1

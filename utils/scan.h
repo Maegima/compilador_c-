@@ -1,5 +1,5 @@
 /**
- * @file analyze.h
+ * @file scan.h
  * @author André Lucas Maegima
  * @brief Interface para o analisador léxico
  * @version 0.1
@@ -22,7 +22,7 @@
 TokenType getToken(void);
 
 /**
- * @brief initScanner icializa as 
+ * @brief initScanner inicializa as 
  * váriaveis do analizador léxico
  * 
  */
