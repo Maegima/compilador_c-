@@ -20,6 +20,14 @@
  */
 void buildSymtab(TreeNode *);
 
+/**
+ * @brief uniteStrings junta duas strings em uma 
+ * separadas por espaço
+ * 
+ * @param str1 Primeira string 
+ * @param str2 Segunda string
+ * @return char* Endereço da string resultante
+ */
 char *uniteStrings(const char* scope, const char *name);
 
 #endif

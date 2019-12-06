@@ -31,9 +31,9 @@ static void traverse(TreeNode*t, void(*preProc)(TreeNode*), void(*postProc)(Tree
         preProc(t);
         int i;
         for (i = 0; i < MAXCHILDREN; i++)
-            traverse(t->child[i],preProc,postProc);
+            traverse(t->child[i], preProc, postProc);
         postProc(t);
-        traverse(t->sibling,preProc,postProc);
+        traverse(t->sibling, preProc, postProc);
     }
 }
 
@@ -128,8 +128,7 @@ static void insertNode( TreeNode * t){
  * 
  * @param syntaxTree Raiz da árvore sintática
  */
-void buildSymtab(TreeNode * syntaxTree)
-{ 
+void buildSymtab(TreeNode * syntaxTree){ 
     char *input = (char*) malloc(sizeof(char)*6);
     char *output = (char*) malloc(sizeof(char)*7);
     char *G_input = (char*) malloc(sizeof(char)*13);
@@ -138,12 +137,11 @@ void buildSymtab(TreeNode * syntaxTree)
     memcpy(output, "output\0", sizeof(char)*7);
     memcpy(G_input, "GLOBAL input\0", sizeof(char)*13);
     memcpy(G_output, "GLOBAL output\0", sizeof(char)*14); 
-    st_insert(G_input,input,0,0,Integer,1,-1,location++);
-    st_insert(G_output,output,0,0,Void,1,-1,location++);
-    traverse(syntaxTree,insertNode,nullProc);
-    if (TraceAnalyze)
-    { 
-        fprintf(symbtab,"\nSymbol table:\n\n");
+    st_insert(G_input, input, 0, 0, Integer, 1, -1, location++);
+    st_insert(G_output, output, 0, 0, Void, 1, -1, location++);
+    traverse(syntaxTree, insertNode, nullProc);
+    if (TraceAnalyze){ 
+        fprintf(symbtab, "\nSymbol table:\n\n");
         printSymTab(symbtab);
     }
 }
