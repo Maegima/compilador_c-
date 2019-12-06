@@ -165,10 +165,10 @@ void printTree( TreeNode * tree )
           fprintf(listing,"Const: %d\n",tree->attr.val);
           break;
         case IdK:
-          fprintf(listing,"Id: %s Line %d\n",tree->attr.name, tree->lineno);
+          fprintf(listing,"Id: %s\n",tree->attr.name);
           break;
         case TypeK:
-          fprintf(listing,"Type: %s Line %d\n",tree->attr.name, tree->lineno);
+          fprintf(listing,"Type: %s\n",tree->attr.name);
           break;
         default:
           fprintf(listing,"Unknown ExpNode kind\n");

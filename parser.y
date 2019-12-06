@@ -343,10 +343,7 @@ mult: MULT
 ;
 fator: OPAREN expressao CPAREN { $$ = $2; } 
 | var { $$ = $1; } 
-| ativacao 
-{ $$ = $1;
-    printf("ativacao %d\n", $1->type);
-} 
+| ativacao { $$ = $1; } 
 | numero { $$ = $1; }
 ;
 ativacao: identificador OPAREN simples_expressao CPAREN 

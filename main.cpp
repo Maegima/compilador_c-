@@ -33,7 +33,7 @@ extern void fecharArq();
 int line_counter = 0;
 FILE * source = NULL;
 FILE * listing = stdout;
-FILE * code = NULL;
+FILE * code = stdout;
 
 /* allocate and set tracing flags */
 int EchoSource = FALSE;
