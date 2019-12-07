@@ -12,10 +12,7 @@
 #include "symtab.h"
 #include "analyze.h"
 
-/**
- * @brief Contador para o local das variáveis na memória 
- * 
- */
+/// @brief Contador para o local das variáveis na memória 
 static int location = 0;
 
 /**

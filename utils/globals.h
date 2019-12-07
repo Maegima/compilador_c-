@@ -22,100 +22,106 @@
  * Yacc/Bison option -d ("generate header")
  *
  * The YYPARSER flag prevents inclusion of the tab.h
- * into the Yacc/Bison output itself
+ * into the Yacc/Bison output itself.
  */
 
 #ifndef YYPARSER
 
-/* nome do header do parser criado pelo bison */
+/* Nome do header do parser criado pelo bison. */
 #include "../parser.h"
 
-/* ENDFILE is implicitly defined by Yacc/Bison,
- * and not included in the tab.h file
+/** ENDFILE é definido implicitamente pelo Yacc/Bison,
+ * mas não é icluido no arquivo tab.h.
  */
 #define ENDFILE 0
 
 #endif
 
 #ifndef FALSE
-#define FALSE 0
+#define FALSE 0 ///< Definição de FALSE.
 #endif
 
 #ifndef TRUE
-#define TRUE 1
+#define TRUE 1 ///< Definição de TRUE.
 #endif
 
-/* Yacc/Bison generates its own integer values
- * for tokens
- */
-typedef int TokenType; 
+typedef int TokenType; /**< Yacc/Bison gera o próprio tipo para valores de token. */
 
-extern FILE* source; /* arquivo de origem */
-extern FILE* listing; /* arquivo para saída */
-extern FILE* code; /* arquivo para saída do código intermediário */
-extern FILE* symbtree; /* arquivo para saída da árvore sintática */
-extern FILE *symbtab; /* arquivo para sída da tabela de simbolos */
+extern FILE* source; /**< Arquivo de origem. */
+extern FILE* listing; /**< Arquivo para saída. */
+extern FILE* code; /**< Arquivo para saída do código intermediário. */
+extern FILE* symbtree; /**< Arquivo para saída da árvore sintática. */
+extern FILE *symbtab; /**< Arquivo para saída da tabela de simbolos. */
 
-extern int line_counter; /* linha atual do arquivo de origem */
+extern int line_counter; /**< Linha atual do arquivo de origem. */
 
 /**************************************************/
 /******  Definições para árvore sintática *********/
 /**************************************************/
-
-typedef enum {StmtK,ExpK} NodeKind;
+/// Enum de tipos de Nós.
+typedef enum {StmtK,ExpK} NodeKind; 
+/// Enum de tipos de declarações.
 typedef enum {IfK,WhileK,AssignK,ReturnK} StmtKind;
-typedef enum {OpK,ConstK,IdK,TypeK} ExpKind;
+/// Enum de tipos de expressões. 
+typedef enum {OpK,ConstK,IdK,TypeK} ExpKind; 
+/// ExpType é usado para verificar o tipo da expressão.
+typedef enum {Void,Integer} ExpType; 
 
-/* ExpType is used for type checking */
-typedef enum {Void,Integer} ExpType;
+#define MAXCHILDREN 3 /**< Número máximo de filhos para um nó da árvore sintática. */
 
-#define MAXCHILDREN 3
-
-typedef struct treeNode
-   { struct treeNode * child[MAXCHILDREN];
-     struct treeNode * sibling;
-     int lineno, decl_line, func, atrib, decl;
-     NodeKind nodekind;
-     char *scope;
-     union { StmtKind stmt; ExpKind exp;} kind;
-     union { TokenType op;
-             int val;
-             char * name; } attr;
-     ExpType type;
+/**
+ * @brief Definição da árvore.
+ * @brief Definição da estrutura da árvore de análise sintática.
+ */
+typedef struct treeNode{ 
+    /// Filhos de um nó.
+    struct treeNode *child[MAXCHILDREN];
+    /// Próximo irmão.
+    struct treeNode *sibling;
+    int lineno /** @brief Número da linha. */, decl_line /** @brief Linha de declaração. */; 
+    int func /** @brief Se for função. */, atrib /** @brief Se for atribuição. */, decl /** @brief Se for declaração. */;
+    NodeKind nodekind; /**< @brief Tipo de Nó. */
+    char *scope; /**< @brief Escopo do Nó. */
+    /// Tipo de um nó.
+    union { StmtKind stmt; ExpKind exp; } kind;
+    /// Dado do nó.
+    union { TokenType op; int val; char *name; } attr;
+    /// Tipo de expressão.
+    ExpType type;
    } TreeNode;
 
 /**************************************************/
 /***********   Flags para o rastreamento   ********/
 /**************************************************/
 
-/* EchoSource = TRUE causes the source program to
+/** EchoSource = TRUE causes the source program to
  * be echoed to the listing file with line numbers
  * during parsing
  */
 extern int EchoSource;
 
-/* TraceScan = TRUE causes token information to be
+/** TraceScan = TRUE causes token information to be
  * printed to the listing file as each token is
  * recognized by the scanner
  */
 extern int TraceScan;
 
-/* TraceParse = TRUE causes the syntax tree to be
+/** TraceParse = TRUE causes the syntax tree to be
  * printed to the listing file in linearized form
  * (using indents for children)
  */
 extern int TraceParse;
 
-/* TraceAnalyze = TRUE causes symbol table inserts
+/** TraceAnalyze = TRUE causes symbol table inserts
  * and lookups to be reported to the listing file
  */
 extern int TraceAnalyze;
 
-/* TraceCode = TRUE causes comments to be written
+/** TraceCode = TRUE causes comments to be written
  * to the TM code file as code is generated
  */
 extern int TraceCode;
 
-/* Error = TRUE prevents further passes if an error occurs */
+/** Error = TRUE prevents further passes if an error occurs */
 extern int Error; 
 #endif
