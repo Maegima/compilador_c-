@@ -1,36 +1,59 @@
-/****************************************************/
-/* File: util.h                                     */
-/* Utility functions for the TINY compiler          */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
-/****************************************************/
+/**
+ * @file util.h
+ * @author André Lucas Maegima
+ * @brief Funções utilitárias para o compilador de C-.
+ * @version 0.1
+ * @date 2019-12-09
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 
 #ifndef _UTIL_H_
 #define _UTIL_H_
 
-/* Procedure printToken prints a token 
- * and its lexeme to the listing file
+/**
+ * @brief O procedimento printToken imprime um token 
+ * e seu lexema no arquivo symbtree.
+ * 
+ * @param token Identificador do token.
+ * @param tokenString Descrição textual do token.
  */
-void printToken( TokenType, const char* );
+void printToken(TokenType token, const char* tokenString);
 
-/* Function newStmtNode creates a new statement
- * node for syntax tree construction
+/**
+ * @brief A função newStmtNode cria um novo nó de declaração
+ * para a construção da árvore sintática.
+ * 
+ * @param kind Tipo de declaração.
+ * @return TreeNode* Nó da árvore sintática.
  */
-TreeNode * newStmtNode(StmtKind);
+TreeNode *newStmtNode(StmtKind kind);
 
-/* Function newExpNode creates a new expression 
- * node for syntax tree construction
+/**
+ * @brief A função newExpNode cria um novo nó de expressão
+ * para a construção da árvore sintática.
+ * 
+ * @param kind Tipo de expressão.
+ * @return TreeNode* Nó da árvore sintática.
  */
-TreeNode * newExpNode(ExpKind);
+TreeNode * newExpNode(ExpKind kind);
 
-/* Function copyString allocates and makes a new
- * copy of an existing string
+/**
+ * @brief A função copyString cria e aloca uma nova
+ * cópia da string passada como parâmetro.
+ * 
+ * @param str String a ser copiada.
+ * @return char* Endereço da copia criada.
  */
-char * copyString( char * );
+char * copyString(char *str);
 
-/* procedure printTree prints a syntax tree to the 
- * listing file using indentation to indicate subtrees
+/**
+ * @brief O procedimento printTree imprime a árvore sintática
+ * no arquivo symbtree usando identação para indicar sub-árvores.
+ * 
+ * @param tree Raiz da árvore.
  */
-void printTree( TreeNode * );
+void printTree(TreeNode *tree);
 
 #endif
