@@ -13,16 +13,16 @@
 #define _PARSE_H_
 
 /**
- * @brief Parse faz a análise sintática
- * e cria a árvore de sintática
+ * @brief A função parse faz a análise sintática
+ * e cria a árvore de análise sintática.
  * 
- * @return TreeNode* Nó raiz da árvore
+ * @return TreeNode* Nó raiz da árvore.
  */
 TreeNode * parse(void);
 
 /**
- * @brief initParser inicializa as váriaveis 
- * do analizador sintática
+ * @brief O procedimento initParser inicializa as váriaveis 
+ * do analisador sintático.
  * 
  */
 void initParser();

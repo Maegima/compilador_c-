@@ -14,9 +14,9 @@ using namespace std;
 #define YYSTYPE TreeNode *
 static char * scope;
 static int sc = 1;
-int func_id = 0;
-char * func[256];
-ExpType type[256];
+static int func_id = 0;
+static char * func[256];
+static ExpType type[256];
 static TreeNode * savedTree; /* raiz da árvore sintática */
 
 int yylex(void);
@@ -431,12 +431,6 @@ int yylex(void){
     return getToken(); 
 }
 
-/**
- * @brief parse é procedimento que inicia a análise
- * léxica juntamente com a análise semântica
- *
- * @return TreeNode* Raiz da árvore semântica
- */
 TreeNode * parse(void){ 
     initScanner();
     initParse();
