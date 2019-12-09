@@ -1,7 +1,7 @@
 /**
  * @file analyze.c
  * @author André Lucas Maegima
- * @brief Analizador semântico para a linguagem c-
+ * @brief Analizador semântico para a linguagem C-.
  * @version 0.1
  * @date 2019-12-06
  * 
@@ -12,16 +12,16 @@
 #include "symtab.h"
 #include "analyze.h"
 
-/// @brief Contador para o local das variáveis na memória 
+/// @brief Contador para o local das variáveis na memória. 
 static int location = 0;
 
 /**
  * @brief Procedimento com sintaxe recursiva 
- * generica para a rotina traverse
+ * generica para a rotina traverse.
  * 
- * @param t Raiz da arvore
- * @param preProc Percurso em pré ordem
- * @param postProc Percurso em pós ordem
+ * @param t Raiz da arvore.
+ * @param preProc Percurso em pré ordem.
+ * @param postProc Percurso em pós ordem.
  */
 static void traverse(TreeNode*t, void(*preProc)(TreeNode*), void(*postProc)(TreeNode*)){ 
     if (t != NULL){ 
@@ -35,19 +35,19 @@ static void traverse(TreeNode*t, void(*preProc)(TreeNode*), void(*postProc)(Tree
 }
 
 /**
- * @brief Procedimento que não faz nada
+ * @brief Procedimento que não faz nada.
  * 
- * @param t Raiz da árvore
+ * @param t Raiz da árvore.
  */
 static void nullProc(TreeNode * t){ }
 
 /**
  * @brief uniteStrings junta duas strings em uma 
- * separadas por espaço
+ * separadas por espaço.
  * 
- * @param str1 Primeira string 
- * @param str2 Segunda string
- * @return char* Endereço da string resultante
+ * @param str1 Primeira string. 
+ * @param str2 Segunda string.
+ * @return char* Endereço da string resultante.
  */
 char *uniteStrings(const char* str1, const char *str2){
     char *scopeName;
@@ -63,9 +63,9 @@ char *uniteStrings(const char* str1, const char *str2){
 
 /**
  * @brief insertNode insere identificadores armazenados
- * em t na tabela de simbolos
+ * em t na tabela de simbolos.
  * 
- * @param t No da árvore
+ * @param t No da árvore.
  */
 static void insertNode( TreeNode * t){ 
     char *name, *func;
@@ -121,9 +121,9 @@ static void insertNode( TreeNode * t){
 
 /**
  * @brief Função que constroi uma tabela de simbolos
- * percorrendo a árvore sintática em pré ordem
+ * percorrendo a árvore sintática em pré ordem.
  * 
- * @param syntaxTree Raiz da árvore sintática
+ * @param syntaxTree Raiz da árvore sintática.
  */
 void buildSymtab(TreeNode * syntaxTree){ 
     char *input = (char*) malloc(sizeof(char)*6);

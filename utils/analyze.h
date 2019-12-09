@@ -1,7 +1,7 @@
 /**
  * @file analyze.h
  * @author André Lucas Maegima
- * @brief Interface para o analizador semântico
+ * @brief Interface para o analizador semântico.
  * @version 0.1
  * @date 2019-12-06
  * 
@@ -14,19 +14,19 @@
 
 /**
  * @brief Função que constroi uma tabela de simbolos
- * percorrendo a árvore sintática em pré ordem
+ * percorrendo a árvore sintática em pré ordem.
  * 
- * @param syntaxTree Raiz da árvore sintática
+ * @param syntaxTree Raiz da árvore sintática.
  */
 void buildSymtab(TreeNode *);
 
 /**
  * @brief uniteStrings junta duas strings em uma 
- * separadas por espaço
+ * separadas por espaço.
  * 
- * @param str1 Primeira string 
- * @param str2 Segunda string
- * @return char* Endereço da string resultante
+ * @param str1 Primeira string.
+ * @param str2 Segunda string.
+ * @return char* Endereço da string resultante.
  */
 char *uniteStrings(const char* scope, const char *name);
 
