@@ -41,14 +41,6 @@ static void traverse(TreeNode*t, void(*preProc)(TreeNode*), void(*postProc)(Tree
  */
 static void nullProc(TreeNode * t){ }
 
-/**
- * @brief uniteStrings junta duas strings em uma 
- * separadas por espaço.
- * 
- * @param str1 Primeira string. 
- * @param str2 Segunda string.
- * @return char* Endereço da string resultante.
- */
 char *uniteStrings(const char* str1, const char *str2){
     char *scopeName;
     int len1, len2;
@@ -119,12 +111,6 @@ static void insertNode( TreeNode * t){
     }
 }
 
-/**
- * @brief Função que constroi uma tabela de simbolos
- * percorrendo a árvore sintática em pré ordem.
- * 
- * @param syntaxTree Raiz da árvore sintática.
- */
 void buildSymtab(TreeNode * syntaxTree){ 
     char *input = (char*) malloc(sizeof(char)*6);
     char *output = (char*) malloc(sizeof(char)*7);

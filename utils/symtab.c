@@ -2,7 +2,7 @@
  * @file symtab.c
  * @author André Lucas Maegima
  * @brief Implementação da tabela de simbolos e 
- * analizador semântico
+ * analizador semântico.
  * @version 0.1
  * @date 2019-12-06
  * 
@@ -17,16 +17,17 @@
 #include "symtab.h"
 #include "analyze.h"
 
-/** @brief SIZE é o tamanho da tabela hash */
+/** SIZE é o tamanho da tabela hash. */
 #define SIZE 211
 
-/** @brief SHIFT é a potência de dois usada como multiplicador
-na função de hash  */
+/** SHIFT é a potência de dois usada como multiplicador
+na função de hash.  */
 #define SHIFT 4
 
+/** Variável para indicar erro na análise semântica. */
 int erro_ = 0;
 
-/**  @brief Função de hash */
+/**  @brief Função de hash. */
 static int hash(char *key){
     int temp = 0;
     int i = 0;
@@ -38,45 +39,32 @@ static int hash(char *key){
     return temp;
 }
 
-/** @brief Lista encadeada de linhas */
+/** @brief Lista encadeada de linhas. */
 typedef struct LineListRec{
-    int lineno;
-    int type;
-    struct LineListRec *next;
+    int lineno; /**< @brief Número da linha. */
+    int type; /**< @brief Tipo. */
+    struct LineListRec *next; /**< @brief Próxima linha. */
 } * LineList;
 
 /**
  * @brief Armazena os dados de uma
- * entrada na tabela de símbolos 
+ * entrada na tabela de símbolos. 
  * 
  */
 typedef struct BucketListRec{
-    char *name;
-    char *idName;
-    int func;
-    LineList lines;
-    LineList atrib;
-    LineList decl_line;
-    int memloc; /* memory location for variable */
-    struct BucketListRec *next;
+    char *name; /**< @brief Nome do identificador. */
+    char *idName; /**< @brief Nome do escopo do identificador. */
+    int func; /**< @brief Se o identificador é uma função. */
+    LineList lines; /**< @brief Linhas onde o identificador aparece. */
+    LineList atrib; /**< @brief Linhas de atribuição ao identificador. */
+    LineList decl_line; /**< @brief Linhas de declaração do identificador. */
+    int memloc; /**< @brief Localização na memória. */
+    struct BucketListRec *next; /**< @brief Próximo item. */
 } *BucketList;
 
-/*  @brief A tabela hash */
+/** @brief A tabela hash */
 static BucketList hashTable[SIZE];
 
-/**
- * @brief Procedimento st_insert insere ou 
- * atualiza um dado na tabela de simbolos
- * 
- * @param name Nome
- * @param idName escopo
- * @param lineno linha
- * @param decl_line linha de declaração
- * @param type tipo
- * @param func se é função
- * @param atrib se é atribuição
- * @param loc localização na memória
- */
 void st_insert(char *name, char *idName, int lineno, int decl_line, int type, int func, int atrib, int loc){
     int h = hash(name);
     BucketList l = hashTable[h];
@@ -160,13 +148,6 @@ void st_insert(char *name, char *idName, int lineno, int decl_line, int type, in
     }
 }
 
-/**
- * @brief Função st_lookup procura na tabela
- * de símbolos por um dado
- * 
- * @param name Id do dado a ser procurado
- * @return int Localização do dado
- */
 int st_lookup(char *name){
     int h = hash(name);
     BucketList l = hashTable[h];
@@ -178,12 +159,6 @@ int st_lookup(char *name){
         return l->memloc;
 }
 
-/**
- * @brief Procedimento printSymTab imprime em um
- * arquivo a tabela de simbolos
- * 
- * @param listing arquivo de escrita
- */
 void printSymTab(FILE *listing){
     int i, padding = 2, count;
     for (i = 0; i < SIZE; ++i){
@@ -239,10 +214,10 @@ void printSymTab(FILE *listing){
 }
 
 /**
- * @brief Printa no arquivo o escopo de name
+ * @brief Imprime no arquivo o escopo de name.
  * 
- * @param name Id da tabela de simbolo 
- * @param listing Arquivo de escrita
+ * @param name Id da tabela de simbolo.
+ * @param listing Arquivo de escrita.
  */
 static void printScope(char *name, FILE *listing){
     int i = 0;
@@ -254,9 +229,9 @@ static void printScope(char *name, FILE *listing){
 
 /**
  * @brief Procura e imprime no arquivo os erros de 
- * não unicidade de declaração
+ * não unicidade de declaração.
  * 
- * @param listing Arquivo de escrita
+ * @param listing Arquivo de escrita.
  */
 static void notUniqueVariable(FILE *listing){
     int i, count = 0;
@@ -285,9 +260,9 @@ static void notUniqueVariable(FILE *listing){
 
 /**
  * @brief Procura e imprime no arquivo de escrita os erros
- * de declaração de váriavel void 
+ * de declaração de váriavel void.
  * 
- * @param listing Arquivo de escrita 
+ * @param listing Arquivo de escrita. 
  */
 static void notVoidVariable(FILE *listing){
     int i;
@@ -314,9 +289,9 @@ static void notVoidVariable(FILE *listing){
 
 /**
  * @brief Procura e imprime no arquivo de escrita os erros
- * de váriavel não declarada 
+ * de váriavel não declarada.
  * 
- * @param listing Arquivo de escrita 
+ * @param listing Arquivo de escrita. 
  */
 static void variableNotDeclared(FILE *listing){
     int i;
@@ -347,9 +322,9 @@ static void variableNotDeclared(FILE *listing){
 
 /**
  * @brief Procura e imprime no arquivo de escrita os erros
- * de função não declarada 
+ * de função não declarada.
  * 
- * @param listing Arquivo de escrita 
+ * @param listing Arquivo de escrita. 
  */
 static void functionNotDeclared(FILE *listing){
     int i;
@@ -379,9 +354,9 @@ static void functionNotDeclared(FILE *listing){
 
 /**
  * @brief Procura e imprime no arquivo de escrita o erro
- * de main não declarada 
+ * de main não declarada.
  * 
- * @param listing Arquivo de escrita 
+ * @param listing Arquivo de escrita.
  */
 static void mainNotDeclared(FILE *listing){
     int i, error = 1;
@@ -407,9 +382,9 @@ static void mainNotDeclared(FILE *listing){
 
 /**
  * @brief Procura e imprime no arquivo de escrita os erros
- * de váriavel declarada previamente como função
+ * de váriavel declarada previamente como função.
  * 
- * @param listing Arquivo de escrita 
+ * @param listing Arquivo de escrita.
  */
 static void variableIsFunction(FILE *listing){
     int i, j = 0, k = 0, m;
@@ -453,9 +428,9 @@ static void variableIsFunction(FILE *listing){
 
 /**
  * @brief Procura e imprime no arquivo de escrita os erros
- * atribuição void em váriavel
+ * atribuição void em váriavel.
  * 
- * @param listing Arquivo de escrita 
+ * @param listing Arquivo para saída. 
  */
 static void voidAtribuition(FILE *listing){
     int i;
@@ -480,13 +455,6 @@ static void voidAtribuition(FILE *listing){
     }
 }
 
-/**
- * @brief Função que procura e imprime os erros 
- * semânticos e retorna 1 caso ocorrar um erro
- * 
- * @param symbtab tabela de simbolos 
- * @return int Erro
- */
 int semantical(FILE *listing){
     notUniqueVariable(listing);
     notVoidVariable(listing);

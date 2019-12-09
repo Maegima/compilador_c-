@@ -151,7 +151,7 @@ TreeNode *newExpNode(ExpKind kind)
  * @brief A função copyString cria e aloca uma nova
  * cópia da string passada como parâmetro.
  * 
- * @param str String a ser copiada.
+ * @param s String a ser copiada.
  * @return char* Endereço da copia criada.
  */
 char *copyString(char *s){

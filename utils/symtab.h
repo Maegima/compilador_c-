@@ -1,7 +1,7 @@
 /**
  * @file symtab.h
  * @author André Lucas Maegima
- * @brief Interface para o analisador semântico
+ * @brief Interface para o analisador semântico.
  * @version 0.1
  * @date 2019-12-06
  * 
@@ -14,43 +14,43 @@
 
 /**
  * @brief Procedimento st_insert insere ou 
- * atualiza um dado na tabela de simbolos
+ * atualiza um dado na tabela de simbolos.
  * 
- * @param name Nome
- * @param idName escopo
- * @param lineno linha
- * @param decl_line linha de declaração
- * @param type tipo
- * @param func se é função
- * @param atrib se é atribuição
- * @param loc localização na memória
+ * @param name Nome.
+ * @param idName Escopo.
+ * @param lineno Linha.
+ * @param decl_line Linha de declaração.
+ * @param type Tipo.
+ * @param func Se é função.
+ * @param atrib Se é atribuição.
+ * @param loc Localização na memória.
  */
 void st_insert(char * name, char *idName, int lineno, int decl_line, int type, int func, int atrib, int loc);
 
 /**
- * @brief Função st_lookup procura na tabela
- * de símbolos por um dado
+ * @brief A função st_lookup procura na tabela
+ * de símbolos por um dado.
  * 
- * @param name Id do dado a ser procurado
- * @return int Localização do dado
+ * @param name Id do dado a ser procurado.
+ * @return int Localização do dado.
  */
 int st_lookup (char * name);
 
 /**
- * @brief Procedimento printSymTab imprime em um
- * arquivo a tabela de simbolos
+ * @brief O procedimento printSymTab imprime em um
+ * arquivo a tabela de simbolos.
  * 
- * @param listing arquivo de escrita
+ * @param listing Arquivo de escrita.
  */
 void printSymTab(FILE * listing);
 
 /**
- * @brief Função que procura e imprime os erros 
- * semânticos e retorna 1 caso ocorrar um erro
+ * @brief A função que procura e imprime os erros 
+ * semânticos e retorna 1 caso ocorrar um erro.
  * 
- * @param symbtab tabela de simbolos 
- * @return int Erro
+ * @param listing Arquivo de escrita.
+ * @return int Erro.
  */
-int semantical(FILE *symbtab);
+int semantical(FILE *listing);
 
 #endif

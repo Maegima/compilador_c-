@@ -18,7 +18,7 @@
  * 
  * @param syntaxTree Raiz da árvore sintática.
  */
-void buildSymtab(TreeNode *);
+void buildSymtab(TreeNode *syntaxTree);
 
 /**
  * @brief uniteStrings junta duas strings em uma 
@@ -28,6 +28,6 @@ void buildSymtab(TreeNode *);
  * @param str2 Segunda string.
  * @return char* Endereço da string resultante.
  */
-char *uniteStrings(const char* scope, const char *name);
+char *uniteStrings(const char* str1, const char *str2);
 
 #endif
