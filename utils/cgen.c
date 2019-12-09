@@ -1,11 +1,14 @@
-/****************************************************/
-/* File: cgen.c                                     */
-/* The code generator implementation                */
-/* for the TINY compiler                            */
-/* (generates code for the TM machine)              */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
-/****************************************************/
+/**
+ * @file cgen.c
+ * @author André Lucas Maegima
+ * @brief Implementação do gerador de código 
+ * intermediário para a linguagem C-.
+ * @version 0.1
+ * @date 2019-12-09
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 
 #include <stdlib.h>
 #include <string.h>
@@ -14,10 +17,18 @@
 #include "code.h"
 #include "cgen.h"
 
-char number[11];
-int cont_aux = 0, cont_lab = 0, cont_vet = 0;
+static char number[11]; /**< Utilizado na conversão de número para string */
+static int cont_aux = 0, cont_lab = 0, cont_vet = 0;
 
-void intToString(char *str, int v, int n){
+/**
+ * @brief O procedimento intToString converte um 
+ * inteiro em uma string.
+ * 
+ * @param str Buffer onde o número será armazenado.
+ * @param v Número.
+ * @param n Tamanho do buffer.
+ */
+static void intToString(char *str, int v, int n){
     int i, value, cont = 0;
     value = v;
     str[0] = '0';
@@ -36,7 +47,14 @@ void intToString(char *str, int v, int n){
         str[cont] = '\0';
 }
 
-char *strNumber(const char *str, int number){
+/**
+ * @brief A função strNumber concatena uma string com um número.
+ * 
+ * @param str String base.
+ * @param number Número.
+ * @return char* Endereço da nova string.
+ */
+static char *strNumber(const char *str, int number){
     char num[11];
     char *rt;
     int a, b;
@@ -49,12 +67,32 @@ char *strNumber(const char *str, int number){
     return rt;
 }
 
-/* prototype for internal recursive code generator */
+/**
+ * @brief O procedimento cGen gera o código intermediário
+ * percorrendo a árvore de forma recursiva.
+ * 
+ * @param tree Nó da árvore.
+ * @param operate Último operando.
+ */
 static void cGen(TreeNode *tree, char **operate);
 
+/**
+ * @brief O procedimento ccGen gera o código intermediário
+ * percorrendo a árvore de forma recursiva mas sem fazer
+ * chamadas recursivas para seus irmãos.
+ * 
+ * @param tree Nó da árvore.
+ * @param operate Último operando.
+ */
 static void ccGen(TreeNode *tree, char **operate);
 
-/* Procedure genStmt generates code at a statement node */
+/**
+ * @brief O procedimento genStmt gera o código intermediário
+ * para um nó de declaração.
+ * 
+ * @param tree Nó da árvore.
+ * @param operate Último operando.
+ */
 static void genStmt(TreeNode *tree, char **operate){
     TreeNode *p1, *p2, *p3;
     char *op[3] = {NULL, NULL, NULL};
@@ -120,8 +158,6 @@ static void genStmt(TreeNode *tree, char **operate){
         cGen(tree->child[1], &op[1]);
         if (strcmp(op[0], op[1]) != 0)
             emitQuadruple("ASSIGN", op[0], op[1], "-");
-        /* now store value */
-        //emitQuadruple("ASSIGN", "-", "-", "-");
         if (TraceCode)
             emitComment("<- assign");
         *operate = op[0];
@@ -136,9 +172,15 @@ static void genStmt(TreeNode *tree, char **operate){
     default:
         break;
     }
-} /* genStmt */
+}
 
-/* Procedure genExp generates code at an expression node */
+/**
+ * @brief O procedimento genExp gera o código intermediário
+ * para um nó de expressão.
+ * 
+ * @param tree Nó da árvore.
+ * @param operate Último operando.
+ */
 static void genExp(TreeNode *tree, char **operate){
     TreeNode *p1, *p2;
     char *op[3] = {NULL, NULL, NULL};
@@ -270,13 +312,9 @@ static void genExp(TreeNode *tree, char **operate){
     default:
         break;
     }
-} /* genExp */
+}
 
-/* Procedure cGen recursively generates code by
- * tree traversal
- */
-static void cGen(TreeNode *tree, char **operate)
-{
+static void cGen(TreeNode *tree, char **operate){
     if (tree != NULL){
         switch (tree->nodekind){
         case StmtK:
@@ -292,9 +330,6 @@ static void cGen(TreeNode *tree, char **operate)
     }
 }
 
-/* Procedure cGen recursively generates code by
- * tree traversal
- */
 static void ccGen(TreeNode *tree, char **operate){
     if (tree != NULL){
         switch (tree->nodekind){
@@ -310,15 +345,6 @@ static void ccGen(TreeNode *tree, char **operate){
     }
 }
 
-/**********************************************/
-/* the primary function of the code generator */
-/**********************************************/
-/* Procedure codeGen generates code to a code
- * file by traversal of the syntax tree. The
- * second parameter (codefile) is the file name
- * of the code file, and is used to print the
- * file name as a comment in the code file
- */
 void codeGen(TreeNode *syntaxTree, const char *codefile){
     char *s = (char *)malloc(strlen(codefile) + 7);
     char *pointer = NULL;
@@ -343,6 +369,5 @@ void codeGen(TreeNode *syntaxTree, const char *codefile){
         }
         tr = tr->sibling;
     }
-    /* finish */
     emitComment("End of execution.");
 }
