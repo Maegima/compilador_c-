@@ -1,7 +1,7 @@
 /**
  * @file analyze.c
  * @author André Lucas Maegima
- * @brief Analizador semântico para a linguagem C-.
+ * @brief Analisador semântico para a linguagem C-.
  * @version 0.1
  * @date 2019-12-06
  * 

@@ -1,7 +1,7 @@
 /**
  * @file analyze.h
  * @author André Lucas Maegima
- * @brief Interface para o analizador semântico.
+ * @brief Interface para o analisador semântico.
  * @version 0.1
  * @date 2019-12-06
  * 
