@@ -14,16 +14,16 @@
 #define _SCAN_H_
 
 /**
- * @brief getToken retorna o próximo token
- * do arquivo de origem
+ * @brief A função getToken retorna o próximo token
+ * do arquivo de origem.
  * 
- * @return TokenType token do arquivo
+ * @return TokenType Token do arquivo.
  */
 TokenType getToken(void);
 
 /**
- * @brief initScanner inicializa as 
- * váriaveis do analizador léxico
+ * @brief O procedimento initScanner inicializa as 
+ * váriaveis do analisador léxico.
  * 
  */
 void initScanner();

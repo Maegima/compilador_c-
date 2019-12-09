@@ -2,7 +2,7 @@
  * @file symtab.c
  * @author André Lucas Maegima
  * @brief Implementação da tabela de simbolos e 
- * analizador semântico.
+ * analisador semântico.
  * @version 0.1
  * @date 2019-12-06
  * 
