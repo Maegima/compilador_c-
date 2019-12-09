@@ -9,11 +9,6 @@
 extern YYSTYPE yylval;
 extern int line_counter;
 
-/**
- * @brief initScanner icializa as 
- * váriaveis do analizador léxico
- * 
- */
 void initScanner(){
     yyin = source;
     yyout = listing;
@@ -85,12 +80,6 @@ while                                 return WHILE;
 {OTHER}+({LETTER}|{DIGIT})*{OTHER}*   return FreakShow();
 %%
 
-/**
- * @brief getToken retorna o próximo token
- * do arquivo de origem
- * 
- * @return TokenType token do arquivo
- */
 TokenType getToken(void)
 { 
     TokenType currentToken = 0;

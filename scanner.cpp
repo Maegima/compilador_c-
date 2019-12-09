@@ -500,11 +500,6 @@ char *yytext;
 extern YYSTYPE yylval;
 extern int line_counter;
 
-/**
- * @brief initScanner icializa as 
- * váriaveis do analizador léxico
- * 
- */
 void initScanner(){
     yyin = source;
     yyout = listing;
