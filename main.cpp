@@ -1,3 +1,13 @@
+/**
+ * @file main.cpp
+ * @author André Lucas Maegima
+ * @brief Compilador para a linguagem C-.
+ * @version 0.1
+ * @date 2019-12-10
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 #include <iostream>
 using namespace std;
 
@@ -8,7 +18,7 @@ using namespace std;
 #include "utils/analyze.h"
 #include "utils/cgen.h"
 
-/** allocate global variables */
+/* allocate global variables */
 int line_counter = 0;
 FILE * source = NULL;
 FILE * listing = stdout;
@@ -24,11 +34,9 @@ int TraceAnalyze = TRUE;
 int TraceCode = FALSE;
 int Error = FALSE;
 
-extern void abrirArq(char *arq);
-extern void fecharArq();
 extern int semantical(FILE *listing);
 
-int erro = 0; /**< Váravel que indica erro na compilação */
+int erro = 0; /**< Variável que indica erro na compilação. */
 
 int main(int argc, char **argv){
     TreeNode *raiz;    
@@ -49,5 +57,9 @@ int main(int argc, char **argv){
     }
     if(!erro)
         codeGen(raiz, "code.txt");
+    fclose(source);
+    fclose(symbtab);
+    fclose(symbtree);
+    fclose(code);
     return 0;
 }
