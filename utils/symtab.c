@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Implementação da tabela de simbolos e 
  * analisador semântico.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-06
  * 
  * @copyright Copyright (c) 2019
@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "globals.h"
+#include "globals.hpp"
 #include "symtab.h"
 #include "analyze.h"
 

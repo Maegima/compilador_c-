@@ -2,7 +2,7 @@
  * @file globals.h
  * @author André Lucas Maegima
  * @brief Definições de tipos e variáveis globais.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-06
  * 
  * @copyright Copyright (c) 2019
@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include "TokenType.hpp"
+#include "scanner.hpp"
 
 /* Yacc/Bison generates internally its own values
  * for the tokens. Other files can access these values
@@ -45,7 +47,6 @@
 #define TRUE 1 ///< Definição de TRUE.
 #endif
 
-typedef int TokenType; /**< Yacc/Bison gera o próprio tipo para valores de token. */
 
 extern FILE* source; /**< Arquivo de origem. */
 extern FILE* listing; /**< Arquivo para saída. */
@@ -53,7 +54,7 @@ extern FILE* code; /**< Arquivo para saída do código intermediário. */
 extern FILE* symbtree; /**< Arquivo para saída da árvore sintática. */
 extern FILE *symbtab; /**< Arquivo para saída da tabela de simbolos. */
 
-extern int line_counter; /**< Linha atual do arquivo de origem. */
+extern Scanner *scan; /**< Analisador léxico. */
 
 /**************************************************/
 /******  Definições para árvore sintática *********/

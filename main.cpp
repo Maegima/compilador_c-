@@ -2,7 +2,7 @@
  * @file main.cpp
  * @author André Lucas Maegima
  * @brief Compilador para a linguagem C-.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-10
  * 
  * @copyright Copyright (c) 2019
@@ -11,15 +11,15 @@
 #include <iostream>
 using namespace std;
 
-#include "utils/globals.h"
+#include "utils/globals.hpp"
 #include "utils/util.h"
-#include "utils/scan.h"
+#include "utils/scanner.hpp"
 #include "utils/parse.h"
 #include "utils/analyze.h"
 #include "utils/cgen.h"
 
 /* allocate global variables */
-int line_counter = 0;
+Scanner *scan = NULL;
 FILE * source = NULL;
 FILE * listing = stdout;
 FILE * symbtab = stdout;

@@ -2,13 +2,13 @@
  * @file analyze.c
  * @author André Lucas Maegima
  * @brief Analisador semântico para a linguagem C-.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-06
  * 
  * @copyright Copyright (c) 2019
  * 
  */
-#include "globals.h"
+#include "globals.hpp"
 #include "symtab.h"
 #include "analyze.h"
 

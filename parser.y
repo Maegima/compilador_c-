@@ -3,7 +3,7 @@
  * @file parser.cpp
  * @author André Lucas Maegima
  * @brief Implementação do analisador sintático.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-10
  * 
  * @copyright Copyright (c) 2019
@@ -14,9 +14,9 @@ using namespace std;
 
 #define YYPARSER /* distinguishes Yacc output from other code files */
 
-#include "utils/globals.h"
+#include "utils/globals.hpp"
 #include "utils/util.h"
-#include "utils/scan.h"
+#include "utils/scanner.hpp"
 #include "utils/parse.h"
 
 #define YYSTYPE TreeNode *
@@ -29,7 +29,6 @@ static TreeNode * savedTree; /* raiz da árvore sintática */
 
 int yylex(void);
 extern char* yytext;
-extern int line_counter;
 extern int erro;
 void yyerror(const char *msg);
 
@@ -425,7 +424,7 @@ arg_lista: arg_lista COMMA expressao
 void yyerror(const char * msg)
 {
   extern char* yytext;
-  cout << msg << ": " << yytext << " " << yylval << " " << yychar << " line " << line_counter << endl;
+  cout << msg << ": " << yytext << " " << yylval << " " << yychar << " line " << scan->getLineNumber() << endl;
   erro = 1;
 }
  
@@ -436,11 +435,11 @@ void yyerror(const char * msg)
  * @return int Token do arquivo.
  */
 int yylex(void){ 
-    return getToken(); 
+    return scan->getToken(); 
 }
 
 TreeNode * parse(void){ 
-    initScanner();
+    scan = new Scanner();
     initParser();
     yyparse();
     return savedTree;

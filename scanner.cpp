@@ -1,6 +1,6 @@
-#line 2 "scanner.cpp"
+#line 2 "Scanner.cpp"
 
-#line 4 "scanner.cpp"
+#line 4 "Scanner.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -488,13 +488,13 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "scanner.l"
-#line 2 "scanner.l"
+#line 1 "Scanner.l"
+#line 2 "Scanner.l"
 /**
  * @file scanner.cpp
  * @author André Lucas Maegima
  * @brief Implementação do analisador léxico.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-10
  * 
  * @copyright Copyright (c) 2019
@@ -503,45 +503,44 @@ char *yytext;
 #include <stdlib.h>
 #include <stdio.h>
 #include "parser.h"
-#include "utils/globals.h"
+#include "utils/globals.hpp"
 #include "utils/util.h"
-#include "utils/scan.h"
+#include "utils/scanner.hpp"
 
 extern YYSTYPE yylval;
-extern int line_counter;
-
-void initScanner(){
-    yyin = source;
-    yyout = listing;
-    line_counter = 1;
-}
-
-/**
- * @brief A função FreakShow imprime uma mensagem
- * na tela caso ocorra algum erro léxico.
- * 
- * @return ERR Retorna o token de erro.
- */
-int FreakShow(){
-    printf("Erro lexico: %s na linha %d.\n", yytext, line_counter);
-    return ERR;
-}
-
 extern "C" int yylex(void);
 
-TokenType getToken(void)
+Scanner::Scanner(){
+    yyin = source;
+    yyout = listing;
+    this->line_number = 1;
+}
+
+TokenType Scanner::getToken(void)
 { 
     TokenType currentToken = 0;
     currentToken = yylex();
     if (TraceScan) {
-        fprintf(listing,"\t%d: ",line_counter);
-        printToken(currentToken,yytext);
+        fprintf(listing,"\t%d: ", this->line_number);
+        printToken(currentToken, yytext);
     }
     return currentToken;
 }
 
-#line 544 "scanner.cpp"
-#line 545 "scanner.cpp"
+TokenType Scanner::lexicalError(){
+    printf("Erro lexico: %s na linha %d.\n", yytext, this->line_number);
+    return ERR;
+}
+
+int Scanner::getLineNumber(){
+    return this->line_number;
+}
+
+void Scanner::incrementLine(){
+    this->line_number++;
+}
+#line 543 "Scanner.cpp"
+#line 544 "Scanner.cpp"
 
 #define INITIAL 0
 
@@ -763,9 +762,9 @@ YY_DECL
 		}
 
 	{
-#line 57 "scanner.l"
+#line 56 "Scanner.l"
 
-#line 764 "scanner.cpp"
+#line 763 "Scanner.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -824,157 +823,157 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 58 "scanner.l"
+#line 57 "Scanner.l"
 return IF;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 59 "scanner.l"
+#line 58 "Scanner.l"
 return ELSE;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 60 "scanner.l"
+#line 59 "Scanner.l"
 return INT;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 61 "scanner.l"
+#line 60 "Scanner.l"
 return RETURN;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 62 "scanner.l"
+#line 61 "Scanner.l"
 return VOID;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 63 "scanner.l"
+#line 62 "Scanner.l"
 return WHILE;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 64 "scanner.l"
+#line 63 "Scanner.l"
 return ID;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 65 "scanner.l"
+#line 64 "Scanner.l"
 return NUM;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 66 "scanner.l"
+#line 65 "Scanner.l"
 return ADD;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 67 "scanner.l"
+#line 66 "Scanner.l"
 return SUB;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 68 "scanner.l"
+#line 67 "Scanner.l"
 return MULT;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 69 "scanner.l"
+#line 68 "Scanner.l"
 return DIV;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 70 "scanner.l"
+#line 69 "Scanner.l"
 return SLT;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 71 "scanner.l"
+#line 70 "Scanner.l"
 return SLTE;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 72 "scanner.l"
+#line 71 "Scanner.l"
 return SGT;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 73 "scanner.l"
+#line 72 "Scanner.l"
 return SGTE;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 74 "scanner.l"
+#line 73 "Scanner.l"
 return EQUAL;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 75 "scanner.l"
+#line 74 "Scanner.l"
 return DIFFERENT;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 76 "scanner.l"
+#line 75 "Scanner.l"
 return ATRIB;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 77 "scanner.l"
+#line 76 "Scanner.l"
 return SEMICOLON;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 78 "scanner.l"
+#line 77 "Scanner.l"
 return COMMA;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 79 "scanner.l"
+#line 78 "Scanner.l"
 return OBRACE;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 80 "scanner.l"
+#line 79 "Scanner.l"
 return CBRACE;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 81 "scanner.l"
+#line 80 "Scanner.l"
 return OPAREN;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 82 "scanner.l"
+#line 81 "Scanner.l"
 return CPAREN;
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 83 "scanner.l"
+#line 82 "Scanner.l"
 return OBRACT;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 84 "scanner.l"
+#line 83 "Scanner.l"
 return CBRACT;
 	YY_BREAK
 case 28:
 /* rule 28 can match eol */
 YY_RULE_SETUP
-#line 85 "scanner.l"
-line_counter++;
+#line 84 "Scanner.l"
+scan->incrementLine();
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 86 "scanner.l"
+#line 85 "Scanner.l"
 {
                                         char c;
                                         int state = 0;
                                         do{ 
                                             c = yyinput();
                                             switch(c){
-                                                case '\n': line_counter++; break;
-                                                case '*':  state = 1;      break;
-                                                case '/':  state++;        break;
+                                                case '\n': scan->incrementLine(); break;
+                                                case '*':  state = 1;             break;
+                                                case '/':  state++;               break;
                                                 default:   state = 0;
                                             }
                                         }while(state < 2 && c != 0);
@@ -982,40 +981,40 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 99 "scanner.l"
+#line 98 "Scanner.l"
 
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 100 "scanner.l"
+#line 99 "Scanner.l"
 
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 101 "scanner.l"
+#line 100 "Scanner.l"
 
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 102 "scanner.l"
-return FreakShow();
+#line 101 "Scanner.l"
+return scan->lexicalError();
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 103 "scanner.l"
-return FreakShow();
+#line 102 "Scanner.l"
+return scan->lexicalError();
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 104 "scanner.l"
-return FreakShow();
+#line 103 "Scanner.l"
+return scan->lexicalError();
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 105 "scanner.l"
+#line 104 "Scanner.l"
 ECHO;
 	YY_BREAK
-#line 1014 "scanner.cpp"
+#line 1013 "Scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2020,5 +2019,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 105 "scanner.l"
+#line 104 "Scanner.l"
 

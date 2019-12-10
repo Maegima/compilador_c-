@@ -3,7 +3,7 @@
  * @file scanner.cpp
  * @author André Lucas Maegima
  * @brief Implementação do analisador léxico.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-10
  * 
  * @copyright Copyright (c) 2019
@@ -12,43 +12,42 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "parser.h"
-#include "utils/globals.h"
+#include "utils/globals.hpp"
 #include "utils/util.h"
-#include "utils/scan.h"
+#include "utils/scanner.hpp"
 
 extern YYSTYPE yylval;
-extern int line_counter;
-
-void initScanner(){
-    yyin = source;
-    yyout = listing;
-    line_counter = 1;
-}
-
-/**
- * @brief A função FreakShow imprime uma mensagem
- * na tela caso ocorra algum erro léxico.
- * 
- * @return ERR Retorna o token de erro.
- */
-int FreakShow(){
-    printf("Erro lexico: %s na linha %d.\n", yytext, line_counter);
-    return ERR;
-}
-
 extern "C" int yylex(void);
 
-TokenType getToken(void)
+Scanner::Scanner(){
+    yyin = source;
+    yyout = listing;
+    this->line_number = 1;
+}
+
+TokenType Scanner::getToken(void)
 { 
     TokenType currentToken = 0;
     currentToken = yylex();
     if (TraceScan) {
-        fprintf(listing,"\t%d: ",line_counter);
-        printToken(currentToken,yytext);
+        fprintf(listing,"\t%d: ", this->line_number);
+        printToken(currentToken, yytext);
     }
     return currentToken;
 }
 
+TokenType Scanner::lexicalError(){
+    printf("Erro lexico: %s na linha %d.\n", yytext, this->line_number);
+    return ERR;
+}
+
+int Scanner::getLineNumber(){
+    return this->line_number;
+}
+
+void Scanner::incrementLine(){
+    this->line_number++;
+}
 %}
 
 DIGIT [0-9]
@@ -82,16 +81,16 @@ while                                 return WHILE;
 ")"                                   return CPAREN;
 "["                                   return OBRACT;
 "]"                                   return CBRACT;
-\n                                    line_counter++;
+\n                                    scan->incrementLine();
 "/*"                                  {
                                         char c;
                                         int state = 0;
                                         do{ 
                                             c = yyinput();
                                             switch(c){
-                                                case '\n': line_counter++; break;
-                                                case '*':  state = 1;      break;
-                                                case '/':  state++;        break;
+                                                case '\n': scan->incrementLine(); break;
+                                                case '*':  state = 1;             break;
+                                                case '/':  state++;               break;
                                                 default:   state = 0;
                                             }
                                         }while(state < 2 && c != 0);
@@ -99,7 +98,7 @@ while                                 return WHILE;
 \r
 \t
 [ ]+
-{DIGIT}+({LETTER}|{DIGIT}|{OTHER})*   return FreakShow();
-{LETTER}+({LETTER}|{DIGIT}|{OTHER})*  return FreakShow();
-{OTHER}+({LETTER}|{DIGIT})*{OTHER}*   return FreakShow();
+{DIGIT}+({LETTER}|{DIGIT}|{OTHER})*   return scan->lexicalError();
+{LETTER}+({LETTER}|{DIGIT}|{OTHER})*  return scan->lexicalError();
+{OTHER}+({LETTER}|{DIGIT})*{OTHER}*   return scan->lexicalError();
 %%

@@ -3,14 +3,14 @@
  * @author André Lucas Maegima
  * @brief Implementação para as funções utilitárias para 
  * geração do código intermediário.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-09
  * 
  * @copyright Copyright (c) 2019
  * 
  */
 
-#include "globals.h"
+#include "globals.hpp"
 #include "code.h"
 
 void emitComment(const char *c){

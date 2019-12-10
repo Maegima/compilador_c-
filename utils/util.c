@@ -2,14 +2,14 @@
  * @file util.c
  * @author André Lucas Maegima
  * @brief Implementação das funções utilitárias.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-09
  * 
  * @copyright Copyright (c) 2019
  * 
  */
 
-#include "globals.h"
+#include "globals.hpp"
 #include "util.h"
 
 /**
@@ -101,14 +101,14 @@ TreeNode *newStmtNode(StmtKind kind){
     TreeNode *t = (TreeNode *)malloc(sizeof(TreeNode));
     int i;
     if (t == NULL)
-        fprintf(symbtree, "Out of memory error at line %d\n", line_counter);
+        fprintf(symbtree, "Out of memory error at line %d\n", scan->getLineNumber());
     else{
         for (i = 0; i < MAXCHILDREN; i++)
             t->child[i] = NULL;
         t->sibling = NULL;
         t->nodekind = StmtK;
         t->kind.stmt = kind;
-        t->lineno = line_counter;
+        t->lineno = scan->getLineNumber();
         t->type = Void;
         t->decl_line = -1;
         t->func = 0;
@@ -130,14 +130,14 @@ TreeNode *newExpNode(ExpKind kind)
     TreeNode *t = (TreeNode *)malloc(sizeof(TreeNode));
     int i;
     if (t == NULL)
-        fprintf(symbtree, "Out of memory error at line %d\n", line_counter);
+        fprintf(symbtree, "Out of memory error at line %d\n", scan->getLineNumber());
     else{
         for (i = 0; i < MAXCHILDREN; i++)
             t->child[i] = NULL;
         t->sibling = NULL;
         t->nodekind = ExpK;
         t->kind.exp = kind;
-        t->lineno = line_counter;
+        t->lineno = scan->getLineNumber();
         t->type = Void;
         t->decl_line = -1;
         t->func = 0;
@@ -162,7 +162,7 @@ char *copyString(char *s){
     n = strlen(s) + 1;
     t = (char *)malloc(n);
     if (t == NULL)
-        fprintf(symbtree, "Out of memory error at line %d\n", line_counter);
+        fprintf(symbtree, "Out of memory error at line %d\n", scan->getLineNumber());
     else
         strcpy(t, s);
     return t;

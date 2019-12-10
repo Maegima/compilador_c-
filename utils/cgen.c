@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Implementação do gerador de código 
  * intermediário para a linguagem C-.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-09
  * 
  * @copyright Copyright (c) 2019
@@ -12,7 +12,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "globals.h"
+#include "globals.hpp"
 #include "symtab.h"
 #include "code.h"
 #include "cgen.h"
