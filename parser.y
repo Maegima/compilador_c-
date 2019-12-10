@@ -1,6 +1,14 @@
 %{
-//GLC para gerar parser para a linguagem c-
-
+/**
+ * @file parser.cpp
+ * @author André Lucas Maegima
+ * @brief Implementação do analisador sintático.
+ * @version 0.1
+ * @date 2019-12-10
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 #include <iostream>
 using namespace std;
 
@@ -25,7 +33,7 @@ extern int line_counter;
 extern int erro;
 void yyerror(const char *msg);
 
-void initParse(){
+void initParser(){
     func[0] = (char*) malloc(sizeof(char)*6);
     func[1] = (char*)  malloc(sizeof(char)*7);
     memcpy(func[0], "input\0", sizeof(char)*6);
@@ -409,10 +417,10 @@ arg_lista: arg_lista COMMA expressao
 %%
 
 /**
- * @brief yyerror imprime na tela caso ocorra
- * algum erro semântico
+ * @brief O procedimento yyerror imprime na tela 
+ * caso ocorra algum erro semântico.
  * 
- * @param msg Mensagem do erro
+ * @param msg Mensagem do erro.
  */
 void yyerror(const char * msg)
 {
@@ -422,10 +430,10 @@ void yyerror(const char * msg)
 }
  
 /**
- * @brief yylex chama a função getToken do parser
- * para obter o próximo token do arquivo de origem
+ * @brief A função yylex chama a função getToken do parser
+ * para obter o próximo token do arquivo de origem.
  * 
- * @return int Token do arquivo
+ * @return int Token do arquivo.
  */
 int yylex(void){ 
     return getToken(); 
@@ -433,7 +441,7 @@ int yylex(void){
 
 TreeNode * parse(void){ 
     initScanner();
-    initParse();
+    initParser();
     yyparse();
     return savedTree;
 }
