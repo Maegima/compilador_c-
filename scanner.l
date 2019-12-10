@@ -1,4 +1,14 @@
 %{
+/**
+ * @file scanner.cpp
+ * @author André Lucas Maegima
+ * @brief Implementação do analisador léxico.
+ * @version 0.1
+ * @date 2019-12-10
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 #include <stdlib.h>
 #include <stdio.h>
 #include "parser.h"
@@ -16,13 +26,27 @@ void initScanner(){
 }
 
 /**
- * @brief FreakShow imprime uma mensagem de
- * na tela caso ocorra algum erro léxico
+ * @brief A função FreakShow imprime uma mensagem
+ * na tela caso ocorra algum erro léxico.
  * 
+ * @return ERR Retorna o token de erro.
  */
 int FreakShow(){
     printf("Erro lexico: %s na linha %d.\n", yytext, line_counter);
     return ERR;
+}
+
+extern "C" int yylex(void);
+
+TokenType getToken(void)
+{ 
+    TokenType currentToken = 0;
+    currentToken = yylex();
+    if (TraceScan) {
+        fprintf(listing,"\t%d: ",line_counter);
+        printToken(currentToken,yytext);
+    }
+    return currentToken;
 }
 
 %}
@@ -79,14 +103,3 @@ while                                 return WHILE;
 {LETTER}+({LETTER}|{DIGIT}|{OTHER})*  return FreakShow();
 {OTHER}+({LETTER}|{DIGIT})*{OTHER}*   return FreakShow();
 %%
-
-TokenType getToken(void)
-{ 
-    TokenType currentToken = 0;
-    currentToken = yylex();
-    if (TraceScan) {
-        fprintf(listing,"\t%d: ",line_counter);
-        printToken(currentToken,yytext);
-    }
-    return currentToken;
-}

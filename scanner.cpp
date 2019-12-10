@@ -490,6 +490,16 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "scanner.l"
 #line 2 "scanner.l"
+/**
+ * @file scanner.cpp
+ * @author André Lucas Maegima
+ * @brief Implementação do analisador léxico.
+ * @version 0.1
+ * @date 2019-12-10
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 #include <stdlib.h>
 #include <stdio.h>
 #include "parser.h"
@@ -507,17 +517,31 @@ void initScanner(){
 }
 
 /**
- * @brief FreakShow imprime uma mensagem de
- * na tela caso ocorra algum erro léxico
+ * @brief A função FreakShow imprime uma mensagem
+ * na tela caso ocorra algum erro léxico.
  * 
+ * @return ERR Retorna o token de erro.
  */
 int FreakShow(){
     printf("Erro lexico: %s na linha %d.\n", yytext, line_counter);
     return ERR;
 }
 
-#line 525 "scanner.cpp"
-#line 526 "scanner.cpp"
+extern "C" int yylex(void);
+
+TokenType getToken(void)
+{ 
+    TokenType currentToken = 0;
+    currentToken = yylex();
+    if (TraceScan) {
+        fprintf(listing,"\t%d: ",line_counter);
+        printToken(currentToken,yytext);
+    }
+    return currentToken;
+}
+
+#line 544 "scanner.cpp"
+#line 545 "scanner.cpp"
 
 #define INITIAL 0
 
@@ -739,9 +763,9 @@ YY_DECL
 		}
 
 	{
-#line 38 "scanner.l"
+#line 57 "scanner.l"
 
-#line 745 "scanner.cpp"
+#line 764 "scanner.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -800,148 +824,148 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 39 "scanner.l"
+#line 58 "scanner.l"
 return IF;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 40 "scanner.l"
+#line 59 "scanner.l"
 return ELSE;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 41 "scanner.l"
+#line 60 "scanner.l"
 return INT;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 42 "scanner.l"
+#line 61 "scanner.l"
 return RETURN;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 43 "scanner.l"
+#line 62 "scanner.l"
 return VOID;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 44 "scanner.l"
+#line 63 "scanner.l"
 return WHILE;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 45 "scanner.l"
+#line 64 "scanner.l"
 return ID;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 46 "scanner.l"
+#line 65 "scanner.l"
 return NUM;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 47 "scanner.l"
+#line 66 "scanner.l"
 return ADD;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 48 "scanner.l"
+#line 67 "scanner.l"
 return SUB;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 49 "scanner.l"
+#line 68 "scanner.l"
 return MULT;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 50 "scanner.l"
+#line 69 "scanner.l"
 return DIV;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 51 "scanner.l"
+#line 70 "scanner.l"
 return SLT;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 52 "scanner.l"
+#line 71 "scanner.l"
 return SLTE;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 53 "scanner.l"
+#line 72 "scanner.l"
 return SGT;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 54 "scanner.l"
+#line 73 "scanner.l"
 return SGTE;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 55 "scanner.l"
+#line 74 "scanner.l"
 return EQUAL;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 56 "scanner.l"
+#line 75 "scanner.l"
 return DIFFERENT;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 57 "scanner.l"
+#line 76 "scanner.l"
 return ATRIB;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 58 "scanner.l"
+#line 77 "scanner.l"
 return SEMICOLON;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 59 "scanner.l"
+#line 78 "scanner.l"
 return COMMA;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 60 "scanner.l"
+#line 79 "scanner.l"
 return OBRACE;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 61 "scanner.l"
+#line 80 "scanner.l"
 return CBRACE;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 62 "scanner.l"
+#line 81 "scanner.l"
 return OPAREN;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 63 "scanner.l"
+#line 82 "scanner.l"
 return CPAREN;
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 64 "scanner.l"
+#line 83 "scanner.l"
 return OBRACT;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 65 "scanner.l"
+#line 84 "scanner.l"
 return CBRACT;
 	YY_BREAK
 case 28:
 /* rule 28 can match eol */
 YY_RULE_SETUP
-#line 66 "scanner.l"
+#line 85 "scanner.l"
 line_counter++;
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 67 "scanner.l"
+#line 86 "scanner.l"
 {
                                         char c;
                                         int state = 0;
@@ -958,40 +982,40 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 80 "scanner.l"
+#line 99 "scanner.l"
 
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 81 "scanner.l"
+#line 100 "scanner.l"
 
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 82 "scanner.l"
+#line 101 "scanner.l"
 
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 83 "scanner.l"
+#line 102 "scanner.l"
 return FreakShow();
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 84 "scanner.l"
+#line 103 "scanner.l"
 return FreakShow();
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 85 "scanner.l"
+#line 104 "scanner.l"
 return FreakShow();
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 86 "scanner.l"
+#line 105 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 995 "scanner.cpp"
+#line 1014 "scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1996,22 +2020,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 86 "scanner.l"
+#line 105 "scanner.l"
 
-
-/**
- * @brief getToken retorna o próximo token
- * do arquivo de origem
- * 
- * @return TokenType token do arquivo
- */
-TokenType getToken(void)
-{ 
-    TokenType currentToken = 0;
-    currentToken = yylex();
-    if (TraceScan) {
-        fprintf(listing,"\t%d: ",line_counter);
-        printToken(currentToken,yytext);
-    }
-    return currentToken;
-}
