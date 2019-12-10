@@ -1,7 +1,7 @@
 /**
  * @file parse.h
  * @author André Lucas Maegima
- * @brief Interface para o analisador sintática
+ * @brief Interface para o analisador sintático.
  * @version 0.1
  * @date 2019-12-06
  * 

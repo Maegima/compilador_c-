@@ -17,7 +17,7 @@
 #include "code.h"
 #include "cgen.h"
 
-static char number[11]; /**< Utilizado na conversão de número para string */
+static char number[11]; /**< Utilizado na conversão de número para string. */
 static int cont_aux = 0, cont_lab = 0, cont_vet = 0;
 
 /**

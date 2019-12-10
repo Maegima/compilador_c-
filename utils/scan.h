@@ -1,7 +1,7 @@
 /**
  * @file scan.h
  * @author André Lucas Maegima
- * @brief Interface para o analisador léxico
+ * @brief Interface para o analisador léxico.
  * @version 0.1
  * @date 2019-12-06
  * 

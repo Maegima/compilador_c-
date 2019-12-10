@@ -260,7 +260,7 @@ static void notUniqueVariable(FILE *listing){
 
 /**
  * @brief Procura e imprime no arquivo de escrita os erros
- * de declaração de váriavel void.
+ * de declaração de variável void.
  * 
  * @param listing Arquivo de escrita. 
  */
@@ -289,7 +289,7 @@ static void notVoidVariable(FILE *listing){
 
 /**
  * @brief Procura e imprime no arquivo de escrita os erros
- * de váriavel não declarada.
+ * de variável não declarada.
  * 
  * @param listing Arquivo de escrita. 
  */
@@ -382,7 +382,7 @@ static void mainNotDeclared(FILE *listing){
 
 /**
  * @brief Procura e imprime no arquivo de escrita os erros
- * de váriavel declarada previamente como função.
+ * de variável declarada previamente como função.
  * 
  * @param listing Arquivo de escrita.
  */
@@ -428,7 +428,7 @@ static void variableIsFunction(FILE *listing){
 
 /**
  * @brief Procura e imprime no arquivo de escrita os erros
- * atribuição void em váriavel.
+ * atribuição void em variável.
  * 
  * @param listing Arquivo para saída. 
  */

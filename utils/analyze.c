@@ -19,7 +19,7 @@ static int location = 0;
  * @brief Procedimento com sintaxe recursiva 
  * generica para a rotina traverse.
  * 
- * @param t Raiz da arvore.
+ * @param t Raiz da árvore.
  * @param preProc Percurso em pré ordem.
  * @param postProc Percurso em pós ordem.
  */

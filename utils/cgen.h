@@ -17,7 +17,7 @@
  * @brief O procedimento codeGen gera o código
  * intermediário.
  * 
- * @param syntaxTree Arvore sintática. 
+ * @param syntaxTree Árvore sintática. 
  * @param codefile Arquivo para escrita do código.
  */
 void codeGen(TreeNode * syntaxTree, const char *codefile);

@@ -13,10 +13,6 @@
 #ifndef _CODE_H_
 #define _CODE_H_
 
-/* Procedure emitComment prints a comment line 
- * with comment c in the code file
- */
-
 /**
  * @brief O procedimento emitComment imprime um 
  * linha de comentário no arquivo de código.
