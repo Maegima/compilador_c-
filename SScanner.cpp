@@ -505,7 +505,7 @@ char *yytext;
 #include "parser.h"
 #include "utils/globals.hpp"
 #include "utils/util.h"
-#include "utils/scanner.hpp"
+#include "utils/Scanner.hpp"
 
 extern YYSTYPE yylval;
 extern "C" int yylex(void);

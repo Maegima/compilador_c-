@@ -16,7 +16,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "TokenType.hpp"
-#include "scanner.hpp"
+#include "Scanner.hpp"
 
 /* Yacc/Bison generates internally its own values
  * for the tokens. Other files can access these values
@@ -70,26 +70,6 @@ typedef enum {Void,Integer} ExpType;
 
 #define MAXCHILDREN 3 /**< Número máximo de filhos para um nó da árvore sintática. */
 
-/**
- * @brief Definição da árvore.
- * @brief Definição da estrutura da árvore de análise sintática.
- */
-typedef struct treeNode{ 
-    /// Filhos de um nó.
-    struct treeNode *child[MAXCHILDREN];
-    /// Próximo irmão.
-    struct treeNode *sibling;
-    int lineno /** @brief Número da linha. */, decl_line /** @brief Linha de declaração. */; 
-    int func /** @brief Se for função. */, atrib /** @brief Se for atribuição. */, decl /** @brief Se for declaração. */;
-    NodeKind nodekind; /**< @brief Tipo de Nó. */
-    char *scope; /**< @brief Escopo do Nó. */
-    /// Tipo de um nó.
-    union { StmtKind stmt; ExpKind exp; } kind;
-    /// Dado do nó.
-    union { TokenType op; int val; char *name; } attr;
-    /// Tipo de expressão.
-    ExpType type;
-   } TreeNode;
 
 /**************************************************/
 /***********   Flags para o rastreamento   ********/

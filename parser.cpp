@@ -85,7 +85,7 @@ using namespace std;
 
 #include "utils/globals.hpp"
 #include "utils/util.h"
-#include "utils/scanner.hpp"
+#include "utils/Scanner.hpp"
 #include "utils/parse.h"
 
 #define YYSTYPE TreeNode *
