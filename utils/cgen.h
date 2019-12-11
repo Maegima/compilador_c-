@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Interface do gerador de código 
  * intermediário para a linguagem C-.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-09
  * 
  * @copyright Copyright (c) 2019
@@ -12,6 +12,8 @@
 
 #ifndef _CGEN_H_
 #define _CGEN_H_
+
+#include "TreeNode.hpp"
 
 /**
  * @brief O procedimento codeGen gera o código

@@ -17,7 +17,7 @@ using namespace std;
 #include "utils/globals.hpp"
 #include "utils/util.h"
 #include "utils/Scanner.hpp"
-#include "utils/parse.h"
+#include "utils/Parser.hpp"
 
 #define YYSTYPE TreeNode *
 static char * scope;
@@ -61,7 +61,7 @@ void initParser(){
 %token ERR                      
 
 %%
-programa: declaracao_lista { savedTree = $1;} 
+programa: declaracao_lista { savedTree = $1; } 
 ;
 declaracao_lista: declaracao_lista declaracao
 { 
@@ -100,7 +100,7 @@ var_declaracao: tipo_especificador identificador SEMICOLON
 ;
 identificador: ID 
 { 
-    $$ = newExpNode(IdK);
+    $$ = new TreeNode(IdK);
     $$->attr.name = copyString(yytext);
     if(sc){
         scope = copyString($$->attr.name);
@@ -113,21 +113,21 @@ identificador: ID
 ;
 numero: NUM 
 { 
-    $$ = newExpNode(ConstK);
+    $$ = new TreeNode(ConstK);
     $$->attr.val = atoi(yytext);
     $$->type = Integer;
 }
 ;
 tipo_especificador: INT 
 { 
-    $$ = newExpNode(TypeK);
+    $$ = new TreeNode(TypeK);
     $$->attr.name = (char*) malloc(sizeof(char)*4);
     memcpy($$->attr.name, "INT\0", 4);
     $$->type = Integer;
 } 
 | VOID 
 { 
-    $$ = newExpNode(TypeK);
+    $$ = new TreeNode(TypeK);
     $$->attr.name = (char*) malloc(sizeof(char)*5);
     memcpy($$->attr.name, "VOID\0", 4);
     $$->type = Void; 
@@ -235,13 +235,13 @@ expressao_decl: expressao SEMICOLON { $$ = $1; }
 ;
 selecao_decl: IF OPAREN expressao CPAREN statement 
 { 
-    $$ = newStmtNode(IfK);
+    $$ = new TreeNode(IfK);
     $$->child[0] = $3;
     $$->child[1] = $5;
 }
 | IF OPAREN expressao CPAREN statement ELSE statement
 { 
-    $$ = newStmtNode(IfK);
+    $$ = new TreeNode(IfK);
     $$->child[0] = $3;
     $$->child[1] = $5;
     $$->child[2] = $7;
@@ -249,20 +249,20 @@ selecao_decl: IF OPAREN expressao CPAREN statement
 ;
 iteracao_decl: WHILE OPAREN expressao CPAREN statement
 {
-    $$ = newStmtNode(WhileK);
+    $$ = new TreeNode(WhileK);
     $$->child[0] = $3;
     $$->child[1] = $5;
 }
 ;
 retorno_decl: RETURN SEMICOLON | RETURN expressao SEMICOLON
 {
-    $$ = newStmtNode(ReturnK);
+    $$ = new TreeNode(ReturnK);
     $$->child[0] = $2;
 }
 ;
 expressao: var ATRIB expressao
 {
-    $$ = newStmtNode(AssignK);
+    $$ = new TreeNode(AssignK);
     $$->attr.name = $1->attr.name;
     $$->atrib = 1;
     $$->type = ($1->type == $3->type) ? $3->type : Void;
@@ -295,32 +295,32 @@ simples_expressao: soma_expressao relacional soma_expressao
 ;
 relacional: SLTE 
 { 
-    $$ = newExpNode(OpK);
+    $$ = new TreeNode(OpK);
     $$->attr.op = SLTE; 
 } 
 | SLT 
 { 
-    $$ = newExpNode(OpK);
+    $$ = new TreeNode(OpK);
     $$->attr.op = SLT;
 } 
 | SGT 
 {
-    $$ = newExpNode(OpK);
+    $$ = new TreeNode(OpK);
     $$->attr.op = SGT;
 } 
 | SGTE 
 {
-    $$ = newExpNode(OpK);
+    $$ = new TreeNode(OpK);
     $$->attr.op = SGTE; 
 } 
 | EQUAL 
 {
-    $$ = newExpNode(OpK);
+    $$ = new TreeNode(OpK);
     $$->attr.op = EQUAL;
 } 
 | DIFFERENT 
 {
-    $$ = newExpNode(OpK);
+    $$ = new TreeNode(OpK);
     $$->attr.op = DIFFERENT;
 } 
 ;
@@ -335,12 +335,12 @@ soma_expressao: soma_expressao soma termo
 ;
 soma: ADD
 { 
-    $$ = newExpNode(OpK);
+    $$ = new TreeNode(OpK);
     $$->attr.op = ADD; 
 } 
 | SUB 
 { 
-    $$ = newExpNode(OpK);
+    $$ = new TreeNode(OpK);
     $$->attr.op = SUB; 
 }
 ;
@@ -355,12 +355,12 @@ termo: termo mult fator
 ;
 mult: MULT
 { 
-    $$ = newExpNode(OpK);
+    $$ = new TreeNode(OpK);
     $$->attr.op = MULT; 
 } 
 | DIV
 { 
-    $$ = newExpNode(OpK);
+    $$ = new TreeNode(OpK);
     $$->attr.op = DIV; 
 } 
 ;

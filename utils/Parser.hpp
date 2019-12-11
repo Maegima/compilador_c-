@@ -1,16 +1,18 @@
 /**
- * @file parse.h
+ * @file Parser.hpp
  * @author André Lucas Maegima
- * @brief Interface para o analisador sintático.
- * @version 0.1
+ * @brief Definição da classe utilizada para a análise sintática.
+ * @version 1.0
  * @date 2019-12-06
  * 
  * @copyright Copyright (c) 2019
  * 
  */
 
-#ifndef _PARSE_H_
-#define _PARSE_H_
+#ifndef _PARSER_HPP_
+#define _PARSER_HPP_
+
+#include "TreeNode.hpp"
 
 /**
  * @brief A função parse faz a análise sintática

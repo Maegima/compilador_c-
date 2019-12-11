@@ -14,7 +14,7 @@ using namespace std;
 #include "utils/globals.hpp"
 #include "utils/util.h"
 #include "utils/Scanner.hpp"
-#include "utils/parse.h"
+#include "utils/Parser.hpp"
 #include "utils/analyze.h"
 #include "utils/cgen.h"
 
@@ -51,7 +51,7 @@ int main(int argc, char **argv){
         code = fopen(argv[4], "w");
     raiz = parse();
     if(!erro){
-        printTree(raiz);
+        raiz->print();
         buildSymtab(raiz);
         erro = semantical(listing);
     }

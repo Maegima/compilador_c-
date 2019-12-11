@@ -57,21 +57,6 @@ extern FILE *symbtab; /**< Arquivo para saída da tabela de simbolos. */
 extern Scanner *scan; /**< Analisador léxico. */
 
 /**************************************************/
-/******  Definições para árvore sintática *********/
-/**************************************************/
-/// Enum de tipos de Nós.
-typedef enum {StmtK,ExpK} NodeKind; 
-/// Enum de tipos de declarações.
-typedef enum {IfK,WhileK,AssignK,ReturnK} StmtKind;
-/// Enum de tipos de expressões. 
-typedef enum {OpK,ConstK,IdK,TypeK} ExpKind; 
-/// ExpType é usado para verificar o tipo da expressão.
-typedef enum {Void,Integer} ExpType; 
-
-#define MAXCHILDREN 3 /**< Número máximo de filhos para um nó da árvore sintática. */
-
-
-/**************************************************/
 /***********   Flags para o rastreamento   ********/
 /**************************************************/
 

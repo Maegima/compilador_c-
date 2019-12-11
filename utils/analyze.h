@@ -2,7 +2,7 @@
  * @file analyze.h
  * @author André Lucas Maegima
  * @brief Interface para o analisador semântico.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-06
  * 
  * @copyright Copyright (c) 2019
@@ -11,6 +11,8 @@
 
 #ifndef _ANALYZE_H_
 #define _ANALYZE_H_
+
+#include "TreeNode.hpp"
 
 /**
  * @brief Função que constroi uma tabela de simbolos

@@ -2,7 +2,7 @@
  * @file util.h
  * @author André Lucas Maegima
  * @brief Funções utilitárias para o compilador de C-.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-09
  * 
  * @copyright Copyright (c) 2019
@@ -22,24 +22,6 @@
 void printToken(TokenType token, const char* tokenString);
 
 /**
- * @brief A função newStmtNode cria um novo nó de declaração
- * para a construção da árvore sintática.
- * 
- * @param kind Tipo de declaração.
- * @return TreeNode* Nó da árvore sintática.
- */
-TreeNode *newStmtNode(StmtKind kind);
-
-/**
- * @brief A função newExpNode cria um novo nó de expressão
- * para a construção da árvore sintática.
- * 
- * @param kind Tipo de expressão.
- * @return TreeNode* Nó da árvore sintática.
- */
-TreeNode * newExpNode(ExpKind kind);
-
-/**
  * @brief A função copyString cria e aloca uma nova
  * cópia da string passada como parâmetro.
  * 
@@ -48,12 +30,5 @@ TreeNode * newExpNode(ExpKind kind);
  */
 char * copyString(char *s);
 
-/**
- * @brief O procedimento printTree imprime a árvore sintática
- * no arquivo symbtree usando identação para indicar sub-árvores.
- * 
- * @param tree Raiz da árvore.
- */
-void printTree(TreeNode *tree);
 
 #endif

@@ -86,7 +86,7 @@ using namespace std;
 #include "utils/globals.hpp"
 #include "utils/util.h"
 #include "utils/Scanner.hpp"
-#include "utils/parse.h"
+#include "utils/Parser.hpp"
 
 #define YYSTYPE TreeNode *
 static char * scope;
@@ -1350,7 +1350,7 @@ yyreduce:
     {
         case 2:
 #line 64 "parser.y" /* yacc.c:1652  */
-    { savedTree = yyvsp[0];}
+    { savedTree = yyvsp[0]; }
 #line 1355 "parser.cpp" /* yacc.c:1652  */
     break;
 
@@ -1417,7 +1417,7 @@ yyreduce:
   case 9:
 #line 102 "parser.y" /* yacc.c:1652  */
     { 
-    yyval = newExpNode(IdK);
+    yyval = new TreeNode(IdK);
     yyval->attr.name = copyString(yytext);
     if(sc){
         scope = copyString(yyval->attr.name);
@@ -1433,7 +1433,7 @@ yyreduce:
   case 10:
 #line 115 "parser.y" /* yacc.c:1652  */
     { 
-    yyval = newExpNode(ConstK);
+    yyval = new TreeNode(ConstK);
     yyval->attr.val = atoi(yytext);
     yyval->type = Integer;
 }
@@ -1443,7 +1443,7 @@ yyreduce:
   case 11:
 #line 122 "parser.y" /* yacc.c:1652  */
     { 
-    yyval = newExpNode(TypeK);
+    yyval = new TreeNode(TypeK);
     yyval->attr.name = (char*) malloc(sizeof(char)*4);
     memcpy(yyval->attr.name, "INT\0", 4);
     yyval->type = Integer;
@@ -1454,7 +1454,7 @@ yyreduce:
   case 12:
 #line 129 "parser.y" /* yacc.c:1652  */
     { 
-    yyval = newExpNode(TypeK);
+    yyval = new TreeNode(TypeK);
     yyval->attr.name = (char*) malloc(sizeof(char)*5);
     memcpy(yyval->attr.name, "VOID\0", 4);
     yyval->type = Void; 
@@ -1639,7 +1639,7 @@ yyreduce:
   case 32:
 #line 237 "parser.y" /* yacc.c:1652  */
     { 
-    yyval = newStmtNode(IfK);
+    yyval = new TreeNode(IfK);
     yyval->child[0] = yyvsp[-2];
     yyval->child[1] = yyvsp[0];
 }
@@ -1649,7 +1649,7 @@ yyreduce:
   case 33:
 #line 243 "parser.y" /* yacc.c:1652  */
     { 
-    yyval = newStmtNode(IfK);
+    yyval = new TreeNode(IfK);
     yyval->child[0] = yyvsp[-4];
     yyval->child[1] = yyvsp[-2];
     yyval->child[2] = yyvsp[0];
@@ -1660,7 +1660,7 @@ yyreduce:
   case 34:
 #line 251 "parser.y" /* yacc.c:1652  */
     {
-    yyval = newStmtNode(WhileK);
+    yyval = new TreeNode(WhileK);
     yyval->child[0] = yyvsp[-2];
     yyval->child[1] = yyvsp[0];
 }
@@ -1670,7 +1670,7 @@ yyreduce:
   case 36:
 #line 258 "parser.y" /* yacc.c:1652  */
     {
-    yyval = newStmtNode(ReturnK);
+    yyval = new TreeNode(ReturnK);
     yyval->child[0] = yyvsp[-1];
 }
 #line 1677 "parser.cpp" /* yacc.c:1652  */
@@ -1679,7 +1679,7 @@ yyreduce:
   case 37:
 #line 264 "parser.y" /* yacc.c:1652  */
     {
-    yyval = newStmtNode(AssignK);
+    yyval = new TreeNode(AssignK);
     yyval->attr.name = yyvsp[-2]->attr.name;
     yyval->atrib = 1;
     yyval->type = (yyvsp[-2]->type == yyvsp[0]->type) ? yyvsp[0]->type : Void;
@@ -1735,7 +1735,7 @@ yyreduce:
   case 43:
 #line 297 "parser.y" /* yacc.c:1652  */
     { 
-    yyval = newExpNode(OpK);
+    yyval = new TreeNode(OpK);
     yyval->attr.op = SLTE; 
 }
 #line 1742 "parser.cpp" /* yacc.c:1652  */
@@ -1744,7 +1744,7 @@ yyreduce:
   case 44:
 #line 302 "parser.y" /* yacc.c:1652  */
     { 
-    yyval = newExpNode(OpK);
+    yyval = new TreeNode(OpK);
     yyval->attr.op = SLT;
 }
 #line 1751 "parser.cpp" /* yacc.c:1652  */
@@ -1753,7 +1753,7 @@ yyreduce:
   case 45:
 #line 307 "parser.y" /* yacc.c:1652  */
     {
-    yyval = newExpNode(OpK);
+    yyval = new TreeNode(OpK);
     yyval->attr.op = SGT;
 }
 #line 1760 "parser.cpp" /* yacc.c:1652  */
@@ -1762,7 +1762,7 @@ yyreduce:
   case 46:
 #line 312 "parser.y" /* yacc.c:1652  */
     {
-    yyval = newExpNode(OpK);
+    yyval = new TreeNode(OpK);
     yyval->attr.op = SGTE; 
 }
 #line 1769 "parser.cpp" /* yacc.c:1652  */
@@ -1771,7 +1771,7 @@ yyreduce:
   case 47:
 #line 317 "parser.y" /* yacc.c:1652  */
     {
-    yyval = newExpNode(OpK);
+    yyval = new TreeNode(OpK);
     yyval->attr.op = EQUAL;
 }
 #line 1778 "parser.cpp" /* yacc.c:1652  */
@@ -1780,7 +1780,7 @@ yyreduce:
   case 48:
 #line 322 "parser.y" /* yacc.c:1652  */
     {
-    yyval = newExpNode(OpK);
+    yyval = new TreeNode(OpK);
     yyval->attr.op = DIFFERENT;
 }
 #line 1787 "parser.cpp" /* yacc.c:1652  */
@@ -1806,7 +1806,7 @@ yyreduce:
   case 51:
 #line 337 "parser.y" /* yacc.c:1652  */
     { 
-    yyval = newExpNode(OpK);
+    yyval = new TreeNode(OpK);
     yyval->attr.op = ADD; 
 }
 #line 1813 "parser.cpp" /* yacc.c:1652  */
@@ -1815,7 +1815,7 @@ yyreduce:
   case 52:
 #line 342 "parser.y" /* yacc.c:1652  */
     { 
-    yyval = newExpNode(OpK);
+    yyval = new TreeNode(OpK);
     yyval->attr.op = SUB; 
 }
 #line 1822 "parser.cpp" /* yacc.c:1652  */
@@ -1841,7 +1841,7 @@ yyreduce:
   case 55:
 #line 357 "parser.y" /* yacc.c:1652  */
     { 
-    yyval = newExpNode(OpK);
+    yyval = new TreeNode(OpK);
     yyval->attr.op = MULT; 
 }
 #line 1848 "parser.cpp" /* yacc.c:1652  */
@@ -1850,7 +1850,7 @@ yyreduce:
   case 56:
 #line 362 "parser.y" /* yacc.c:1652  */
     { 
-    yyval = newExpNode(OpK);
+    yyval = new TreeNode(OpK);
     yyval->attr.op = DIV; 
 }
 #line 1857 "parser.cpp" /* yacc.c:1652  */

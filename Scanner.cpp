@@ -491,7 +491,7 @@ char *yytext;
 #line 1 "Scanner.l"
 #line 2 "Scanner.l"
 /**
- * @file scanner.cpp
+ * @file Scanner.cpp
  * @author André Lucas Maegima
  * @brief Implementação do analisador léxico.
  * @version 1.0

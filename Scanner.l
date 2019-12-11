@@ -1,6 +1,6 @@
 %{
 /**
- * @file scanner.cpp
+ * @file Scanner.cpp
  * @author André Lucas Maegima
  * @brief Implementação do analisador léxico.
  * @version 1.0
