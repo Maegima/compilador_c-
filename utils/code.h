@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Interface para as funções utilitárias para 
  * geração do código intermediário.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-09
  * 
  * @copyright Copyright (c) 2019

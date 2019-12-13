@@ -9,11 +9,11 @@ sed 's/extern int yylex (void);/\/\/caso queira usar c++\
     extern int yylex (void);\
 #endif/g' lex.cpp > Scanner.cpp
 rm lex.cpp
-echo gerando parser ...
-bison parser.y --defines=parser.h -o parser.cpp
+echo gerando Parser.cpp ...
+bison Parser.y --defines=parser.h -o Parser.cpp
 echo gerando objetos para compilacao ...
 #rm parser.tab.o
-g++ -c main.cpp Scanner.cpp utils/TreeNode.cpp parser.cpp utils/util.c utils/analyze.cpp utils/symtab.cpp utils/code.c utils/cgen.cpp
+g++ -c main.cpp Scanner.cpp utils/TreeNode.cpp Parser.cpp utils/util.c utils/analyze.cpp utils/symtab.cpp utils/code.c utils/cgen.cpp
 echo compilando objetos ...
 g++ -o compilador.exe main.o Scanner.o parser.o util.o analyze.o symtab.o cgen.o code.o TreeNode.o -ly -lfl
 rm *.o
