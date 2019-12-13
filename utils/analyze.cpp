@@ -10,7 +10,7 @@
  */
 #include "globals.hpp"
 #include "symtab.h"
-#include "analyze.h"
+#include "analyze.hpp"
 
 /// @brief Contador para o local das variáveis na memória. 
 static int location = 0;
@@ -28,9 +28,9 @@ static void traverse(TreeNode*t, void(*preProc)(TreeNode*), void(*postProc)(Tree
         preProc(t);
         int i;
         for (i = 0; i < MAXCHILDREN; i++)
-            traverse(t->child[i], preProc, postProc);
+            traverse(t->getChild(i), preProc, postProc);
         postProc(t);
-        traverse(t->sibling, preProc, postProc);
+        traverse(t->getSibling(), preProc, postProc);
     }
 }
 
@@ -63,20 +63,20 @@ static void insertNode( TreeNode * t){
     char *name, *func;
     int n;
     TreeNode *r;
-    switch (t->nodekind){ 
+    switch (t->getNodekind()){ 
         case StmtK:
-        switch (t->kind.stmt){ 
+        switch (t->getStmt()){ 
             case AssignK:
-                r = t->child[0];
+                r = t->getChild(0);
                 if(r){
-                    name = uniteStrings(r->scope, r->attr.name);
+                    name = uniteStrings(r->getScope()->c_str(), r->getName()->c_str());
                     if (st_lookup(name) == -1)
                     /* not yet in table, so treat as new definition */
-                        st_insert(name,r->attr.name,r->lineno,-1,t->type,r->func,t->atrib,location++);
+                        st_insert(name,r->getName()->c_str(),r->getLineno(),-1,t->getType(),r->getFunc(),t->getAtrib(),location++);
                     else{
-                    /* already in table, so ignore location, 
+                    /* alrady in table, so ignore location, 
                         add line number of use only */ 
-                        st_insert(name,r->attr.name,r->lineno,-1,t->type,r->func,t->atrib,0);
+                        st_insert(name,r->getName()->c_str(),r->getLineno(),-1,t->getType(),r->getFunc(),t->getAtrib(),0);
                         free(name);
                     }
                 }
@@ -88,16 +88,16 @@ static void insertNode( TreeNode * t){
         }
         break;
         case ExpK:
-        switch (t->kind.exp){ 
+        switch (t->getExp()){ 
             case IdK:
-                name = uniteStrings(t->scope, t->attr.name);
+                name = uniteStrings(t->getScope()->c_str(), t->getName()->c_str());
                 if (st_lookup(name) == -1)
                 /* not yet in table, so treat as new definition */
-                    st_insert(name,t->attr.name,t->lineno,t->decl_line,t->type,t->func,-1,location++);
+                    st_insert(name,t->getName()->c_str(),t->getLineno(),t->getDeclLine(),t->getType(),t->getFunc(),-1,location++);
                 else{
                 /* already in table, so ignore location, 
                     add line number of use only */ 
-                    st_insert(name,t->attr.name,t->lineno,t->decl_line,t->type,t->func,-1,0);
+                    st_insert(name,t->getName()->c_str(),t->getLineno(),t->getDeclLine(),t->getType(),t->getFunc(),-1,0);
                     free(name);
                 }
             break;

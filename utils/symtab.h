@@ -2,7 +2,7 @@
  * @file symtab.h
  * @author André Lucas Maegima
  * @brief Interface para o analisador semântico.
- * @version 0.1
+ * @version 1.0
  * @date 2019-12-06
  * 
  * @copyright Copyright (c) 2019
@@ -25,7 +25,7 @@
  * @param atrib Se é atribuição.
  * @param loc Localização na memória.
  */
-void st_insert(char * name, char *idName, int lineno, int decl_line, int type, int func, int atrib, int loc);
+void st_insert(const char * name, const char *idName, int lineno, int decl_line, int type, int func, int atrib, int loc);
 
 /**
  * @brief A função st_lookup procura na tabela

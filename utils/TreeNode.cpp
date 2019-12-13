@@ -79,7 +79,7 @@ void TreeNode::print(){
                 fprintf(symbtree, "While\n");
                 break;
             case AssignK:
-                fprintf(symbtree, "Assign to: %s\n", tree->attr.name);
+                fprintf(symbtree, "Assign to: %s\n", tree->attr.name->c_str());
                 break;
             case ReturnK:
                 fprintf(symbtree, "Return\n");
@@ -99,10 +99,10 @@ void TreeNode::print(){
                 fprintf(symbtree, "Const: %d\n", tree->attr.val);
                 break;
             case IdK:
-                fprintf(symbtree, "Id: %s\n", tree->attr.name);
+                fprintf(symbtree, "Id: %s\n", tree->attr.name->c_str());
                 break;
             case TypeK:
-                fprintf(symbtree, "Type: %s\n", tree->attr.name);
+                fprintf(symbtree, "Type: %s\n", tree->attr.name->c_str());
                 break;
             default:
                 fprintf(symbtree, "Unknown ExpNode kind\n");
@@ -116,4 +116,124 @@ void TreeNode::print(){
         tree = tree->sibling;
     }
     UNINDENT;
+}
+
+TreeNode *TreeNode::getChild(int index){
+    return this->child[index];
+}
+
+void TreeNode::setChild(TreeNode *value, int index){
+    this->child[index] = value;
+}
+
+TreeNode *TreeNode::getSibling(){
+    return this->sibling;
+}
+
+void TreeNode::setSibling(TreeNode *Sibling){
+    this->sibling = Sibling;
+}
+
+int TreeNode::getLineno(){
+    return this->lineno;
+}
+
+void TreeNode::setLineno(int lineno){
+    this->lineno = lineno;
+}
+
+int TreeNode::getDeclLine(){
+    return this->decl_line;
+}
+
+void TreeNode::setDeclLine(int decl_line){
+    this->decl_line = decl_line;
+}
+
+int TreeNode::getFunc(){
+    return this->func;
+}
+
+void TreeNode::setFunc(int func){
+    this->func = func;
+}
+
+int TreeNode::getAtrib(){
+    return this->atrib;
+}
+
+void TreeNode::setAtrib(int atrib){
+    this->atrib = atrib;
+}
+
+int TreeNode::getDecl(){
+    return this->decl;
+}
+
+void TreeNode::setDecl(int decl){
+    this->decl = decl;
+}
+
+NodeKind TreeNode::getNodekind(){
+    return this->nodekind;
+}
+
+void TreeNode::setNodekind(NodeKind nodekind){
+    this->nodekind = nodekind;
+}
+
+std::string *TreeNode::getScope(){
+    return this->scope;
+}
+
+void TreeNode::setScope(std::string *scope){
+    this->scope = scope;
+}
+
+StmtKind TreeNode::getStmt(){
+    return this->kind.stmt;
+}
+
+void TreeNode::setStmt(StmtKind stmt){
+    this->kind.stmt = stmt;
+}
+
+ExpKind TreeNode::getExp(){
+    return this->kind.exp;
+}
+
+void TreeNode::setExp(ExpKind exp){
+    this->kind.exp = exp;
+}
+
+TokenType TreeNode::getOp(){
+    return this->attr.op;
+}
+
+void TreeNode::setOp(TokenType op){
+    this->attr.op = op;
+}
+
+int TreeNode::getVal(){
+    return this->attr.val;
+}
+
+void TreeNode::setVal(int val){
+    this->attr.val = val;
+}
+
+std::string *TreeNode::getName(){
+    return this->attr.name;
+}
+
+void TreeNode::setName(std::string *name){
+    this->attr.name = name;
+}
+
+ExpType TreeNode::getType(){
+    return this->type;
+}
+
+void TreeNode::setType(ExpType type){
+    this->type = type; 
 }

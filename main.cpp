@@ -15,8 +15,8 @@ using namespace std;
 #include "utils/util.h"
 #include "utils/Scanner.hpp"
 #include "utils/Parser.hpp"
-#include "utils/analyze.h"
-#include "utils/cgen.h"
+#include "utils/analyze.hpp"
+#include "utils/cgen.hpp"
 
 /* allocate global variables */
 Scanner *scan = NULL;

@@ -1,5 +1,5 @@
 /**
- * @file analyze.h
+ * @file analyze.hpp
  * @author André Lucas Maegima
  * @brief Interface para o analisador semântico.
  * @version 1.0

@@ -1,5 +1,5 @@
 /**
- * @file symtab.c
+ * @file symtab.cpp
  * @author André Lucas Maegima
  * @brief Implementação da tabela de simbolos e 
  * analisador semântico.
@@ -15,7 +15,8 @@
 #include <string.h>
 #include "globals.hpp"
 #include "symtab.h"
-#include "analyze.h"
+#include "analyze.hpp"
+#include "util.h"
 
 /** SIZE é o tamanho da tabela hash. */
 #define SIZE 211
@@ -28,7 +29,7 @@ na função de hash.  */
 int erro_ = 0;
 
 /**  @brief Função de hash. */
-static int hash(char *key){
+static int hash(const char *key){
     int temp = 0;
     int i = 0;
     while (key[i] != '\0')
@@ -65,15 +66,15 @@ typedef struct BucketListRec{
 /** @brief A tabela hash */
 static BucketList hashTable[SIZE];
 
-void st_insert(char *name, char *idName, int lineno, int decl_line, int type, int func, int atrib, int loc){
+void st_insert(const char *name, const char *idName, int lineno, int decl_line, int type, int func, int atrib, int loc){
     int h = hash(name);
     BucketList l = hashTable[h];
     while ((l != NULL) && (strcmp(name, l->name) != 0))
         l = l->next;
     if (l == NULL){ /* variable not yet in table */
         l = (BucketList)malloc(sizeof(struct BucketListRec));
-        l->name = name;
-        l->idName = idName;
+        l->name = copyString(name);
+        l->idName = copyString(idName);
         l->func = func;
         l->lines = (LineList)malloc(sizeof(struct LineListRec));
         l->lines->lineno = lineno;

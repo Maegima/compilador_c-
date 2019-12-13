@@ -97,7 +97,7 @@ void printToken(TokenType token, const char *tokenString){
  * @param s String a ser copiada.
  * @return char* Endereço da copia criada.
  */
-char *copyString(char *s){
+char *copyString(const char *s){
     int n;
     char *t;
     if (s == NULL)

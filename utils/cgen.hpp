@@ -1,5 +1,5 @@
 /**
- * @file cgen.h
+ * @file cgen.hpp
  * @author André Lucas Maegima
  * @brief Interface do gerador de código 
  * intermediário para a linguagem C-.

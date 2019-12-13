@@ -12,6 +12,7 @@
 #ifndef _TREENODE_HPP_
 #define _TREENODE_HPP_
 
+#include <iostream>
 #include "TokenType.hpp"
 
 /// Enum de tipos de Nós.
@@ -31,7 +32,6 @@ typedef enum {Void,Integer} ExpType;
  */
 class TreeNode{ 
 private:
-public:
     /// Filhos de um nó.
     TreeNode *child[MAXCHILDREN];
     /// Próximo irmão.
@@ -39,13 +39,14 @@ public:
     int lineno /** @brief Número da linha. */, decl_line /** @brief Linha de declaração. */; 
     int func /** @brief Se for função. */, atrib /** @brief Se for atribuição. */, decl /** @brief Se for declaração. */;
     NodeKind nodekind; /**< @brief Tipo de Nó. */
-    char *scope; /**< @brief Escopo do Nó. */
+    std::string *scope; /**< @brief Escopo do Nó. */
     /// Tipo de um nó.
     union { StmtKind stmt; ExpKind exp; } kind;
     /// Dado do nó.
-    union { TokenType op; int val; char *name; } attr;
+    union { TokenType op; int val; std::string *name; } attr;
     /// Tipo de expressão.
     ExpType type;
+public:
     /**
      * @brief O construtor TreeNode cria um novo nó de declaração
      * para a construção da árvore sintática.
@@ -68,6 +69,183 @@ public:
      * 
      */
     void print();
+    /**
+     * @brief Get the Child object
+     * 
+     * @param index 
+     * @return TreeNode* 
+     */
+    TreeNode *getChild(int index);
+    /**
+     * @brief Set the Child object
+     * 
+     * @param value 
+     * @param index 
+     */
+    void setChild(TreeNode *value, int index);
+    /**
+     * @brief Get the Sibling object
+     * 
+     * @return TreeNode* 
+     */
+    TreeNode *getSibling();
+    /**
+     * @brief Set the Sibling object
+     * 
+     * @param Sibling 
+     */
+    void setSibling(TreeNode *Sibling);
+    /**
+     * @brief Get the Lineno object
+     * 
+     * @return int 
+     */
+    int getLineno();
+    /**
+     * @brief Set the Lineno object
+     * 
+     * @param lineno 
+     */
+    void setLineno(int lineno);
+    /**
+     * @brief Get the Dec Line object
+     * 
+     * @return int 
+     */
+    int getDeclLine();
+    /**
+     * @brief Set the Decl Line object
+     * 
+     * @param decl_line 
+     */
+    void setDeclLine(int decl_line);
+    /**
+     * @brief Get the Func object
+     * 
+     * @return int 
+     */
+    int getFunc();
+    /**
+     * @brief Set the Func object
+     * 
+     * @param func 
+     */
+    void setFunc(int func);
+    /**
+     * @brief Get the Atrib object
+     * 
+     * @return int 
+     */
+    int getAtrib();
+    /**
+     * @brief Set the Atrib object
+     * 
+     * @param atrib 
+     */
+    void setAtrib(int atrib);
+    /**
+     * @brief Get the Decl object
+     * 
+     * @return int 
+     */
+    int getDecl();
+    /**
+     * @brief Set the Decl object
+     * 
+     * @param decl 
+     */
+    void setDecl(int decl);
+    /**
+     * @brief Get the Nodekind object
+     * 
+     * @return NodeKind 
+     */
+    NodeKind getNodekind();
+    /**
+     * @brief Set the Nodekind object
+     * 
+     * @param nodekind 
+     */
+    void setNodekind(NodeKind nodekind);
+    /**
+     * @brief Get the Scope object
+     * 
+     * @return std::string* 
+     */
+    std::string *getScope();
+    /**
+     * @brief Set the Scope object
+     * 
+     * @param scope 
+     */
+    void setScope(std::string *scope);
+    /**
+     * @brief Get the Stmt object
+     * 
+     * @return StmtKind 
+     */
+    StmtKind getStmt();
+    /**
+     * @brief Set the Stmt object
+     * 
+     * @param stmt 
+     */
+    void setStmt(StmtKind stmt);
+    /**
+     * @brief Get the Exp object
+     * 
+     * @return ExpKind 
+     */
+    ExpKind getExp();
+    void setExp(ExpKind exp);
+    /**
+     * @brief Get the Op object
+     * 
+     * @return TokenType 
+     */
+    TokenType getOp();
+    /**
+     * @brief Set the Op object
+     * 
+     * @param op 
+     */
+    void setOp(TokenType op);
+    /**
+     * @brief Get the Val object
+     * 
+     * @return int 
+     */
+    int getVal();
+    /**
+     * @brief Set the Val object
+     * 
+     * @param val 
+     */
+    void setVal(int val);
+    /**
+     * @brief Get the Name object
+     * 
+     * @return std::string* 
+     */
+    std::string *getName();
+    /**
+     * @brief Set the Name object
+     * 
+     * @param name 
+     */
+    void setName(std::string *name);
+    /**
+     * @brief Get the Type object
+     * 
+     * @return ExpType 
+     */
+    ExpType getType();
+    /**
+     * @brief Set the Type object
+     * 
+     * @param type 
+     */
+    void setType(ExpType type);
 };
 
 #endif

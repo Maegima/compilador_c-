@@ -6,8 +6,17 @@
         "parser.tab.h": "cpp",
         "symtab.h": "cpp",
         "random": "cpp",
-        "analyze.h": "cpp",
+        "analyze.hpp": "cpp",
         "code.h": "cpp",
-        "cgen.h": "cpp"
+        "cgen.hpp": "cpp",
+        "optional": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "system_error": "cpp",
+        "array": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "string": "cpp"
     }
 }

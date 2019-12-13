@@ -20,12 +20,13 @@ using namespace std;
 #include "utils/Parser.hpp"
 
 #define YYSTYPE TreeNode *
-static char * scope;
-static int sc = 1;
-static int func_id = 0;
-static char * func[256];
-static ExpType type[256];
+static int sc;
+static int func_id;
+static char **func;
+static ExpType *type;
 static TreeNode * savedTree; /* raiz da árvore sintática */
+static string *str_global;
+static string *scope;
 
 int yylex(void);
 extern char* yytext;
@@ -33,6 +34,9 @@ extern int erro;
 void yyerror(const char *msg);
 
 void initParser(){
+    sc = 1;
+    func = (char**) malloc(sizeof(char)*256);
+    type = (ExpType*) malloc(sizeof(ExpType)*256);
     func[0] = (char*) malloc(sizeof(char)*6);
     func[1] = (char*)  malloc(sizeof(char)*7);
     memcpy(func[0], "input\0", sizeof(char)*6);
@@ -40,6 +44,7 @@ void initParser(){
     type[0] = Integer;
     type[1] = Void;
     func_id = 2;
+    str_global = new string("GLOBAL");
 }
 %}
 
@@ -67,9 +72,9 @@ declaracao_lista: declaracao_lista declaracao
 { 
     YYSTYPE t = $1;
     if (t != NULL) { 
-        while (t->sibling != NULL)
-            t = t->sibling;
-        t->sibling = $2;
+        while (t->getSibling() != NULL)
+            t = t->getSibling();
+        t->setSibling($2);
         $$ = $1; 
     }
     else $$ = $2;
@@ -81,75 +86,68 @@ declaracao: var_declaracao { sc = 1; $$ = $1; } | fun_declaracao { sc = 1; $$ = 
 var_declaracao: tipo_especificador identificador SEMICOLON 
 {
     $$ = $1;
-    $$->child[0] = $2;
-    $2->decl_line = $2->lineno;
-    $2->type = $1->type;
-    $2->decl = 1;
-    $1->decl = 1;
+    $$->setChild($2, 0);
+    $2->setDeclLine($2->getLineno());
+    $2->setType($1->getType());
+    $2->setDecl(1);
+    $1->setDecl(1);
 } 
 | tipo_especificador identificador OBRACT numero CBRACT SEMICOLON 
 { 
     $$ = $1;
-    $$->child[0] = $2;
-    $$->child[0]->child[0] = $4;
-    $2->decl_line = $2->lineno;
-    $2->type = $1->type;
-    $2->decl = 1;
-    $1->decl = 1;
+    $$->setChild($2, 0);
+    $$->getChild(0)->setChild($4, 0);
+    $2->setDeclLine($2->getLineno());
+    $2->setType($1->getType());
+    $2->setDecl(1);
+    $1->setDecl(1);
 } 
 ;
 identificador: ID 
 { 
     $$ = new TreeNode(IdK);
-    $$->attr.name = copyString(yytext);
+    $$->setName(new string(yytext));
     if(sc){
-        scope = copyString($$->attr.name);
-        $$->scope = (char*) malloc(sizeof(char)*7);
-        memcpy($$->scope, "GLOBAL\0", 7);
+        scope = $$->getName();
+        $$->setScope(str_global);
         sc = 0;
     }
-    else $$->scope = scope;
+    else $$->setScope(scope);
 }
 ;
 numero: NUM 
 { 
     $$ = new TreeNode(ConstK);
-    $$->attr.val = atoi(yytext);
-    $$->type = Integer;
+    $$->setVal(atoi(yytext));
+    $$->setType(Integer);
 }
 ;
 tipo_especificador: INT 
 { 
     $$ = new TreeNode(TypeK);
-    $$->attr.name = (char*) malloc(sizeof(char)*4);
-    memcpy($$->attr.name, "INT\0", 4);
-    $$->type = Integer;
+    $$->setName(new string("INT"));
+    $$->setType(Integer);
 } 
 | VOID 
 { 
     $$ = new TreeNode(TypeK);
-    $$->attr.name = (char*) malloc(sizeof(char)*5);
-    memcpy($$->attr.name, "VOID\0", 4);
-    $$->type = Void; 
+    $$->setName(new string("VOID"));
+    $$->setType(Void);
 }
 ;
 fun_declaracao: tipo_especificador identificador OPAREN params CPAREN composto_decl
 {
     $$ = $1;
-    $$->child[0] = $2;
-    $$->child[0]->child[0] = $4;
-    $$->child[0]->child[1] = $6;
-    $2->decl_line = $2->lineno;
-    $2->type = $1->type;
-    $2->func = 1;
-    $2->decl = 1;
-    func[func_id] = $2->attr.name;
-    type[func_id] = $2->type;
+    $$->setChild($2, 0);
+    $$->getChild(0)->setChild($4, 0);
+    $$->getChild(0)->setChild($6, 1);
+    $2->setDeclLine($2->getLineno());
+    $2->setType($1->getType());
+    $2->setFunc(1);
+    $2->setDecl(1);
+    func[func_id] = copyString($2->getName()->c_str());
+    type[func_id] = $2->getType();
     func_id++;
-    /*printf("params:\n");
-    printTree($4);
-    printf("compos:\n");
-    printTree($6);*/
 }
 ;
 params: param_lista { $$ = $1; } | VOID { $$ = NULL; }
@@ -158,9 +156,9 @@ param_lista: param_lista COMMA param
 { 
    YYSTYPE t = $1;
     if (t != NULL) { 
-        while (t->sibling != NULL)
-            t = t->sibling;
-        t->sibling = $3;
+        while (t->getSibling() != NULL)
+            t = t->getSibling();
+        t->setSibling($3);
         $$ = $1; 
     }
     else $$ = $3;
@@ -170,29 +168,29 @@ param_lista: param_lista COMMA param
 param: tipo_especificador identificador 
 {  
     $$ = $1;
-    $$->child[0] = $2;
-    $2->decl_line = $2->lineno;
-    $2->type = $1->type;
-    $2->decl = 1;
-    $1->decl = 1;
+    $$->setChild($2, 0);
+    $2->setDeclLine($2->getLineno());
+    $2->setType($1->getType());
+    $2->setDecl(1);
+    $1->setDecl(1);
 } 
 | tipo_especificador identificador OBRACT CBRACT
 { 
     $$ = $1;
-    $$->child[0] = $2; 
-    $2->decl_line = $2->lineno;
-    $2->type = $1->type;
-    $2->decl = 1;
-    $1->decl = 1;
+    $$->setChild($2, 0);
+    $2->setDeclLine($2->getLineno());
+    $2->setType($1->getType());
+    $2->setDecl(1);
+    $1->setDecl(1);
 }
 ;
 composto_decl: OBRACE local_declaracoes statement_lista CBRACE
 { 
     YYSTYPE t = $2;
     if(t != NULL){
-        while(t->sibling != NULL)
-            t = t->sibling;
-        t->sibling = $3;
+        while(t->getSibling() != NULL)
+            t = t->getSibling();
+        t->setSibling($3);
         $$ = $2;
     }
     else $$ = $3;
@@ -202,9 +200,9 @@ local_declaracoes: local_declaracoes var_declaracao
 {
     YYSTYPE t = $1;
     if(t != NULL){
-        while(t->sibling != NULL)
-            t = t->sibling;
-        t->sibling = $2;
+        while(t->getSibling() != NULL)
+            t = t->getSibling();
+        t->setSibling($2);
         $$ = $1;
     }
     else $$ = $2;
@@ -215,9 +213,9 @@ statement_lista: statement_lista statement
 {
     YYSTYPE t = $1;
     if(t != NULL){
-        while(t->sibling != NULL)
-            t = t->sibling;
-        t->sibling = $2;
+        while(t->getSibling() != NULL)
+            t = t->getSibling();
+        t->setSibling($2);
         $$ = $1;
     }
     else $$ = $2;
@@ -236,132 +234,132 @@ expressao_decl: expressao SEMICOLON { $$ = $1; }
 selecao_decl: IF OPAREN expressao CPAREN statement 
 { 
     $$ = new TreeNode(IfK);
-    $$->child[0] = $3;
-    $$->child[1] = $5;
+    $$->setChild($3, 0);
+    $$->setChild($5, 1);
 }
 | IF OPAREN expressao CPAREN statement ELSE statement
 { 
     $$ = new TreeNode(IfK);
-    $$->child[0] = $3;
-    $$->child[1] = $5;
-    $$->child[2] = $7;
+    $$->setChild($3, 0);
+    $$->setChild($5, 1);
+    $$->setChild($7, 2);
 }
 ;
 iteracao_decl: WHILE OPAREN expressao CPAREN statement
 {
     $$ = new TreeNode(WhileK);
-    $$->child[0] = $3;
-    $$->child[1] = $5;
+    $$->setChild($3, 0);
+    $$->setChild($5, 1);
 }
 ;
 retorno_decl: RETURN SEMICOLON | RETURN expressao SEMICOLON
 {
     $$ = new TreeNode(ReturnK);
-    $$->child[0] = $2;
+    $$->setChild($2, 0);
 }
 ;
 expressao: var ATRIB expressao
 {
     $$ = new TreeNode(AssignK);
-    $$->attr.name = $1->attr.name;
-    $$->atrib = 1;
-    $$->type = ($1->type == $3->type) ? $3->type : Void;
-    $$->scope = scope;
-    $$->child[0] = $1;
-    $$->child[1] = $3;
+    $$->setName($1->getName());
+    $$->setAtrib(1);
+    $$->setType(($1->getType() == $3->getType()) ? $3->getType() : Void);
+    $$->setScope(scope);
+    $$->setChild($1, 0);
+    $$->setChild($3, 1);
 } 
 | simples_expressao { $$ = $1; }
 ;
 var: identificador
 { 
     $$ = $1;
-    $$->type = Integer;
+    $$->setType(Integer);
 } 
 | identificador OBRACT expressao CBRACT
 {
     $$ = $1;
-    $$->child[0] = $3;
-    $$->type = Integer;
+    $$->setChild($3, 0);
+    $$->setType(Integer);
 }
 ;
 simples_expressao: soma_expressao relacional soma_expressao 
 {
     $$ = $2;
-    $$->child[0] = $1;
-    $$->child[1] = $3;
-    $$->type = ($1->type == $3->type) ? $1->type : Void;
+    $$->setChild($1, 0);
+    $$->setChild($3, 1);
+    $$->setType(($1->getType() == $3->getType()) ? $1->getType() : Void);
 }
 | soma_expressao { $$ = $1; }
 ;
 relacional: SLTE 
 { 
     $$ = new TreeNode(OpK);
-    $$->attr.op = SLTE; 
+    $$->setOp(SLTE);
 } 
 | SLT 
 { 
     $$ = new TreeNode(OpK);
-    $$->attr.op = SLT;
+    $$->setOp(SLT);
 } 
 | SGT 
 {
     $$ = new TreeNode(OpK);
-    $$->attr.op = SGT;
+    $$->setOp(SGT);
 } 
 | SGTE 
 {
-    $$ = new TreeNode(OpK);
-    $$->attr.op = SGTE; 
+    $$ = new TreeNode(OpK); 
+    $$->setOp(SGTE);
 } 
 | EQUAL 
 {
     $$ = new TreeNode(OpK);
-    $$->attr.op = EQUAL;
+    $$->setOp(EQUAL);
 } 
 | DIFFERENT 
 {
     $$ = new TreeNode(OpK);
-    $$->attr.op = DIFFERENT;
+    $$->setOp(DIFFERENT);
 } 
 ;
 soma_expressao: soma_expressao soma termo
 {
     $$ = $2;
-    $$->child[0] = $1;
-    $$->child[1] = $3;
-    $$->type = ($1->type == $3->type) ? $1->type : Void;
+    $$->setChild($1, 0);
+    $$->setChild($3, 1);
+    $$->setType(($1->getType() == $3->getType()) ? $1->getType() : Void);
 } 
 | termo { $$ = $1; }
 ;
 soma: ADD
 { 
     $$ = new TreeNode(OpK);
-    $$->attr.op = ADD; 
+    $$->setOp(ADD); 
 } 
 | SUB 
 { 
     $$ = new TreeNode(OpK);
-    $$->attr.op = SUB; 
+    $$->setOp(SUB); 
 }
 ;
 termo: termo mult fator
 {
     $$ = $2;
-    $$->child[0] = $1;
-    $$->child[1] = $3;
-    $$->type = ($1->type == $3->type) ? $1->type : Void;
+    $$->setChild($1, 0);
+    $$->setChild($3, 1);
+    $$->setType(($1->getType() == $3->getType()) ? $1->getType() : Void);
 }  
 | fator { $$ = $1; }
 ;
 mult: MULT
 { 
     $$ = new TreeNode(OpK);
-    $$->attr.op = MULT; 
+    $$->setOp(MULT); 
 } 
 | DIV
 { 
     $$ = new TreeNode(OpK);
-    $$->attr.op = DIV; 
+    $$->setOp(DIV); 
 } 
 ;
 fator: OPAREN expressao CPAREN { $$ = $2; } 
@@ -372,30 +370,30 @@ fator: OPAREN expressao CPAREN { $$ = $2; }
 ativacao: identificador OPAREN simples_expressao CPAREN 
 { 
     $$ = $1;
-    $$->child[0] = $3;
-    $1->func = 1;
+    $$->setChild($3, 0);
+    $1->setFunc(1);
     ExpType t = Void;
     for(int i = 0; i < func_id; i++){
-        if( strcmp($1->attr.name, func[i]) == 0 ){
+        if( strcmp($1->getName()->c_str(), func[i]) == 0 ){
             t = type[i];
             break;
         }
     }
-    $$->type = t;
+    $$->setType(t);
 } 
 | identificador OPAREN args CPAREN 
 { 
-    $$ = $1; 
-    $$->child[0] = $3;
-    $1->func = 1;
+    $$ = $1;
+    $$->setChild($3, 0);
+    $1->setFunc(1);
     ExpType t = Void;
     for(int i = 0; i < func_id; i++){
-        if( strcmp($1->attr.name, func[i]) == 0 ){
+        if( strcmp($1->getName()->c_str(), func[i]) == 0 ){
             t = type[i];
             break;
         }
     }
-    $$->type = t;
+    $$->setType(t);
 }
 ;
 args: arg_lista { $$ = $1; } | { $$ = NULL; }
@@ -404,9 +402,9 @@ arg_lista: arg_lista COMMA expressao
 {
     YYSTYPE t = $1;
     if(t != NULL){
-        while(t->sibling != NULL)
-            t = t->sibling;
-        t->sibling = $3;
+        while(t->getSibling() != NULL)
+            t = t->getSibling();
+        t->setSibling($3);
         $$ = $1;
     }
     else $$ = $3;
