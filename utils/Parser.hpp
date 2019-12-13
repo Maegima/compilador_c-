@@ -14,19 +14,32 @@
 
 #include "TreeNode.hpp"
 
-/**
- * @brief A função parse faz a análise sintática
- * e cria a árvore de análise sintática.
- * 
- * @return TreeNode* Nó raiz da árvore.
- */
-TreeNode * parse(void);
+class Parser{
+private:
+    /// Raiz da árvore sintática.
+    TreeNode * savedTree; 
+public:
+    /**
+     * @brief O método Parser inicializa as váriaveis 
+     * do analisador sintático.
+     * 
+     */
+    Parser(void);
 
-/**
- * @brief O procedimento initParser inicializa as váriaveis 
- * do analisador sintático.
- * 
- */
-void initParser();
+    /**
+     * @brief O método parse faz a análise sintática
+     * e cria a árvore de análise sintática.
+     * 
+     * @return TreeNode* Nó raiz da árvore.
+     */
+    TreeNode *parse();
+    /**
+     * @brief O método setSavedTree altera o valor da 
+     * raiz da árvore de ánalise sintática.
+     * 
+     * @param savedTree Raiz da árvore.
+     */
+    void setSavedTree(TreeNode *savedTree);
+};
 
 #endif

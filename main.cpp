@@ -20,6 +20,7 @@ using namespace std;
 
 /* allocate global variables */
 Scanner *scan = NULL;
+Parser *parser = NULL;
 FILE * source = NULL;
 FILE * listing = stdout;
 FILE * symbtab = stdout;
@@ -49,7 +50,9 @@ int main(int argc, char **argv){
         symbtab = fopen(argv[3], "w");
     if(argc > 4)
         code = fopen(argv[4], "w");
-    raiz = parse();
+    scan = new Scanner();
+    parser = new Parser();
+    raiz = parser->parse();
     if(!erro){
         raiz->print();
         buildSymtab(raiz);

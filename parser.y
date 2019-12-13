@@ -24,28 +24,13 @@ static int sc;
 static int func_id;
 static char **func;
 static ExpType *type;
-static TreeNode * savedTree; /* raiz da árvore sintática */
 static string *str_global;
 static string *scope;
 
 int yylex(void);
+void yyerror(const char *msg);
 extern char* yytext;
 extern int erro;
-void yyerror(const char *msg);
-
-void initParser(){
-    sc = 1;
-    func = (char**) malloc(sizeof(char)*256);
-    type = (ExpType*) malloc(sizeof(ExpType)*256);
-    func[0] = (char*) malloc(sizeof(char)*6);
-    func[1] = (char*)  malloc(sizeof(char)*7);
-    memcpy(func[0], "input\0", sizeof(char)*6);
-    memcpy(func[1], "output\0", sizeof(char)*7);
-    type[0] = Integer;
-    type[1] = Void;
-    func_id = 2;
-    str_global = new string("GLOBAL");
-}
 %}
 
 %start programa
@@ -66,7 +51,7 @@ void initParser(){
 %token ERR                      
 
 %%
-programa: declaracao_lista { savedTree = $1; } 
+programa: declaracao_lista { parser->setSavedTree($1); } 
 ;
 declaracao_lista: declaracao_lista declaracao
 { 
@@ -421,7 +406,6 @@ arg_lista: arg_lista COMMA expressao
  */
 void yyerror(const char * msg)
 {
-  extern char* yytext;
   cout << msg << ": " << yytext << " " << yylval << " " << yychar << " line " << scan->getLineNumber() << endl;
   erro = 1;
 }
@@ -436,9 +420,25 @@ int yylex(void){
     return scan->getToken(); 
 }
 
-TreeNode * parse(void){ 
-    scan = new Scanner();
-    initParser();
+Parser::Parser(){
+    sc = 1;
+    func = (char**) malloc(sizeof(char)*256);
+    type = (ExpType*) malloc(sizeof(ExpType)*256);
+    func[0] = (char*) malloc(sizeof(char)*6);
+    func[1] = (char*)  malloc(sizeof(char)*7);
+    memcpy(func[0], "input\0", sizeof(char)*6);
+    memcpy(func[1], "output\0", sizeof(char)*7);
+    type[0] = Integer;
+    type[1] = Void;
+    func_id = 2;
+    str_global = new string("GLOBAL");
+}
+
+TreeNode *Parser::parse(void){ 
     yyparse();
-    return savedTree;
+    return this->savedTree;
+}
+
+void Parser::setSavedTree(TreeNode *savedTree){
+    this->savedTree = savedTree;
 }

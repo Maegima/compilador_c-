@@ -17,6 +17,7 @@
 #include <string.h>
 #include "TokenType.hpp"
 #include "Scanner.hpp"
+#include "Parser.hpp"
 
 /* Yacc/Bison generates internally its own values
  * for the tokens. Other files can access these values
@@ -55,6 +56,8 @@ extern FILE* symbtree; /**< Arquivo para saída da árvore sintática. */
 extern FILE *symbtab; /**< Arquivo para saída da tabela de simbolos. */
 
 extern Scanner *scan; /**< Analisador léxico. */
+
+extern Parser *parser; /**< Analisador sintático */
 
 /**************************************************/
 /***********   Flags para o rastreamento   ********/
