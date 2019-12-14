@@ -10,14 +10,14 @@
  * 
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include <iostream>
 #include "globals.hpp"
-#include "symtab.h"
+#include "symtab.hpp"
 #include "code.h"
-#include "util.h"
 #include "cgen.hpp"
 #include "TreeNode.hpp"
+
+using namespace std;
 
 static char number[11]; /**< Utilizado na conversão de número para string. */
 static int cont_aux = 0, cont_lab = 0, cont_vet = 0;
@@ -76,7 +76,7 @@ static char *strNumber(const char *str, int number){
  * @param tree Nó da árvore.
  * @param operate Último operando.
  */
-static void cGen(TreeNode *tree, char **operate);
+static void cGen(TreeNode *tree, string **operate);
 
 /**
  * @brief O procedimento ccGen gera o código intermediário
@@ -86,7 +86,7 @@ static void cGen(TreeNode *tree, char **operate);
  * @param tree Nó da árvore.
  * @param operate Último operando.
  */
-static void ccGen(TreeNode *tree, char **operate);
+static void ccGen(TreeNode *tree, string **operate);
 
 /**
  * @brief O procedimento genStmt gera o código intermediário
@@ -95,9 +95,9 @@ static void ccGen(TreeNode *tree, char **operate);
  * @param tree Nó da árvore.
  * @param operate Último operando.
  */
-static void genStmt(TreeNode *tree, char **operate){
+static void genStmt(TreeNode *tree, string **operate){
     TreeNode *p1, *p2, *p3;
-    char *op[3] = {NULL, NULL, NULL};
+    string *op[3] = {NULL, NULL, NULL};
     char *label1, *label2;
     switch (tree->getStmt()){
     case IfK:
@@ -110,7 +110,7 @@ static void genStmt(TreeNode *tree, char **operate){
         label1 = strNumber("LABEL", cont_lab);
         cont_lab++;
         cGen(p1, &op[0]);
-        emitQuadruple("IF_NOT", op[0], label1, "-");
+        emitQuadruple("IF_NOT", op[0]->c_str(), label1, "-");
         /* recurse on then part */
         cGen(p2, &op[1]);
         if(p3){
@@ -142,7 +142,7 @@ static void genStmt(TreeNode *tree, char **operate){
         cont_lab++;
         emitQuadruple("LABEL", label1, "-", "-");
         cGen(p1, &op[0]);
-        emitQuadruple("IF_NOT", op[0], label2, "-");
+        emitQuadruple("IF_NOT", op[0]->c_str(), label2, "-");
         /* generate code for test */
         cGen(p2, &op[1]);
         emitQuadruple("JUMP", label1, "-", "-");
@@ -158,8 +158,8 @@ static void genStmt(TreeNode *tree, char **operate){
         cGen(tree->getChild(0), &op[0]);
         op[1] = op[0];
         cGen(tree->getChild(1), &op[1]);
-        if (strcmp(op[0], op[1]) != 0)
-            emitQuadruple("ASSIGN", op[0], op[1], "-");
+        if (op[0]->compare(*op[1]) != 0)
+            emitQuadruple("ASSIGN", op[0]->c_str(), op[1]->c_str(), "-");
         if (TraceCode)
             emitComment("<- assign");
         *operate = op[0];
@@ -168,7 +168,7 @@ static void genStmt(TreeNode *tree, char **operate){
         if (TraceCode)
             emitComment("-> return");
         cGen(tree->getChild(0), &op[0]);
-        emitQuadruple("JR", op[0], "-", "-");
+        emitQuadruple("JR", op[0]->c_str(), "-", "-");
         if (TraceCode)
             emitComment("<- return");
     default:
@@ -183,15 +183,15 @@ static void genStmt(TreeNode *tree, char **operate){
  * @param tree Nó da árvore.
  * @param operate Último operando.
  */
-static void genExp(TreeNode *tree, char **operate){
+static void genExp(TreeNode *tree, string **operate){
     TreeNode *p1, *p2;
-    char *op[3] = {NULL, NULL, NULL};
+    string *op[3] = {NULL, NULL, NULL};
     switch (tree->getExp()){
     case ConstK:
         if (TraceCode)
             emitComment("-> Const");
         intToString(number, tree->getVal(), 10);
-        *operate = number;
+        *operate = new string(number);
         if (TraceCode)
             emitComment("<- Const");
         break; /* ConstK */
@@ -199,15 +199,15 @@ static void genExp(TreeNode *tree, char **operate){
     case IdK:
         if (TraceCode)
             emitComment("-> Id");
-        *operate = copyString(tree->getName()->c_str());
+        *operate = tree->getName();
         if (tree->getFunc()){
             if (tree->getDecl()){
-                op[0] = copyString(tree->getName()->c_str());
-                emitQuadruple("LABEL", op[0], "-", "-");
+                op[0] = tree->getName();
+                emitQuadruple("LABEL", op[0]->c_str(), "-", "-");
                 TreeNode *p = tree->getChild(0);
                 while (p){
                     ccGen(p->getChild(0), &op[0]);
-                    emitQuadruple("LOAD", op[0], "-", "-");
+                    emitQuadruple("LOAD", op[0]->c_str(), "-", "-");
                     p = p->getSibling();
                 }
                 cGen(tree->getChild(1), &op[1]);
@@ -217,25 +217,26 @@ static void genExp(TreeNode *tree, char **operate){
                 int cont = 0;
                 while (p){
                     ccGen(p, &op[0]);
-                    emitQuadruple("PARAM", op[0], "-", "-");
+                    emitQuadruple("PARAM", op[0]->c_str(), "-", "-");
                     p = p->getSibling();
                     cont++;
                 }
                 intToString(number, cont, 10);
-                op[0] = copyString(tree->getName()->c_str());
-                op[1] = number;
-                emitQuadruple("CALL", op[0], op[1], "-");
+                op[0] = tree->getName();
+                op[1] = new string(number);
+                emitQuadruple("CALL", op[0]->c_str(), op[1]->c_str(), "-");
+                delete op[1];
             }
         }
         else{
             if (!tree->getDecl()){
                 cGen(tree->getChild(0), &op[2]);
                 if (tree->getChild(0) != NULL){
-                    op[0] = strNumber("VET", cont_vet);
-                    op[1] = copyString(tree->getName()->c_str());
+                    op[0] = new string(strNumber("VET", cont_vet));
+                    op[1] = tree->getName();
                     cont_vet++;
-                    emitQuadruple("ADD", op[0], op[1], op[2]);
-                    emitQuadruple("LOAD_ADRESS", op[0], op[0], "-");
+                    emitQuadruple("ADD", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
+                    emitQuadruple("LOAD_ADRESS", op[0]->c_str(), op[0]->c_str(), "-");
                     *operate = op[0];
                 }
             }
@@ -253,36 +254,36 @@ static void genExp(TreeNode *tree, char **operate){
         cGen(p1, &op[1]);
         cGen(p2, &op[2]);
         if (op[0] == NULL){
-            op[0] = strNumber("AUX", cont_aux);
+            op[0] = new string(strNumber("AUX", cont_aux));
             cont_aux++;
         }
         switch (tree->getOp()){
         case ADD:
-            emitQuadruple("ADD", op[0], op[1], op[2]);
+            emitQuadruple("ADD", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             break;
         case SUB:
-            emitQuadruple("SUB", op[0], op[1], op[2]);
+            emitQuadruple("SUB", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             break;
         case MULT:
-            emitQuadruple("MULT", op[0], op[1], op[2]);
+            emitQuadruple("MULT", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             break;
         case DIV:
-            emitQuadruple("DIV", op[0], op[1], op[2]);
+            emitQuadruple("DIV", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             break;
         case SLT:
-            emitQuadruple("SLT", op[0], op[1], op[2]);
+            emitQuadruple("SLT", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             break;
         case SLTE:
-            emitQuadruple("SLTE", op[0], op[1], op[2]);
+            emitQuadruple("SLTE", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             break;
         case SGT:
-            emitQuadruple("SLT", op[0], op[1], op[2]);
+            emitQuadruple("SLT", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             break;
         case SGTE:
-            emitQuadruple("SGTE", op[0], op[1], op[2]);
+            emitQuadruple("SGTE", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             break;
         case EQUAL:
-            emitQuadruple("EQUAL", op[0], op[1], op[2]);
+            emitQuadruple("EQUAL", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             break;
         default:
             emitComment("BUG: Unknown operate");
@@ -297,13 +298,13 @@ static void genExp(TreeNode *tree, char **operate){
             emitComment("-> type");
         /* generate code for rhs */
         if (tree->getDecl()){
-            op[0] = copyString(tree->getChild(0)->getName()->c_str());
+            op[0] = tree->getChild(0)->getName();
             if (tree->getChild(0)->getChild(0)){
                 cGen(tree->getChild(0)->getChild(0), &op[1]);
-                emitQuadruple("ALOC_MEN", op[0], op[1], "-");
+                emitQuadruple("ALOC_MEN", op[0]->c_str(), op[1]->c_str(), "-");
             }
             else{
-                emitQuadruple("ALOC_MEN", op[0], "1", "-");
+                emitQuadruple("ALOC_MEN", op[0]->c_str(), "1", "-");
             }
             cGen(tree->getChild(0), &op[1]);
         }
@@ -316,7 +317,7 @@ static void genExp(TreeNode *tree, char **operate){
     }
 }
 
-static void cGen(TreeNode *tree, char **operate){
+static void cGen(TreeNode *tree, string **operate){
     if (tree != NULL){
         switch (tree->getNodekind()){
         case StmtK:
@@ -332,7 +333,7 @@ static void cGen(TreeNode *tree, char **operate){
     }
 }
 
-static void ccGen(TreeNode *tree, char **operate){
+static void ccGen(TreeNode *tree, string **operate){
     if (tree != NULL){
         switch (tree->getNodekind()){
         case StmtK:
@@ -349,7 +350,7 @@ static void ccGen(TreeNode *tree, char **operate){
 
 void codeGen(TreeNode *syntaxTree, const char *codefile){
     char *s = (char *)malloc(strlen(codefile) + 7);
-    char *pointer = NULL;
+    string *pointer = NULL;
     strcpy(s, "File: ");
     strcat(s, codefile);
     emitComment("TINY Compilation to TM Code");

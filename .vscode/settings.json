@@ -2,9 +2,8 @@
     "files.associations": {
         "iostream": "cpp",
         "globals.h": "cpp",
-        "util.h": "cpp",
         "parser.tab.h": "cpp",
-        "symtab.h": "cpp",
+        "symtab.hpp": "cpp",
         "random": "cpp",
         "analyze.hpp": "cpp",
         "code.h": "cpp",

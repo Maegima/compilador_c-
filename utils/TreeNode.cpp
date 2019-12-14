@@ -11,7 +11,6 @@
 
 #include "globals.hpp"
 #include "TreeNode.hpp"
-#include "util.h"
 
 TreeNode::TreeNode(StmtKind kind){
     int i;
@@ -93,7 +92,7 @@ void TreeNode::print(){
             switch (tree->kind.exp){
             case OpK:
                 fprintf(symbtree, "Op: ");
-                printToken(tree->attr.op, "\0");
+                scan->printToken(tree->attr.op, "\0");
                 break;
             case ConstK:
                 fprintf(symbtree, "Const: %d\n", tree->attr.val);

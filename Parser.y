@@ -1,6 +1,6 @@
 %{
 /**
- * @file parser.cpp
+ * @file Parser.cpp
  * @author André Lucas Maegima
  * @brief Implementação do analisador sintático.
  * @version 1.0
@@ -15,14 +15,13 @@ using namespace std;
 #define YYPARSER /* distinguishes Yacc output from other code files */
 
 #include "utils/globals.hpp"
-#include "utils/util.h"
 #include "utils/Scanner.hpp"
 #include "utils/Parser.hpp"
 
 #define YYSTYPE TreeNode *
 static int sc;
 static int func_id;
-static char **func;
+static string **func;
 static ExpType *type;
 static string *str_global;
 static string *scope;
@@ -130,7 +129,7 @@ fun_declaracao: tipo_especificador identificador OPAREN params CPAREN composto_d
     $2->setType($1->getType());
     $2->setFunc(1);
     $2->setDecl(1);
-    func[func_id] = copyString($2->getName()->c_str());
+    func[func_id] = $2->getName();
     type[func_id] = $2->getType();
     func_id++;
 }
@@ -359,7 +358,7 @@ ativacao: identificador OPAREN simples_expressao CPAREN
     $1->setFunc(1);
     ExpType t = Void;
     for(int i = 0; i < func_id; i++){
-        if( strcmp($1->getName()->c_str(), func[i]) == 0 ){
+        if( func[i]->compare(*($1->getName())) == 0 ) {
             t = type[i];
             break;
         }
@@ -373,7 +372,7 @@ ativacao: identificador OPAREN simples_expressao CPAREN
     $1->setFunc(1);
     ExpType t = Void;
     for(int i = 0; i < func_id; i++){
-        if( strcmp($1->getName()->c_str(), func[i]) == 0 ){
+        if( func[i]->compare(*($1->getName())) == 0 ){
             t = type[i];
             break;
         }
@@ -422,12 +421,10 @@ int yylex(void){
 
 Parser::Parser(){
     sc = 1;
-    func = (char**) malloc(sizeof(char)*256);
-    type = (ExpType*) malloc(sizeof(ExpType)*256);
-    func[0] = (char*) malloc(sizeof(char)*6);
-    func[1] = (char*)  malloc(sizeof(char)*7);
-    memcpy(func[0], "input\0", sizeof(char)*6);
-    memcpy(func[1], "output\0", sizeof(char)*7);
+    func = new string*[256];
+    type = new ExpType[256];
+    func[0] = new string("input");
+    func[1] = new string("output");
     type[0] = Integer;
     type[1] = Void;
     func_id = 2;

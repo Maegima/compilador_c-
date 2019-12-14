@@ -10,13 +10,12 @@
  * 
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <iostream>
 #include "globals.hpp"
-#include "symtab.h"
+#include "symtab.hpp"
 #include "analyze.hpp"
-#include "util.h"
+
+using namespace std;
 
 /** SIZE é o tamanho da tabela hash. */
 #define SIZE 211
@@ -29,7 +28,7 @@ na função de hash.  */
 int erro_ = 0;
 
 /**  @brief Função de hash. */
-static int hash(const char *key){
+static int hashString(const char *key){
     int temp = 0;
     int i = 0;
     while (key[i] != '\0')
@@ -53,8 +52,8 @@ typedef struct LineListRec{
  * 
  */
 typedef struct BucketListRec{
-    char *name; /**< @brief Nome do identificador. */
-    char *idName; /**< @brief Nome do escopo do identificador. */
+    string *name; /**< @brief Nome do identificador. */
+    string *idName; /**< @brief Nome do escopo do identificador. */
     int func; /**< @brief Se o identificador é uma função. */
     LineList lines; /**< @brief Linhas onde o identificador aparece. */
     LineList atrib; /**< @brief Linhas de atribuição ao identificador. */
@@ -66,15 +65,15 @@ typedef struct BucketListRec{
 /** @brief A tabela hash */
 static BucketList hashTable[SIZE];
 
-void st_insert(const char *name, const char *idName, int lineno, int decl_line, int type, int func, int atrib, int loc){
-    int h = hash(name);
+void st_insert(string *name, string *idName, int lineno, int decl_line, int type, int func, int atrib, int loc){
+    int h = hashString(name->c_str());
     BucketList l = hashTable[h];
-    while ((l != NULL) && (strcmp(name, l->name) != 0))
+    while ((l != NULL) && (name->compare(*l->name) != 0))
         l = l->next;
     if (l == NULL){ /* variable not yet in table */
         l = (BucketList)malloc(sizeof(struct BucketListRec));
-        l->name = copyString(name);
-        l->idName = copyString(idName);
+        l->name = name;
+        l->idName = idName;
         l->func = func;
         l->lines = (LineList)malloc(sizeof(struct LineListRec));
         l->lines->lineno = lineno;
@@ -149,10 +148,10 @@ void st_insert(const char *name, const char *idName, int lineno, int decl_line, 
     }
 }
 
-int st_lookup(char *name){
-    int h = hash(name);
+int st_lookup(string *name){
+    int h = hashString(name->c_str());
     BucketList l = hashTable[h];
-    while ((l != NULL) && (strcmp(name, l->name) != 0))
+    while ((l != NULL) && (name->compare(*l->name) != 0))
         l = l->next;
     if (l == NULL)
         return -1;
@@ -191,7 +190,7 @@ void printSymTab(FILE *listing){
             while (l != NULL){
                 LineList t = l->lines;
                 LineList r = l->decl_line;
-                fprintf(listing, "%-20s ", l->name);
+                fprintf(listing, "%-20s ", l->name->c_str());
                 fprintf(listing, "%-8d  ", l->memloc);
                 for (int j = 0; j < padding; j++){
                     if (r != NULL){
@@ -220,7 +219,7 @@ void printSymTab(FILE *listing){
  * @param name Id da tabela de simbolo.
  * @param listing Arquivo de escrita.
  */
-static void printScope(char *name, FILE *listing){
+static void printScope(const char *name, FILE *listing){
     int i = 0;
     while (name[i] != ' '){
         fprintf(listing, "%c", name[i]);
@@ -245,9 +244,9 @@ static void notUniqueVariable(FILE *listing){
                     count++;
                     if (count > 1){
                         fprintf(listing, "Erro semantico no escopo ");
-                        printScope(l->name, listing);
+                        printScope(l->name->c_str(), listing);
                         fprintf(listing, " na linha %d: declaração inválida de variável %s, já foi declarada previamente.\n",
-                                s->lineno, l->idName);
+                                s->lineno, l->idName->c_str());
                         erro_ = 1;
                     }
                     s = s->next;
@@ -275,9 +274,9 @@ static void notVoidVariable(FILE *listing){
                 while (s != NULL){
                     if (!l->func && !s->type){
                         fprintf(listing, "Erro semantico no escopo ");
-                        printScope(l->name, listing);
+                        printScope(l->name->c_str(), listing);
                         fprintf(listing, " na linha %d: declaração inválida de variável %s, void só pode ser usado para declaração de função.\n",
-                                s->lineno, l->idName);
+                                s->lineno, l->idName->c_str());
                         erro_ = 1;
                     }
                     s = s->next;
@@ -296,20 +295,20 @@ static void notVoidVariable(FILE *listing){
  */
 static void variableNotDeclared(FILE *listing){
     int i;
-    char *name;
+    string *name;
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
             BucketList l = hashTable[i];
             while (l != NULL){
                 LineList s = l->lines;
                 while (s != NULL){
-                    name = uniteStrings("GLOBAL", l->idName);
+                    name = new string("GLOBAL " + *l->idName);
                     if (!l->decl_line && !l->func){
                         if (st_lookup(name) == -1){
                             fprintf(listing, "Erro semantico no escopo ");
-                            printScope(l->name, listing);
+                            printScope(l->name->c_str(), listing);
                             fprintf(listing, " na linha %d: variável %s não declarada.\n",
-                                    s->lineno, l->idName);
+                                    s->lineno, l->idName->c_str());
                             erro_ = 1;
                         }
                     }
@@ -329,24 +328,24 @@ static void variableNotDeclared(FILE *listing){
  */
 static void functionNotDeclared(FILE *listing){
     int i;
-    char *name;
+    string *name;
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
             BucketList l = hashTable[i];
             while (l != NULL){
                 LineList s = l->lines;
-                name = uniteStrings("GLOBAL", l->idName);
+                name = new string("GLOBAL " + *l->idName);
                 while (s != NULL){
-                    if (l->func && st_lookup(name) == -1 && strcmp(name, l->name) != 0){
+                    if (l->func && st_lookup(name) == -1 && name->compare(*l->name) != 0){
                         fprintf(listing, "Erro semantico no escopo ");
-                        printScope(l->name, listing);
+                        printScope(l->name->c_str(), listing);
                         fprintf(listing, " na linha %d: função %s não declarada.\n",
-                                s->lineno, l->idName);
+                                s->lineno, l->idName->c_str());
                         erro_ = 1;
                     }
                     s = s->next;
                 }
-                free(name);
+                delete name;
                 l = l->next;
             }
         }
@@ -361,16 +360,14 @@ static void functionNotDeclared(FILE *listing){
  */
 static void mainNotDeclared(FILE *listing){
     int i, error = 1;
-    char *name;
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
             BucketList l = hashTable[i];
             while (l != NULL){
-                if (strcmp("GLOBAL main", l->name) == 0 || !error){
+                if (l->name->compare("GLOBAL main") == 0 || !error){
                     error = 0;
                     break;
                 }
-                free(name);
                 l = l->next;
             }
         }
@@ -389,15 +386,15 @@ static void mainNotDeclared(FILE *listing){
  */
 static void variableIsFunction(FILE *listing){
     int i, j = 0, k = 0, m;
-    char *name;
+    string *name;
     BucketList func[2 * SIZE];
     BucketList var[2 * SIZE];
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
             BucketList l = hashTable[i];
             while (l != NULL){
-                name = uniteStrings("GLOBAL", l->idName);
-                if (strcmp(name, l->name) == 0 && l->func){
+                name = new string("GLOBAL" + *l->idName);
+                if (name->compare(*l->name) == 0 && l->func){
                     func[j] = l;
                     j++;
                 }
@@ -405,18 +402,18 @@ static void variableIsFunction(FILE *listing){
                     var[k] = l;
                     k++;
                 }
-                free(name);
+                delete name;
                 l = l->next;
             }
         }
     }
     for (i = 0; i < j; i++){
         for (m = 0; m < k; m++){
-            if (strcmp(var[m]->idName, func[i]->idName) == 0){
+            if (var[m]->idName->compare(*func[i]->idName) == 0){
                 LineList s = var[m]->decl_line;
                 while (s){
                     fprintf(listing, "Erro semantico no escopo ");
-                    printScope(var[m]->name, listing);
+                    printScope(var[m]->name->c_str(), listing);
                     fprintf(listing, " na linha %d: %s já foi declarada como nome de função.\n",
                             s->lineno, var[m]->idName);
                     s = s->next;
@@ -443,9 +440,9 @@ static void voidAtribuition(FILE *listing){
                 while (s != NULL){
                     if (!s->type){
                         fprintf(listing, "Erro semantico no escopo ");
-                        printScope(l->name, listing);
+                        printScope(l->name->c_str(), listing);
                         fprintf(listing, " na linha %d: atribuição void em %s.\n",
-                                s->lineno, l->idName);
+                                s->lineno, l->idName->c_str());
                         erro_ = 1;
                     }
                     s = s->next;

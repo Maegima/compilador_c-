@@ -1,5 +1,5 @@
 /**
- * @file symtab.h
+ * @file symtab.hpp
  * @author André Lucas Maegima
  * @brief Interface para o analisador semântico.
  * @version 1.0
@@ -9,8 +9,10 @@
  * 
  */
 
-#ifndef _SYMTAB_H_
-#define _SYMTAB_H_
+#ifndef _SYMTAB_HPP_
+#define _SYMTAB_HPP_
+
+#include <iostream>
 
 /**
  * @brief Procedimento st_insert insere ou 
@@ -25,7 +27,7 @@
  * @param atrib Se é atribuição.
  * @param loc Localização na memória.
  */
-void st_insert(const char * name, const char *idName, int lineno, int decl_line, int type, int func, int atrib, int loc);
+void st_insert(std::string *name, std::string *idName, int lineno, int decl_line, int type, int func, int atrib, int loc);
 
 /**
  * @brief A função st_lookup procura na tabela
@@ -34,7 +36,7 @@ void st_insert(const char * name, const char *idName, int lineno, int decl_line,
  * @param name Id do dado a ser procurado.
  * @return int Localização do dado.
  */
-int st_lookup (char * name);
+int st_lookup (std::string *name);
 
 /**
  * @brief O procedimento printSymTab imprime em um

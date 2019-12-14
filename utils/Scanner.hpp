@@ -54,6 +54,14 @@ public:
      * 
      */
     void incrementLine();
+    /**
+     * @brief O método printToken imprime um token 
+     * e seu lexema no arquivo de listagem.
+     * 
+     * @param token Identificador do token.
+     * @param tokenString Descrição textual do token.
+     */
+    void printToken(TokenType token, const char* tokenString);
 };
 
 #endif
