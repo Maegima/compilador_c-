@@ -14,6 +14,7 @@
 #include "globals.hpp"
 #include "symtab.hpp"
 #include "analyze.hpp"
+#include "LineList.hpp"
 
 using namespace std;
 
@@ -39,13 +40,6 @@ static int hashString(const char *key){
     return temp;
 }
 
-/** @brief Lista encadeada de linhas. */
-typedef struct LineListRec{
-    int lineno; /**< @brief Número da linha. */
-    int type; /**< @brief Tipo. */
-    struct LineListRec *next; /**< @brief Próxima linha. */
-} * LineList;
-
 /**
  * @brief Armazena os dados de uma
  * entrada na tabela de símbolos. 
@@ -55,9 +49,9 @@ typedef struct BucketListRec{
     string *name; /**< @brief Nome do identificador. */
     string *idName; /**< @brief Nome do escopo do identificador. */
     int func; /**< @brief Se o identificador é uma função. */
-    LineList lines; /**< @brief Linhas onde o identificador aparece. */
-    LineList atrib; /**< @brief Linhas de atribuição ao identificador. */
-    LineList decl_line; /**< @brief Linhas de declaração do identificador. */
+    LineList *lines; /**< @brief Linhas onde o identificador aparece. */
+    LineList *atrib; /**< @brief Linhas de atribuição ao identificador. */
+    LineList *decl_line; /**< @brief Linhas de declaração do identificador. */
     int memloc; /**< @brief Localização na memória. */
     struct BucketListRec *next; /**< @brief Próximo item. */
 } *BucketList;
@@ -75,75 +69,56 @@ void st_insert(string *name, string *idName, int lineno, int decl_line, int type
         l->name = name;
         l->idName = idName;
         l->func = func;
-        l->lines = (LineList)malloc(sizeof(struct LineListRec));
-        l->lines->lineno = lineno;
+        l->lines = new LineList(lineno, 0);
         l->memloc = loc;
-        l->lines->next = NULL;
-        if (decl_line > -1){
-            l->decl_line = (LineList)malloc(sizeof(struct LineListRec));
-            l->decl_line->lineno = decl_line;
-            l->decl_line->type = type;
-            l->decl_line->next = NULL;
-        }
+        if (decl_line > -1)
+            l->decl_line = new LineList(decl_line, type);
         else
             l->decl_line = NULL;
-        if (atrib > -1){
-            l->atrib = (LineList)malloc(sizeof(struct LineListRec));
-            l->atrib->lineno = lineno;
-            l->atrib->type = type;
-            l->atrib->next = NULL;
-        }
+        if (atrib > -1)
+            l->atrib = new LineList(lineno, type);
         else
             l->atrib = NULL;
-
         l->next = hashTable[h];
         hashTable[h] = l;
     }
     else{ /* found in table, so just add line number */
-        LineList t;
-        if (atrib > -1){
-            LineList p;
-            p = (LineList)malloc(sizeof(struct LineListRec));
-            p->lineno = lineno;
-            p->type = type;
-            p->next = NULL;
+        LineList *t;
+        if(atrib > -1){
+            LineList *p;
+            p = new LineList(lineno, type);
             t = l->atrib;
             if (t != NULL){
-                while (t->next != NULL)
-                    t = t->next;
-                t->next = p;
+                while (t->getNext() != NULL)
+                    t = t->getNext();
+                t->setNext(p);
             }
             else
                 l->atrib = p;
         }
-        else{
-            LineList p;
-            p = (LineList)malloc(sizeof(struct LineListRec));
-            p->lineno = lineno;
-            p->next = NULL;
-            t = l->lines;
-            if (t != NULL){
-                while (t->next != NULL)
-                    t = t->next;
-                t->next = p;
-            }
-            else
-                l->lines = p;
-        }
-        if (decl_line > -1){
-            LineList p;
-            p = (LineList)malloc(sizeof(struct LineListRec));
-            p->lineno = decl_line;
-            p->type = type;
-            p->next = NULL;
+        else if(decl_line > -1){
+            LineList *p;
+            p = new LineList(decl_line, type);
             t = l->decl_line;
             if (t != NULL){
-                while (t->next != NULL)
-                    t = t->next;
-                t->next = p;
+                while (t->getNext() != NULL)
+                    t = t->getNext();
+                t->setNext(p);
             }
             else
                 l->decl_line = p;
+        }
+        else{
+            LineList *p;
+            p = new LineList(lineno, 0);
+            t = l->lines;
+            if (t != NULL){
+                while (t->getNext() != NULL)
+                    t = t->getNext();
+                t->setNext(p);
+            }
+            else
+                l->lines = p;
         }
     }
 }
@@ -166,10 +141,10 @@ void printSymTab(FILE *listing){
             BucketList l = hashTable[i];
             while (l != NULL){
                 count = 0;
-                LineList s = l->decl_line;
+                LineList *s = l->decl_line;
                 while (s != NULL){
                     count++;
-                    s = s->next;
+                    s = s->getNext();
                 }
                 padding = (count > padding) ? count : padding;
                 l = l->next;
@@ -188,14 +163,14 @@ void printSymTab(FILE *listing){
         if (hashTable[i] != NULL){
             BucketList l = hashTable[i];
             while (l != NULL){
-                LineList t = l->lines;
-                LineList r = l->decl_line;
+                LineList *t = l->lines;
+                LineList *r = l->decl_line;
                 fprintf(listing, "%-20s ", l->name->c_str());
                 fprintf(listing, "%-8d  ", l->memloc);
                 for (int j = 0; j < padding; j++){
                     if (r != NULL){
-                        fprintf(listing, "%-4d(%d)|", r->lineno, r->type);
-                        r = r->next;
+                        fprintf(listing, "%-4d(%d)|", r->getLineno(), r->getType());
+                        r = r->getNext();
                     }
                     else{
                         fprintf(listing, "       |");
@@ -203,8 +178,8 @@ void printSymTab(FILE *listing){
                 }
                 fprintf(listing, " ");
                 while (t != NULL){
-                    fprintf(listing, "%4d ", t->lineno);
-                    t = t->next;
+                    fprintf(listing, "%4d ", t->getLineno());
+                    t = t->getNext();
                 }
                 fprintf(listing, "\n");
                 l = l->next;
@@ -239,17 +214,17 @@ static void notUniqueVariable(FILE *listing){
         if (hashTable[i] != NULL){
             BucketList l = hashTable[i];
             while (l != NULL){
-                LineList s = l->decl_line;
+                LineList *s = l->decl_line;
                 while (s != NULL){
                     count++;
                     if (count > 1){
                         fprintf(listing, "Erro semantico no escopo ");
                         printScope(l->name->c_str(), listing);
                         fprintf(listing, " na linha %d: declaração inválida de variável %s, já foi declarada previamente.\n",
-                                s->lineno, l->idName->c_str());
+                                s->getLineno(), l->idName->c_str());
                         erro_ = 1;
                     }
-                    s = s->next;
+                    s = s->getNext();
                 }
                 count = 0;
                 l = l->next;
@@ -270,16 +245,16 @@ static void notVoidVariable(FILE *listing){
         if (hashTable[i] != NULL){
             BucketList l = hashTable[i];
             while (l != NULL){
-                LineList s = l->decl_line;
+                LineList *s = l->decl_line;
                 while (s != NULL){
-                    if (!l->func && !s->type){
+                    if (!l->func && !s->getType()){
                         fprintf(listing, "Erro semantico no escopo ");
                         printScope(l->name->c_str(), listing);
                         fprintf(listing, " na linha %d: declaração inválida de variável %s, void só pode ser usado para declaração de função.\n",
-                                s->lineno, l->idName->c_str());
+                                s->getLineno(), l->idName->c_str());
                         erro_ = 1;
                     }
-                    s = s->next;
+                    s = s->getNext();
                 }
                 l = l->next;
             }
@@ -300,7 +275,7 @@ static void variableNotDeclared(FILE *listing){
         if (hashTable[i] != NULL){
             BucketList l = hashTable[i];
             while (l != NULL){
-                LineList s = l->lines;
+                LineList *s = l->lines;
                 while (s != NULL){
                     name = new string("GLOBAL " + *l->idName);
                     if (!l->decl_line && !l->func){
@@ -308,11 +283,11 @@ static void variableNotDeclared(FILE *listing){
                             fprintf(listing, "Erro semantico no escopo ");
                             printScope(l->name->c_str(), listing);
                             fprintf(listing, " na linha %d: variável %s não declarada.\n",
-                                    s->lineno, l->idName->c_str());
+                                    s->getLineno(), l->idName->c_str());
                             erro_ = 1;
                         }
                     }
-                    s = s->next;
+                    s = s->getNext();
                 }
                 l = l->next;
             }
@@ -333,17 +308,17 @@ static void functionNotDeclared(FILE *listing){
         if (hashTable[i] != NULL){
             BucketList l = hashTable[i];
             while (l != NULL){
-                LineList s = l->lines;
+                LineList *s = l->lines;
                 name = new string("GLOBAL " + *l->idName);
                 while (s != NULL){
                     if (l->func && st_lookup(name) == -1 && name->compare(*l->name) != 0){
                         fprintf(listing, "Erro semantico no escopo ");
                         printScope(l->name->c_str(), listing);
                         fprintf(listing, " na linha %d: função %s não declarada.\n",
-                                s->lineno, l->idName->c_str());
+                                s->getLineno(), l->idName->c_str());
                         erro_ = 1;
                     }
-                    s = s->next;
+                    s = s->getNext();
                 }
                 delete name;
                 l = l->next;
@@ -410,13 +385,13 @@ static void variableIsFunction(FILE *listing){
     for (i = 0; i < j; i++){
         for (m = 0; m < k; m++){
             if (var[m]->idName->compare(*func[i]->idName) == 0){
-                LineList s = var[m]->decl_line;
+                LineList *s = var[m]->decl_line;
                 while (s){
                     fprintf(listing, "Erro semantico no escopo ");
                     printScope(var[m]->name->c_str(), listing);
                     fprintf(listing, " na linha %d: %s já foi declarada como nome de função.\n",
-                            s->lineno, var[m]->idName);
-                    s = s->next;
+                            s->getLineno(), var[m]->idName);
+                    s = s->getNext();
                     erro_ = 1;
                 }
             }
@@ -436,16 +411,16 @@ static void voidAtribuition(FILE *listing){
         if (hashTable[i] != NULL){
             BucketList l = hashTable[i];
             while (l != NULL){
-                LineList s = l->atrib;
+                LineList *s = l->atrib;
                 while (s != NULL){
-                    if (!s->type){
+                    if (!s->getType()){
                         fprintf(listing, "Erro semantico no escopo ");
                         printScope(l->name->c_str(), listing);
                         fprintf(listing, " na linha %d: atribuição void em %s.\n",
-                                s->lineno, l->idName->c_str());
+                                s->getLineno(), l->idName->c_str());
                         erro_ = 1;
                     }
-                    s = s->next;
+                    s = s->getNext();
                 }
                 l = l->next;
             }
