@@ -12,7 +12,6 @@
 using namespace std;
 
 #include "utils/globals.hpp"
-#include "utils/util.h"
 #include "utils/Scanner.hpp"
 #include "utils/Parser.hpp"
 #include "utils/analyze.hpp"
