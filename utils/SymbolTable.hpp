@@ -12,6 +12,7 @@
 #ifndef _SYMBOLTABLE_HPP_
 #define _SYMBOLTABLE_HPP_
 
+#include "TreeNode.hpp"
 #include "BucketList.hpp"
 
 /** SIZE é o tamanho da tabela hash. (Isso ira para o CPP) */
@@ -24,7 +25,7 @@
  */
 class SymbolTable{
 private:
-    /// A tabela hash
+    /// A tabela hash.
     BucketList **table;
     /**
      * @brief A função hash.
@@ -33,6 +34,22 @@ private:
      * @return int Hash da chave.
      */
     int hash(const char *key);
+    
+    /**
+     * @brief O método traverse percorre a árvore em 
+     * pré-ordem.
+     * 
+     * @param t Nó da árvore.
+     */
+    void traverse(TreeNode *t);
+
+    /**
+     * @brief O método insertNode insere identificadores 
+     * armazenados na árvore sintática na tabela de simbolos.
+     * 
+     * @param t Nó da árvore.
+     */
+    void insertNode(TreeNode *t);
 public:
     /**
      * @brief Construct a new Symbol Table object.
@@ -55,7 +72,7 @@ public:
     void insert(std::string *name, std::string *idName, int lineno, int decl_line, int type, int func, int atrib, int loc);
 
     /**
-     * @brief A método lookup procura na tabela
+     * @brief O método lookup procura na tabela
      * de símbolos por um dado.
      * 
      * @param name Id do dado a ser procurado.
@@ -64,7 +81,7 @@ public:
     int lookup(std::string *name);
 
     /**
-     * @brief O procedimento print imprime em um
+     * @brief O método print imprime em um
      * arquivo a tabela de simbolos.
      * 
      * @param listing Arquivo de escrita.
@@ -77,6 +94,14 @@ public:
      * @return BucketList** A tabela hash.
      */
     BucketList **getHashTable();
+
+    /**
+     * @brief O método que constroi a tabela de simbolos
+     * percorrendo a árvore sintática em pré ordem.
+     * 
+     * @param syntaxTree Raiz da árvore sintática.
+     */
+    void build(TreeNode *symtaxTree);
 };
 
 #endif

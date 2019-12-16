@@ -9,6 +9,7 @@
  * 
  */
 
+#include "globals.hpp"
 #include "SymbolTable.hpp"
 
 using namespace std;
@@ -30,6 +31,71 @@ int SymbolTable::hash(const char *key){
         ++i;
     }
     return temp;
+}
+
+/// @brief Contador para o local das variáveis na memória. 
+static int location = 0;
+
+void SymbolTable::traverse(TreeNode *t){ 
+    if (t != NULL){ 
+        this->insertNode(t);
+        int i;
+        for (i = 0; i < MAXCHILDREN; i++)
+            traverse(t->getChild(i));
+        traverse(t->getSibling());
+    }
+}
+
+void SymbolTable::insertNode(TreeNode *t){ 
+    string *name;
+    int n;
+    TreeNode *r;
+    switch (t->getNodekind()){ 
+        case StmtK:
+        switch (t->getStmt()){ 
+            case AssignK:
+                r = t->getChild(0);
+                if(r){
+                    name = new string(*r->getScope() + " " + *r->getName());
+                    if (this->lookup(name) == -1)
+                    /* not yet in table, so treat as new definition */
+                        this->insert(name,r->getName(),r->getLineno(),-1,t->getType(),r->getFunc(),t->getAtrib(),location++);
+                    else{
+                    /* alrady in table, so ignore location, 
+                        add line number of use only */ 
+                        this->insert(name,r->getName(),r->getLineno(),-1,t->getType(),r->getFunc(),t->getAtrib(),0);
+                        delete name;
+                    }
+                }
+                break;
+            case ReturnK:
+            case IfK:
+            case WhileK:
+            default: break;
+        }
+        break;
+        case ExpK:
+        switch (t->getExp()){ 
+            case IdK:
+                name = new string(*t->getScope()  + " " + *t->getName());
+                if (this->lookup(name) == -1)
+                /* not yet in table, so treat as new definition */
+                    this->insert(name,t->getName(),t->getLineno(),t->getDeclLine(),t->getType(),t->getFunc(),-1,location++);
+                else{
+                /* already in table, so ignore location, 
+                    add line number of use only */ 
+                    this->insert(name,t->getName(),t->getLineno(),t->getDeclLine(),t->getType(),t->getFunc(),-1,0);
+                    delete name;
+                }
+            break;
+            case ConstK:
+            case TypeK:
+            case OpK:
+            default: break;
+        }
+        break;
+        default: break;
+    }
 }
 
 void SymbolTable::insert(string *name, string *idName, int lineno, int decl_line, int type, int func, int atrib, int loc){
@@ -160,4 +226,14 @@ void SymbolTable::print(FILE *listing){
 
 BucketList **SymbolTable::getHashTable(){
     return this->table;
+}
+
+void SymbolTable::build(TreeNode *syntaxTree){ 
+    this->insert(new string("GLOBAL input"), new string("input"), 0, 0, Integer, 1, -1, location++);
+    this->insert(new string("GLOBAL output"), new string("output"), 0, 0, Void, 1, -1, location++);
+    traverse(syntaxTree);
+    if (TraceAnalyze){ 
+        fprintf(symbtab, "\nSymbol table:\n\n");
+        this->print(symbtab);
+    }
 }

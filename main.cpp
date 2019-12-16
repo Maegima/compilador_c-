@@ -16,7 +16,6 @@ using namespace std;
 #include "utils/Parser.hpp"
 #include "utils/SymbolTable.hpp"
 #include "utils/Semantic.hpp"
-#include "utils/analyze.hpp"
 #include "utils/cgen.hpp"
 
 /* allocate global variables */
@@ -54,8 +53,9 @@ int main(int argc, char **argv){
     raiz = parser->parse();
     if(!erro){
         raiz->print();
-        SymbolTable *table = buildSymtab(raiz);
-        Semantic *semantic = new Semantic(table, symbtab);
+        SymbolTable *table = new SymbolTable();
+        table->build(raiz);
+        Semantic *semantic = new Semantic(table, listing);
         erro = semantic->analyze();
     }
     if(!erro)
