@@ -13,13 +13,15 @@
 #define _ANALYZE_HPP_
 
 #include "TreeNode.hpp"
+#include "SymbolTable.hpp"
 
 /**
  * @brief Função que constroi uma tabela de simbolos
  * percorrendo a árvore sintática em pré ordem.
  * 
  * @param syntaxTree Raiz da árvore sintática.
+ * @return SymbolTable* Tabela de simbolos.
  */
-void buildSymtab(TreeNode *syntaxTree);
+SymbolTable *buildSymtab(TreeNode *syntaxTree);
 
 #endif

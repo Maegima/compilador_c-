@@ -14,6 +14,7 @@ using namespace std;
 #include "utils/globals.hpp"
 #include "utils/Scanner.hpp"
 #include "utils/Parser.hpp"
+#include "utils/SymbolTable.hpp"
 #include "utils/analyze.hpp"
 #include "utils/cgen.hpp"
 
@@ -34,7 +35,7 @@ int TraceAnalyze = TRUE;
 int TraceCode = FALSE;
 int Error = FALSE;
 
-extern int semantical(FILE *listing);
+extern int semantical(SymbolTable *table, FILE *listing);
 
 int erro = 0; /**< Variável que indica erro na compilação. */
 
@@ -54,8 +55,8 @@ int main(int argc, char **argv){
     raiz = parser->parse();
     if(!erro){
         raiz->print();
-        buildSymtab(raiz);
-        erro = semantical(listing);
+        SymbolTable *table = buildSymtab(raiz);
+        erro = semantical(table, listing);
     }
     if(!erro)
         codeGen(raiz, "code.txt");

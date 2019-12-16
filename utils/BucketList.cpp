@@ -1,7 +1,7 @@
 /**
  * @file BucketList.cpp
  * @author André Lucas Maegima
- * @brief 
+ * @brief Implementação da classe BucketList.
  * @version 1.0
  * @date 2019-12-15
  * 

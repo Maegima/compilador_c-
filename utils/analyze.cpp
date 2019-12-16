@@ -22,17 +22,18 @@ static int location = 0;
  * generica para a rotina traverse.
  * 
  * @param t Raiz da árvore.
+ * @param table Tabela de simbolos.
  * @param preProc Percurso em pré ordem.
  * @param postProc Percurso em pós ordem.
  */
-static void traverse(TreeNode*t, void(*preProc)(TreeNode*), void(*postProc)(TreeNode*)){ 
+static void traverse(TreeNode*t, SymbolTable *table, void(*preProc)(TreeNode*, SymbolTable*), void(*postProc)(TreeNode*, SymbolTable*)){ 
     if (t != NULL){ 
-        preProc(t);
+        preProc(t, table);
         int i;
         for (i = 0; i < MAXCHILDREN; i++)
-            traverse(t->getChild(i), preProc, postProc);
-        postProc(t);
-        traverse(t->getSibling(), preProc, postProc);
+            traverse(t->getChild(i), table, preProc, postProc);
+        postProc(t, table);
+        traverse(t->getSibling(), table, preProc, postProc);
     }
 }
 
@@ -40,16 +41,18 @@ static void traverse(TreeNode*t, void(*preProc)(TreeNode*), void(*postProc)(Tree
  * @brief Procedimento que não faz nada.
  * 
  * @param t Raiz da árvore.
+ * @param table Tabela de simbolos.
  */
-static void nullProc(TreeNode * t){ }
+static void nullProc(TreeNode * t, SymbolTable *table){ }
 
 /**
  * @brief insertNode insere identificadores armazenados
  * em t na tabela de simbolos.
  * 
  * @param t No da árvore.
+ * @param table Tabela de simbolos.
  */
-static void insertNode(TreeNode *t){ 
+static void insertNode(TreeNode *t, SymbolTable *table){ 
     string *name;
     int n;
     TreeNode *r;
@@ -60,13 +63,13 @@ static void insertNode(TreeNode *t){
                 r = t->getChild(0);
                 if(r){
                     name = new string(*r->getScope() + " " + *r->getName());
-                    if (st_lookup(name) == -1)
+                    if (table->lookup(name) == -1)
                     /* not yet in table, so treat as new definition */
-                        st_insert(name,r->getName(),r->getLineno(),-1,t->getType(),r->getFunc(),t->getAtrib(),location++);
+                        table->insert(name,r->getName(),r->getLineno(),-1,t->getType(),r->getFunc(),t->getAtrib(),location++);
                     else{
                     /* alrady in table, so ignore location, 
                         add line number of use only */ 
-                        st_insert(name,r->getName(),r->getLineno(),-1,t->getType(),r->getFunc(),t->getAtrib(),0);
+                        table->insert(name,r->getName(),r->getLineno(),-1,t->getType(),r->getFunc(),t->getAtrib(),0);
                         delete name;
                     }
                 }
@@ -81,13 +84,13 @@ static void insertNode(TreeNode *t){
         switch (t->getExp()){ 
             case IdK:
                 name = new string(*t->getScope()  + " " + *t->getName());
-                if (st_lookup(name) == -1)
+                if (table->lookup(name) == -1)
                 /* not yet in table, so treat as new definition */
-                    st_insert(name,t->getName(),t->getLineno(),t->getDeclLine(),t->getType(),t->getFunc(),-1,location++);
+                    table->insert(name,t->getName(),t->getLineno(),t->getDeclLine(),t->getType(),t->getFunc(),-1,location++);
                 else{
                 /* already in table, so ignore location, 
                     add line number of use only */ 
-                    st_insert(name,t->getName(),t->getLineno(),t->getDeclLine(),t->getType(),t->getFunc(),-1,0);
+                    table->insert(name,t->getName(),t->getLineno(),t->getDeclLine(),t->getType(),t->getFunc(),-1,0);
                     delete name;
                 }
             break;
@@ -101,12 +104,14 @@ static void insertNode(TreeNode *t){
     }
 }
 
-void buildSymtab(TreeNode * syntaxTree){ 
-    st_insert(new string("GLOBAL input"), new string("input"), 0, 0, Integer, 1, -1, location++);
-    st_insert(new string("GLOBAL output"), new string("output"), 0, 0, Void, 1, -1, location++);
-    traverse(syntaxTree, insertNode, nullProc);
+SymbolTable *buildSymtab(TreeNode *syntaxTree){ 
+    SymbolTable *table = new SymbolTable();
+    table->insert(new string("GLOBAL input"), new string("input"), 0, 0, Integer, 1, -1, location++);
+    table->insert(new string("GLOBAL output"), new string("output"), 0, 0, Void, 1, -1, location++);
+    traverse(syntaxTree, table, insertNode, nullProc);
     if (TraceAnalyze){ 
         fprintf(symbtab, "\nSymbol table:\n\n");
-        printSymTab(symbtab);
+        table->print(symbtab);
     }
+    return table;
 }
