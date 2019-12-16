@@ -1,5 +1,5 @@
 /**
- * @file analyze.c
+ * @file analyze.cpp
  * @author André Lucas Maegima
  * @brief Analisador semântico para a linguagem C-.
  * @version 1.0
@@ -9,7 +9,6 @@
  * 
  */
 #include "globals.hpp"
-#include "symtab.hpp"
 #include "analyze.hpp"
 
 using namespace std;

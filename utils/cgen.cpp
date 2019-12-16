@@ -12,7 +12,6 @@
 
 #include <iostream>
 #include "globals.hpp"
-#include "symtab.hpp"
 #include "code.h"
 #include "cgen.hpp"
 #include "TreeNode.hpp"

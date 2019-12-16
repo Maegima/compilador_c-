@@ -15,6 +15,7 @@ using namespace std;
 #include "utils/Scanner.hpp"
 #include "utils/Parser.hpp"
 #include "utils/SymbolTable.hpp"
+#include "utils/Semantic.hpp"
 #include "utils/analyze.hpp"
 #include "utils/cgen.hpp"
 
@@ -35,8 +36,6 @@ int TraceAnalyze = TRUE;
 int TraceCode = FALSE;
 int Error = FALSE;
 
-extern int semantical(SymbolTable *table, FILE *listing);
-
 int erro = 0; /**< Variável que indica erro na compilação. */
 
 int main(int argc, char **argv){
@@ -56,7 +55,8 @@ int main(int argc, char **argv){
     if(!erro){
         raiz->print();
         SymbolTable *table = buildSymtab(raiz);
-        erro = semantical(table, listing);
+        Semantic *semantic = new Semantic(table, symbtab);
+        erro = semantic->analyze();
     }
     if(!erro)
         codeGen(raiz, "code.txt");

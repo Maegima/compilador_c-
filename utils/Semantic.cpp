@@ -1,47 +1,32 @@
 /**
- * @file symtab.cpp
+ * @file Semantic.cpp
  * @author André Lucas Maegima
- * @brief Implementação do analisador semântico.
+ * @brief Implementação da classe Semantic.
  * @version 1.0
- * @date 2019-12-06
+ * @date 2019-12-16
  * 
  * @copyright Copyright (c) 2019
  * 
  */
 
-#include <iostream>
-#include "globals.hpp"
-#include "symtab.hpp"
+#include "Semantic.hpp"
 
 using namespace std;
 
 /** Variável para indicar erro na análise semântica. */
 int erro_ = 0;
 
-/**
- * @brief Imprime no arquivo o escopo de name.
- * 
- * @param name Id da tabela de simbolo.
- * @param listing Arquivo de escrita.
- */
-static void printScope(const char *name, FILE *listing){
+void Semantic::printScope(const char *name){
     int i = 0;
     while (name[i] != ' '){
-        fprintf(listing, "%c", name[i]);
+        fprintf(this->listing, "%c", name[i]);
         i++;
     }
 }
 
-/**
- * @brief Procura e imprime no arquivo os erros de 
- * não unicidade de declaração.
- * 
- * @param table Tabela de simbolos.
- * @param listing Arquivo de escrita.
- */
-static void notUniqueVariable(SymbolTable *table, FILE *listing){
+void Semantic::notUniqueVariable(){
     int i, count = 0;
-    BucketList **hashTable = table->getHashTable();
+    BucketList **hashTable = this->table->getHashTable();
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
             BucketList* l = hashTable[i];
@@ -50,9 +35,9 @@ static void notUniqueVariable(SymbolTable *table, FILE *listing){
                 while (s != NULL){
                     count++;
                     if (count > 1){
-                        fprintf(listing, "Erro semantico no escopo ");
-                        printScope(l->getName()->c_str(), listing);
-                        fprintf(listing, " na linha %d: declaração inválida de variável %s, já foi declarada previamente.\n",
+                        fprintf(this->listing, "Erro semantico no escopo ");
+                        printScope(l->getName()->c_str());
+                        fprintf(this->listing, " na linha %d: declaração inválida de variável %s, já foi declarada previamente.\n",
                                 s->getLineno(), l->getIdName()->c_str());
                         erro_ = 1;
                     }
@@ -65,16 +50,9 @@ static void notUniqueVariable(SymbolTable *table, FILE *listing){
     }
 }
 
-/**
- * @brief Procura e imprime no arquivo de escrita os erros
- * de declaração de variável void.
- * 
- * @param table Tabela de simbolos.
- * @param listing Arquivo de escrita. 
- */
-static void notVoidVariable(SymbolTable *table, FILE *listing){
+void Semantic::notVoidVariable(){
     int i;
-    BucketList **hashTable = table->getHashTable();
+    BucketList **hashTable = this->table->getHashTable();
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
             BucketList* l = hashTable[i];
@@ -82,9 +60,9 @@ static void notVoidVariable(SymbolTable *table, FILE *listing){
                 LineList *s = l->getDeclLine();
                 while (s != NULL){
                     if (!l->getFunc() && !s->getType()){
-                        fprintf(listing, "Erro semantico no escopo ");
-                        printScope(l->getName()->c_str(), listing);
-                        fprintf(listing, " na linha %d: declaração inválida de variável %s, void só pode ser usado para declaração de função.\n",
+                        fprintf(this->listing, "Erro semantico no escopo ");
+                        printScope(l->getName()->c_str());
+                        fprintf(this->listing, " na linha %d: declaração inválida de variável %s, void Semantic::só pode ser usado para declaração de função.\n",
                                 s->getLineno(), l->getIdName()->c_str());
                         erro_ = 1;
                     }
@@ -96,17 +74,10 @@ static void notVoidVariable(SymbolTable *table, FILE *listing){
     }
 }
 
-/**
- * @brief Procura e imprime no arquivo de escrita os erros
- * de variável não declarada.
- * 
- * @param table Tabela de simbolos.
- * @param listing Arquivo de escrita. 
- */
-static void variableNotDeclared(SymbolTable *table, FILE *listing){
+void Semantic::variableNotDeclared(){
     int i;
     string *name;
-    BucketList **hashTable = table->getHashTable();
+    BucketList **hashTable = this->table->getHashTable();
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
             BucketList* l = hashTable[i];
@@ -116,9 +87,9 @@ static void variableNotDeclared(SymbolTable *table, FILE *listing){
                     name = new string("GLOBAL " + *l->getIdName());
                     if (!l->getDeclLine() && !l->getFunc()){
                         if (table->lookup(name) == -1){
-                            fprintf(listing, "Erro semantico no escopo ");
-                            printScope(l->getName()->c_str(), listing);
-                            fprintf(listing, " na linha %d: variável %s não declarada.\n",
+                            fprintf(this->listing, "Erro semantico no escopo ");
+                            printScope(l->getName()->c_str());
+                            fprintf(this->listing, " na linha %d: variável %s não declarada.\n",
                                     s->getLineno(), l->getIdName()->c_str());
                             erro_ = 1;
                         }
@@ -131,17 +102,10 @@ static void variableNotDeclared(SymbolTable *table, FILE *listing){
     }
 }
 
-/**
- * @brief Procura e imprime no arquivo de escrita os erros
- * de função não declarada.
- * 
- * @param table Tabela de simbolos.
- * @param listing Arquivo de escrita. 
- */
-static void functionNotDeclared(SymbolTable *table, FILE *listing){
+void Semantic::functionNotDeclared(){
     int i;
     string *name;
-    BucketList **hashTable = table->getHashTable();
+    BucketList **hashTable = this->table->getHashTable();
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
             BucketList* l = hashTable[i];
@@ -150,9 +114,9 @@ static void functionNotDeclared(SymbolTable *table, FILE *listing){
                 name = new string("GLOBAL " + *l->getIdName());
                 while (s != NULL){
                     if (l->getFunc() && table->lookup(name) == -1 && name->compare(*l->getName()) != 0){
-                        fprintf(listing, "Erro semantico no escopo ");
-                        printScope(l->getName()->c_str(), listing);
-                        fprintf(listing, " na linha %d: função %s não declarada.\n",
+                        fprintf(this->listing, "Erro semantico no escopo ");
+                        printScope(l->getName()->c_str());
+                        fprintf(this->listing, " na linha %d: função %s não declarada.\n",
                                 s->getLineno(), l->getIdName()->c_str());
                         erro_ = 1;
                     }
@@ -165,16 +129,9 @@ static void functionNotDeclared(SymbolTable *table, FILE *listing){
     }
 }
 
-/**
- * @brief Procura e imprime no arquivo de escrita o erro
- * de main não declarada.
- * 
- * @param table Tabela de simbolos.
- * @param listing Arquivo de escrita.
- */
-static void mainNotDeclared(SymbolTable *table, FILE *listing){
+void Semantic::mainNotDeclared(){
     int i, error = 1;
-    BucketList **hashTable = table->getHashTable();
+    BucketList **hashTable = this->table->getHashTable();
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
             BucketList* l = hashTable[i];
@@ -188,22 +145,15 @@ static void mainNotDeclared(SymbolTable *table, FILE *listing){
         }
     }
     if (error){
-        fprintf(listing, "Erro semantico: função main() não declarada.\n");
+        fprintf(this->listing, "Erro semantico: função main() não declarada.\n");
         erro_ = 1;
     }
 }
 
-/**
- * @brief Procura e imprime no arquivo de escrita os erros
- * de variável declarada previamente como função.
- * 
- * @param table Tabela de simbolos.
- * @param listing Arquivo de escrita.
- */
-static void variableIsFunction(SymbolTable *table, FILE *listing){
+void Semantic::variableIsFunction(){
     int i, j = 0, k = 0, m;
     string *name;
-    BucketList **hashTable = table->getHashTable();
+    BucketList **hashTable = this->table->getHashTable();
     BucketList* func[2 * SIZE];
     BucketList* var[2 * SIZE];
     for (i = 0; i < SIZE; i++){
@@ -229,9 +179,9 @@ static void variableIsFunction(SymbolTable *table, FILE *listing){
             if (var[m]->getIdName()->compare(*func[i]->getIdName()) == 0){
                 LineList *s = var[m]->getDeclLine();
                 while (s){
-                    fprintf(listing, "Erro semantico no escopo ");
-                    printScope(var[m]->getName()->c_str(), listing);
-                    fprintf(listing, " na linha %d: %s já foi declarada como nome de função.\n",
+                    fprintf(this->listing, "Erro semantico no escopo ");
+                    printScope(var[m]->getName()->c_str());
+                    fprintf(this->listing, " na linha %d: %s já foi declarada como nome de função.\n",
                             s->getLineno(), var[m]->getIdName());
                     s = s->getNext();
                     erro_ = 1;
@@ -241,15 +191,9 @@ static void variableIsFunction(SymbolTable *table, FILE *listing){
     }
 }
 
-/**
- * @brief Procura e imprime no arquivo de escrita os erros
- * atribuição void em variável.
- * 
- * @param listing Arquivo para saída. 
- */
-static void voidAtribuition(SymbolTable *table, FILE *listing){
+void Semantic::voidAtribuition(){
     int i;
-    BucketList **hashTable = table->getHashTable();
+    BucketList **hashTable = this->table->getHashTable();
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
             BucketList* l = hashTable[i];
@@ -257,9 +201,9 @@ static void voidAtribuition(SymbolTable *table, FILE *listing){
                 LineList *s = l->getAtrib();
                 while (s != NULL){
                     if (!s->getType()){
-                        fprintf(listing, "Erro semantico no escopo ");
-                        printScope(l->getName()->c_str(), listing);
-                        fprintf(listing, " na linha %d: atribuição void em %s.\n",
+                        fprintf(this->listing, "Erro semantico no escopo ");
+                        printScope(l->getName()->c_str());
+                        fprintf(this->listing, " na linha %d: atribuição void em %s.\n",
                                 s->getLineno(), l->getIdName()->c_str());
                         erro_ = 1;
                     }
@@ -271,13 +215,18 @@ static void voidAtribuition(SymbolTable *table, FILE *listing){
     }
 }
 
-int semantical(SymbolTable *table, FILE *listing){
-    notUniqueVariable(table, listing);
-    notVoidVariable(table, listing);
-    variableNotDeclared(table, listing);
-    functionNotDeclared(table, listing);
-    mainNotDeclared(table, listing);
-    variableIsFunction(table, listing);
-    voidAtribuition(table, listing);
+Semantic::Semantic(SymbolTable *table, FILE *listing){
+    this->table = table;
+    this->listing = listing;
+}
+
+int Semantic::analyze(){
+    this->notUniqueVariable();
+    this->notVoidVariable();
+    this->variableNotDeclared();
+    this->functionNotDeclared();
+    this->mainNotDeclared();
+    this->variableIsFunction();
+    this->voidAtribuition();
     return erro_;
 }
