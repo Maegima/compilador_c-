@@ -62,7 +62,7 @@ void Semantic::notVoidVariable(){
                     if (!l->getFunc() && !s->getType()){
                         fprintf(this->listing, "Erro semantico no escopo ");
                         printScope(l->getName()->c_str());
-                        fprintf(this->listing, " na linha %d: declaração inválida de variável %s, void Semantic::só pode ser usado para declaração de função.\n",
+                        fprintf(this->listing, " na linha %d: declaração inválida de variável %s, void só pode ser usado para declaração de função.\n",
                                 s->getLineno(), l->getIdName()->c_str());
                         erro_ = 1;
                     }
