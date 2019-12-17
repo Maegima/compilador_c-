@@ -1,35 +1,24 @@
 /**
- * @file cgen.c
+ * @file CodeGenerator.cpp
  * @author André Lucas Maegima
- * @brief Implementação do gerador de código 
- * intermediário para a linguagem C-.
+ * @brief Implementação da classe CodeGenerator.
  * @version 1.0
- * @date 2019-12-09
+ * @date 2019-12-17
  * 
  * @copyright Copyright (c) 2019
  * 
  */
 
-#include <iostream>
 #include "globals.hpp"
+#include "CodeGenerator.hpp"
 #include "code.h"
-#include "cgen.hpp"
-#include "TreeNode.hpp"
 
 using namespace std;
 
 static char number[11]; /**< Utilizado na conversão de número para string. */
 static int cont_aux = 0, cont_lab = 0, cont_vet = 0;
 
-/**
- * @brief O procedimento intToString converte um 
- * inteiro em uma string.
- * 
- * @param str Buffer onde o número será armazenado.
- * @param v Número.
- * @param n Tamanho do buffer.
- */
-static void intToString(char *str, int v, int n){
+void CodeGenerator::intToString(char *str, int v, int n){
     int i, value, cont = 0;
     value = v;
     str[0] = '0';
@@ -48,19 +37,12 @@ static void intToString(char *str, int v, int n){
         str[cont] = '\0';
 }
 
-/**
- * @brief A função strNumber concatena uma string com um número.
- * 
- * @param str String base.
- * @param number Número.
- * @return char* Endereço da nova string.
- */
-static char *strNumber(const char *str, int number){
+char *CodeGenerator::strNumber(const char *str, int number){
     char num[11];
     char *rt;
     int a, b;
     a = strlen(str);
-    intToString(num, number, 10);
+    this->intToString(num, number, 10);
     b = strlen(num);
     rt = (char *)malloc(sizeof(char) * (a + b));
     memcpy(rt, str, a * sizeof(char));
@@ -68,33 +50,7 @@ static char *strNumber(const char *str, int number){
     return rt;
 }
 
-/**
- * @brief O procedimento cGen gera o código intermediário
- * percorrendo a árvore de forma recursiva.
- * 
- * @param tree Nó da árvore.
- * @param operate Último operando.
- */
-static void cGen(TreeNode *tree, string **operate);
-
-/**
- * @brief O procedimento ccGen gera o código intermediário
- * percorrendo a árvore de forma recursiva mas sem fazer
- * chamadas recursivas para seus irmãos.
- * 
- * @param tree Nó da árvore.
- * @param operate Último operando.
- */
-static void ccGen(TreeNode *tree, string **operate);
-
-/**
- * @brief O procedimento genStmt gera o código intermediário
- * para um nó de declaração.
- * 
- * @param tree Nó da árvore.
- * @param operate Último operando.
- */
-static void genStmt(TreeNode *tree, string **operate){
+void CodeGenerator::genStmt(TreeNode *tree, string **operate){
     TreeNode *p1, *p2, *p3;
     string *op[3] = {NULL, NULL, NULL};
     char *label1, *label2;
@@ -106,14 +62,14 @@ static void genStmt(TreeNode *tree, string **operate){
         p2 = tree->getChild(1);
         p3 = tree->getChild(2);
         /* generate code for test expression */
-        label1 = strNumber("LABEL", cont_lab);
+        label1 = this->strNumber("LABEL", cont_lab);
         cont_lab++;
-        cGen(p1, &op[0]);
+        this->cGen(p1, &op[0]);
         emitQuadruple("IF_NOT", op[0]->c_str(), label1, "-");
         /* recurse on then part */
-        cGen(p2, &op[1]);
+        this->cGen(p2, &op[1]);
         if(p3){
-            label2 = strNumber("LABEL", cont_lab);
+            label2 = this->strNumber("LABEL", cont_lab);
             cont_lab++;
             emitComment("if: jump to end belongs here");
             emitQuadruple("JUMP", label2, "-", "-");
@@ -121,7 +77,7 @@ static void genStmt(TreeNode *tree, string **operate){
         emitQuadruple("LABEL", label1, "-", "-");
         if(p3){
             /* recurse on else part */
-            cGen(p3, &op[1]);
+            this->cGen(p3, &op[1]);
             emitQuadruple("LABEL", label2, "-", "-");
         }
         if (TraceCode)
@@ -135,15 +91,15 @@ static void genStmt(TreeNode *tree, string **operate){
         p2 = tree->getChild(1);
         emitComment("repeat: jump after body comes back here");
         /* generate code for body */
-        label1 = strNumber("LABEL", cont_lab);
+        label1 = this->strNumber("LABEL", cont_lab);
         cont_lab++;
-        label2 = strNumber("LABEL", cont_lab);
+        label2 = this->strNumber("LABEL", cont_lab);
         cont_lab++;
         emitQuadruple("LABEL", label1, "-", "-");
-        cGen(p1, &op[0]);
+        this->cGen(p1, &op[0]);
         emitQuadruple("IF_NOT", op[0]->c_str(), label2, "-");
         /* generate code for test */
-        cGen(p2, &op[1]);
+        this->cGen(p2, &op[1]);
         emitQuadruple("JUMP", label1, "-", "-");
         emitQuadruple("LABEL", label2, "-", "-");
         if (TraceCode)
@@ -154,9 +110,9 @@ static void genStmt(TreeNode *tree, string **operate){
         if (TraceCode)
             emitComment("-> assign");
         /* generate code for rhs */
-        cGen(tree->getChild(0), &op[0]);
+        this->cGen(tree->getChild(0), &op[0]);
         op[1] = op[0];
-        cGen(tree->getChild(1), &op[1]);
+        this->cGen(tree->getChild(1), &op[1]);
         if (op[0]->compare(*op[1]) != 0)
             emitQuadruple("ASSIGN", op[0]->c_str(), op[1]->c_str(), "-");
         if (TraceCode)
@@ -166,7 +122,7 @@ static void genStmt(TreeNode *tree, string **operate){
     case ReturnK:
         if (TraceCode)
             emitComment("-> return");
-        cGen(tree->getChild(0), &op[0]);
+        this->cGen(tree->getChild(0), &op[0]);
         emitQuadruple("JR", op[0]->c_str(), "-", "-");
         if (TraceCode)
             emitComment("<- return");
@@ -175,21 +131,14 @@ static void genStmt(TreeNode *tree, string **operate){
     }
 }
 
-/**
- * @brief O procedimento genExp gera o código intermediário
- * para um nó de expressão.
- * 
- * @param tree Nó da árvore.
- * @param operate Último operando.
- */
-static void genExp(TreeNode *tree, string **operate){
+void CodeGenerator::genExp(TreeNode *tree, string **operate){
     TreeNode *p1, *p2;
     string *op[3] = {NULL, NULL, NULL};
     switch (tree->getExp()){
     case ConstK:
         if (TraceCode)
             emitComment("-> Const");
-        intToString(number, tree->getVal(), 10);
+        this->intToString(number, tree->getVal(), 10);
         *operate = new string(number);
         if (TraceCode)
             emitComment("<- Const");
@@ -205,22 +154,22 @@ static void genExp(TreeNode *tree, string **operate){
                 emitQuadruple("LABEL", op[0]->c_str(), "-", "-");
                 TreeNode *p = tree->getChild(0);
                 while (p){
-                    ccGen(p->getChild(0), &op[0]);
+                    this->ccGen(p->getChild(0), &op[0]);
                     emitQuadruple("LOAD", op[0]->c_str(), "-", "-");
                     p = p->getSibling();
                 }
-                cGen(tree->getChild(1), &op[1]);
+                this->cGen(tree->getChild(1), &op[1]);
             }
             else{
                 TreeNode *p = tree->getChild(0);
                 int cont = 0;
                 while (p){
-                    ccGen(p, &op[0]);
+                    this->ccGen(p, &op[0]);
                     emitQuadruple("PARAM", op[0]->c_str(), "-", "-");
                     p = p->getSibling();
                     cont++;
                 }
-                intToString(number, cont, 10);
+                this->intToString(number, cont, 10);
                 op[0] = tree->getName();
                 op[1] = new string(number);
                 emitQuadruple("CALL", op[0]->c_str(), op[1]->c_str(), "-");
@@ -229,9 +178,9 @@ static void genExp(TreeNode *tree, string **operate){
         }
         else{
             if (!tree->getDecl()){
-                cGen(tree->getChild(0), &op[2]);
+                this->cGen(tree->getChild(0), &op[2]);
                 if (tree->getChild(0) != NULL){
-                    op[0] = new string(strNumber("VET", cont_vet));
+                    op[0] = new string(this->strNumber("VET", cont_vet));
                     op[1] = tree->getName();
                     cont_vet++;
                     emitQuadruple("ADD", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
@@ -250,10 +199,10 @@ static void genExp(TreeNode *tree, string **operate){
         p1 = tree->getChild(0);
         p2 = tree->getChild(1);
         op[0] = *operate;
-        cGen(p1, &op[1]);
-        cGen(p2, &op[2]);
+        this->cGen(p1, &op[1]);
+        this->cGen(p2, &op[2]);
         if (op[0] == NULL){
-            op[0] = new string(strNumber("AUX", cont_aux));
+            op[0] = new string(this->strNumber("AUX", cont_aux));
             cont_aux++;
         }
         switch (tree->getOp()){
@@ -299,13 +248,13 @@ static void genExp(TreeNode *tree, string **operate){
         if (tree->getDecl()){
             op[0] = tree->getChild(0)->getName();
             if (tree->getChild(0)->getChild(0)){
-                cGen(tree->getChild(0)->getChild(0), &op[1]);
+                this->cGen(tree->getChild(0)->getChild(0), &op[1]);
                 emitQuadruple("ALOC_MEN", op[0]->c_str(), op[1]->c_str(), "-");
             }
             else{
                 emitQuadruple("ALOC_MEN", op[0]->c_str(), "1", "-");
             }
-            cGen(tree->getChild(0), &op[1]);
+            this->cGen(tree->getChild(0), &op[1]);
         }
         /* now store value */
         if (TraceCode)
@@ -316,30 +265,30 @@ static void genExp(TreeNode *tree, string **operate){
     }
 }
 
-static void cGen(TreeNode *tree, string **operate){
+void CodeGenerator::cGen(TreeNode *tree, string **operate){
     if (tree != NULL){
         switch (tree->getNodekind()){
         case StmtK:
-            genStmt(tree, operate);
+            this->genStmt(tree, operate);
             break;
         case ExpK:
-            genExp(tree, operate);
+            this->genExp(tree, operate);
             break;
         default:
             break;
         }
-        cGen(tree->getSibling(), operate);
+        this->cGen(tree->getSibling(), operate);
     }
 }
 
-static void ccGen(TreeNode *tree, string **operate){
+void CodeGenerator::ccGen(TreeNode *tree, string **operate){
     if (tree != NULL){
         switch (tree->getNodekind()){
         case StmtK:
-            genStmt(tree, operate);
+            this->genStmt(tree, operate);
             break;
         case ExpK:
-            genExp(tree, operate);
+            this->genExp(tree, operate);
             break;
         default:
             break;
@@ -347,13 +296,12 @@ static void ccGen(TreeNode *tree, string **operate){
     }
 }
 
-void codeGen(TreeNode *syntaxTree, const char *codefile){
-    char *s = (char *)malloc(strlen(codefile) + 7);
+CodeGenerator::CodeGenerator(){ 
+    
+}
+
+void CodeGenerator::generate(TreeNode *syntaxTree){
     string *pointer = NULL;
-    strcpy(s, "File: ");
-    strcat(s, codefile);
-    emitComment("TINY Compilation to TM Code");
-    emitComment(s);
     /* generate standard prelude */
     emitComment("Standard prelude:");
 
@@ -362,11 +310,11 @@ void codeGen(TreeNode *syntaxTree, const char *codefile){
     TreeNode *tr = syntaxTree;
     while (tr != NULL){
         if (tr->getChild(0)->getFunc()){
-            cGen(tr->getChild(0), &pointer);
+            this->cGen(tr->getChild(0), &pointer);
             fprintf(code,"\n");
         }
         else{
-            cGen(tr, &pointer);
+            this->cGen(tr, &pointer);
             fprintf(code,"\n");
         }
         tr = tr->getSibling();

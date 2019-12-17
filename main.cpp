@@ -16,7 +16,7 @@ using namespace std;
 #include "utils/Parser.hpp"
 #include "utils/SymbolTable.hpp"
 #include "utils/Semantic.hpp"
-#include "utils/cgen.hpp"
+#include "utils/CodeGenerator.hpp"
 
 /* allocate global variables */
 Scanner *scan = NULL;
@@ -58,8 +58,10 @@ int main(int argc, char **argv){
         Semantic *semantic = new Semantic(table, listing);
         erro = semantic->analyze();
     }
-    if(!erro)
-        codeGen(raiz, "code.txt");
+    if(!erro){
+        CodeGenerator *codeGen = new CodeGenerator();
+        codeGen->generate(raiz);
+    }
     fclose(source);
     fclose(symbtab);
     fclose(symbtree);
