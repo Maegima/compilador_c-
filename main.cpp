@@ -59,7 +59,7 @@ int main(int argc, char **argv){
         erro = semantic->analyze();
     }
     if(!erro){
-        CodeGenerator *codeGen = new CodeGenerator();
+        CodeGenerator *codeGen = new CodeGenerator(code);
         codeGen->generate(raiz);
     }
     fclose(source);

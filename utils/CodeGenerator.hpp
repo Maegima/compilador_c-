@@ -21,6 +21,8 @@
  */
 class CodeGenerator{
 private:
+    /// Arquivo para saída do código intermediário.
+    FILE *code;
     /**
      * @brief O método intToString converte um 
      * inteiro em uma string.
@@ -76,12 +78,33 @@ private:
      * @param operate Último operando.
      */
     void genExp(TreeNode *tree, std::string **operate);
+
+    /**
+     * @brief O método emitComment imprime um 
+     * linha de comentário no arquivo de código.
+     * 
+     * @param c Comentário.
+     */
+    void emitComment(const char * c);
+
+    /**
+     * @brief O método emitQuadruple imprime no 
+     * arquivo de código o código intermediário 
+     * na forma de quadrupla.
+     * 
+     * @param op Operador.
+     * @param first Primeiro parâmetro.
+     * @param second Segundo parâmetro.
+     * @param third Terceiro parâmetro.
+     */
+    void emitQuadruple(const char *op,const char *first, const char *second, const char *third);
 public:
     /**
      * @brief Construct a new Code Generator object.
      * 
+     * @param code Arquivo para saída do código intermediário.
      */
-    CodeGenerator();
+    CodeGenerator(FILE *code);
     /**
      * @brief O método generate gera o código
      * intermediário.

@@ -11,7 +11,6 @@
 
 #include "globals.hpp"
 #include "CodeGenerator.hpp"
-#include "code.h"
 
 using namespace std;
 
@@ -296,8 +295,17 @@ void CodeGenerator::ccGen(TreeNode *tree, string **operate){
     }
 }
 
-CodeGenerator::CodeGenerator(){ 
-    
+void CodeGenerator::emitComment(const char *c){
+    if (TraceCode)
+        fprintf(this->code, "* %s\n", c);
+}
+
+void CodeGenerator::emitQuadruple(const char *op, const char *first, const char *second, const char *third){
+    fprintf(this->code, "(%s, %s, %s, %s)\n", op, first, second, third);
+}
+
+CodeGenerator::CodeGenerator(FILE *code){ 
+    this->code = code;
 }
 
 void CodeGenerator::generate(TreeNode *syntaxTree){
