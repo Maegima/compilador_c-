@@ -25,6 +25,8 @@ private:
     SymbolTable *table;
     /// Arquivo de saída.
     FILE *listing;
+    /// Variável para indicar erro na análise semântica.
+    bool error;
     /**
      * @brief Imprime no arquivo o escopo de name.
      * 
@@ -88,13 +90,15 @@ public:
      * @param listing Arquivo para saída. 
      */
     Semantic(SymbolTable *table, FILE *listing);
+
     /**
      * @brief O método analyze procura, imprime os erros 
-     * semânticos e retorna 1 caso ocorrar um erro.
-     *
-     * @return int Erro.
+     * semânticos.
+     * 
+     * @return true Caso ocorra erro semântico.
+     * @return false Caso não ocorra erro semântico.
      */
-    int analyze();
+    bool analyze();
 };
 
 #endif

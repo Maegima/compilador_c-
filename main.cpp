@@ -32,11 +32,9 @@ bool TraceScan = false;
 bool TraceParse = true;
 bool TraceAnalyze = true;
 bool TraceCode = false;
-int Error = FALSE;
-
-int erro = 0; /**< Variável que indica erro na compilação. */
 
 int main(int argc, char **argv){
+    int erro = 0; /**< Variável que indica erro na compilação. */
     TreeNode *raiz;    
     cout << "\nParser em execução...\n"; 
     if(argc == 1) return 1;
@@ -49,7 +47,7 @@ int main(int argc, char **argv){
         code = fopen(argv[4], "w");
     scan = new Scanner(TraceScan);
     parser = new Parser(TraceParse);
-    raiz = parser->parse();
+    erro = parser->parse(&raiz);
     if(!erro){
         SymbolTable *table = new SymbolTable(TraceAnalyze);
         table->build(raiz);

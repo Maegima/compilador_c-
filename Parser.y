@@ -29,7 +29,6 @@ static string *scope;
 int yylex(void);
 void yyerror(const char *msg);
 extern char* yytext;
-extern int erro;
 %}
 
 %start programa
@@ -406,7 +405,7 @@ arg_lista: arg_lista COMMA expressao
 void yyerror(const char * msg)
 {
   cout << msg << ": " << yytext << " " << yylval << " " << yychar << " line " << scan->getLineNumber() << endl;
-  erro = 1;
+  parser->setError();
 }
  
 /**
@@ -417,18 +416,6 @@ void yyerror(const char * msg)
  */
 int yylex(void){ 
     return scan->getToken(); 
-}
-
-Parser::Parser(){
-    sc = 1;
-    func = new string*[256];
-    type = new ExpType[256];
-    func[0] = new string("input");
-    func[1] = new string("output");
-    type[0] = Integer;
-    type[1] = Void;
-    func_id = 2;
-    str_global = new string("GLOBAL");
 }
 
 Parser::Parser(bool trace){
@@ -442,14 +429,20 @@ Parser::Parser(bool trace){
     func_id = 2;
     str_global = new string("GLOBAL");
     this->trace = trace;
+    this->error = false;
 }
 
-TreeNode *Parser::parse(void){ 
+bool Parser::parse(TreeNode **tree){ 
     yyparse();
+    *tree = this->savedTree;
     if(this->trace) this->savedTree->print();
-    return this->savedTree;
+    return this->error;
 }
 
 void Parser::setSavedTree(TreeNode *savedTree){
     this->savedTree = savedTree;
+}
+
+void Parser::setError(){
+    this->error = true;
 }

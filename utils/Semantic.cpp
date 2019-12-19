@@ -13,9 +13,6 @@
 
 using namespace std;
 
-/** Variável para indicar erro na análise semântica. */
-int erro_ = 0;
-
 void Semantic::printScope(const char *name){
     int i = 0;
     while (name[i] != ' '){
@@ -39,7 +36,7 @@ void Semantic::notUniqueVariable(){
                         printScope(l->getName()->c_str());
                         fprintf(this->listing, " na linha %d: declaração inválida de variável %s, já foi declarada previamente.\n",
                                 s->getLineno(), l->getIdName()->c_str());
-                        erro_ = 1;
+                        this->error = true;
                     }
                     s = s->getNext();
                 }
@@ -64,7 +61,7 @@ void Semantic::notVoidVariable(){
                         printScope(l->getName()->c_str());
                         fprintf(this->listing, " na linha %d: declaração inválida de variável %s, void só pode ser usado para declaração de função.\n",
                                 s->getLineno(), l->getIdName()->c_str());
-                        erro_ = 1;
+                        this->error = true;
                     }
                     s = s->getNext();
                 }
@@ -91,7 +88,7 @@ void Semantic::variableNotDeclared(){
                             printScope(l->getName()->c_str());
                             fprintf(this->listing, " na linha %d: variável %s não declarada.\n",
                                     s->getLineno(), l->getIdName()->c_str());
-                            erro_ = 1;
+                            this->error = true;
                         }
                     }
                     s = s->getNext();
@@ -118,7 +115,7 @@ void Semantic::functionNotDeclared(){
                         printScope(l->getName()->c_str());
                         fprintf(this->listing, " na linha %d: função %s não declarada.\n",
                                 s->getLineno(), l->getIdName()->c_str());
-                        erro_ = 1;
+                        this->error = true;
                     }
                     s = s->getNext();
                 }
@@ -146,7 +143,7 @@ void Semantic::mainNotDeclared(){
     }
     if (error){
         fprintf(this->listing, "Erro semantico: função main() não declarada.\n");
-        erro_ = 1;
+        this->error = true;
     }
 }
 
@@ -184,7 +181,7 @@ void Semantic::variableIsFunction(){
                     fprintf(this->listing, " na linha %d: %s já foi declarada como nome de função.\n",
                             s->getLineno(), var[m]->getIdName());
                     s = s->getNext();
-                    erro_ = 1;
+                    this->error = true;
                 }
             }
         }
@@ -205,7 +202,7 @@ void Semantic::voidAtribuition(){
                         printScope(l->getName()->c_str());
                         fprintf(this->listing, " na linha %d: atribuição void em %s.\n",
                                 s->getLineno(), l->getIdName()->c_str());
-                        erro_ = 1;
+                        this->error = true;
                     }
                     s = s->getNext();
                 }
@@ -220,7 +217,7 @@ Semantic::Semantic(SymbolTable *table, FILE *listing){
     this->listing = listing;
 }
 
-int Semantic::analyze(){
+bool Semantic::analyze(){
     this->notUniqueVariable();
     this->notVoidVariable();
     this->variableNotDeclared();
@@ -228,5 +225,5 @@ int Semantic::analyze(){
     this->mainNotDeclared();
     this->variableIsFunction();
     this->voidAtribuition();
-    return erro_;
+    return this->error;
 }

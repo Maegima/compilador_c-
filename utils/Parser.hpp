@@ -18,16 +18,11 @@ class Parser{
 private:
     /// Raiz da árvore sintática.
     TreeNode * savedTree;
-    ///  Imprimir ou não a árvore sintática após sua construção.
+    /// Imprimir ou não a árvore sintática após sua construção.
     bool trace;
+    ///  Indica se houve erro no parser.
+    bool error;
 public:
-    /**
-     * @brief O método Parser inicializa as váriaveis 
-     * do analisador sintático.
-     * 
-     */
-    Parser();
-
     /**
      * @brief O método Parser inicializa as váriaveis 
      * do analisador sintático.
@@ -40,9 +35,12 @@ public:
      * @brief O método parse faz a análise sintática
      * e cria a árvore de análise sintática.
      * 
-     * @return TreeNode* Nó raiz da árvore.
+     * @param tree Endereço da raiz da árvore.
+     * @return true Caso ocorra erro no parser.
+     * @return false Caso não ocorra erro no parser.
      */
-    TreeNode *parse();
+    bool parse(TreeNode **tree);
+    
     /**
      * @brief O método setSavedTree altera o valor da 
      * raiz da árvore de ánalise sintática.
@@ -50,6 +48,13 @@ public:
      * @param savedTree Raiz da árvore.
      */
     void setSavedTree(TreeNode *savedTree);
+
+    /**
+     * @brief O método setError altera o valor de
+     * error para true.
+     * 
+     */
+    void setError();
 };
 
 #endif

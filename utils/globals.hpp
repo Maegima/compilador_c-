@@ -59,10 +59,4 @@ extern Scanner *scan; /**< Analisador léxico. */
 
 extern Parser *parser; /**< Analisador sintático */
 
-/**************************************************/
-/***********   Flags para o rastreamento   ********/
-/**************************************************/
-
-/** Error = TRUE prevents further passes if an error occurs. */
-extern int Error; 
 #endif
