@@ -20,6 +20,8 @@
 class Scanner{
 private:
     int line_number; /**< Linha atual do arquivo de origem. */
+    bool trace; /**< Caso tenha valor true imprime no arquivo 
+    de saída do scanner os tokens lidos. */
 public:
     /**
      * @brief O método Scanner inicializa as 
@@ -27,6 +29,14 @@ public:
      * 
      */
     Scanner();
+
+    /**
+     * @brief O método Scanner inicializa as 
+     * váriaveis do analisador léxico.
+     * @param trace Rastrear ou não.
+     */
+    Scanner(bool trace);
+
     /**
      * @brief O método getToken retorna o próximo token
      * do arquivo de origem.

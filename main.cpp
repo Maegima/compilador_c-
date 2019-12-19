@@ -28,8 +28,7 @@ FILE * symbtree = stdout;
 FILE * code = stdout;
 
 /* allocate and set tracing flags */
-int EchoSource = FALSE;
-int TraceScan = FALSE;
+bool TraceScan = true;
 int TraceParse = TRUE;
 int TraceAnalyze = TRUE;
 int TraceCode = FALSE;
@@ -48,7 +47,7 @@ int main(int argc, char **argv){
         symbtab = fopen(argv[3], "w");
     if(argc > 4)
         code = fopen(argv[4], "w");
-    scan = new Scanner();
+    scan = new Scanner(TraceScan);
     parser = new Parser();
     raiz = parser->parse();
     if(!erro){

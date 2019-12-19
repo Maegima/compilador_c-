@@ -22,13 +22,21 @@ Scanner::Scanner(){
     yyin = source;
     yyout = listing;
     this->line_number = 1;
+    this->trace = false;
+}
+
+Scanner::Scanner(bool trace){
+    yyin = source;
+    yyout = listing;
+    this->line_number = 1;
+    this->trace = trace;
 }
 
 TokenType Scanner::getToken(void)
 { 
     TokenType currentToken = 0;
     currentToken = yylex();
-    if (TraceScan) {
+    if (this->trace) {
         fprintf(listing,"\t%d: ", this->line_number);
         printToken(currentToken, yytext);
     }
@@ -46,10 +54,12 @@ void Scanner::printToken(TokenType token, const char *tokenString){
     case ELSE:
     case RETURN:
     case WHILE:
+    case VOID:
+    case INT:
         fprintf(symbtree,"reserved word: %s\n", tokenString);
         break;
     case ATRIB:
-        fprintf(symbtree, ":=\n");
+        fprintf(symbtree, "=\n");
         break;
     case SLT:
         fprintf(symbtree, "<\n");
@@ -75,8 +85,29 @@ void Scanner::printToken(TokenType token, const char *tokenString){
     case CPAREN:
         fprintf(symbtree, ")\n");
         break;
+    case OBRACT:
+        fprintf(symbtree, "[\n");
+        break;
+    case CBRACT:
+        fprintf(symbtree, "]\n");
+        break;
+    case OBRACE:
+        fprintf(symbtree, "{\n");
+        break;
+    case CBRACE:
+        fprintf(symbtree, "}\n");
+        break;
+    case OCOM:
+        fprintf(symbtree, "OCOM\n");
+        break;
+    case CCOM:
+        fprintf(symbtree, "CCOM\n");
+        break;
     case SEMICOLON:
         fprintf(symbtree, ";\n");
+        break;
+    case COMMA:
+        fprintf(symbtree, ",\n");
         break;
     case ADD:
         fprintf(symbtree, "+\n");
@@ -94,12 +125,10 @@ void Scanner::printToken(TokenType token, const char *tokenString){
         fprintf(symbtree, "EOF\n");
         break;
     case NUM:
-        fprintf(symbtree,
-                "NUM, val= %s\n", tokenString);
+        fprintf(symbtree, "NUM, val= %s\n", tokenString);
         break;
     case ID:
-        fprintf(symbtree,
-                "ID, name= %s\n", tokenString);
+        fprintf(symbtree, "ID, name= %s\n", tokenString);
         break;
     case ERR:
         fprintf(symbtree, "ERROR: %s\n", tokenString);

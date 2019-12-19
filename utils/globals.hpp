@@ -63,18 +63,6 @@ extern Parser *parser; /**< Analisador sintático */
 /***********   Flags para o rastreamento   ********/
 /**************************************************/
 
-/** EchoSource = TRUE causes the source program to
- * be echoed to the listing file with line numbers
- * during parsing.
- */
-extern int EchoSource;
-
-/** TraceScan = TRUE causes token information to be
- * printed to the listing file as each token is
- * recognized by the scanner.
- */
-extern int TraceScan;
-
 /** TraceParse = TRUE causes the syntax tree to be
  * printed to the listing file in linearized form
  * (using indents for children).
