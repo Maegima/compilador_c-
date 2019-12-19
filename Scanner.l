@@ -11,25 +11,19 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include "parser.h"
-#include "utils/globals.hpp"
+#include "utils/Parser.hpp"
 #include "utils/Scanner.hpp"
 
 extern YYSTYPE yylval;
 extern "C" int yylex(void);
+extern Scanner *scan;
 
-Scanner::Scanner(){
-    yyin = source;
-    yyout = listing;
-    this->line_number = 1;
-    this->trace = false;
-}
-
-Scanner::Scanner(bool trace){
+Scanner::Scanner(FILE *source, FILE *listing, bool trace){
     yyin = source;
     yyout = listing;
     this->line_number = 1;
     this->trace = trace;
+    this->listing = listing;
 }
 
 TokenType Scanner::getToken(void)
@@ -38,7 +32,7 @@ TokenType Scanner::getToken(void)
     currentToken = yylex();
     if (this->trace) {
         fprintf(listing,"\t%d: ", this->line_number);
-        printToken(currentToken, yytext);
+        printToken(this->listing, currentToken, yytext);
     }
     return currentToken;
 }
@@ -48,7 +42,7 @@ TokenType Scanner::lexicalError(){
     return ERR;
 }
 
-void Scanner::printToken(TokenType token, const char *tokenString){
+void Scanner::printToken(FILE *listing, TokenType token, const char *tokenString){
     switch (token){
     case IF:
     case ELSE:
@@ -56,85 +50,85 @@ void Scanner::printToken(TokenType token, const char *tokenString){
     case WHILE:
     case VOID:
     case INT:
-        fprintf(symbtree,"reserved word: %s\n", tokenString);
+        fprintf(listing,"reserved word: %s\n", tokenString);
         break;
     case ATRIB:
-        fprintf(symbtree, "=\n");
+        fprintf(listing, "=\n");
         break;
     case SLT:
-        fprintf(symbtree, "<\n");
+        fprintf(listing, "<\n");
         break;
     case SLTE:
-        fprintf(symbtree, "<=\n");
+        fprintf(listing, "<=\n");
         break;
     case SGT:
-        fprintf(symbtree, ">\n");
+        fprintf(listing, ">\n");
         break;
     case SGTE:
-        fprintf(symbtree, "<=\n");
+        fprintf(listing, "<=\n");
         break;
     case EQUAL:
-        fprintf(symbtree, "=\n");
+        fprintf(listing, "=\n");
         break;
     case DIFFERENT:
-        fprintf(symbtree, "!=\n");
+        fprintf(listing, "!=\n");
         break;
     case OPAREN:
-        fprintf(symbtree, "(\n");
+        fprintf(listing, "(\n");
         break;
     case CPAREN:
-        fprintf(symbtree, ")\n");
+        fprintf(listing, ")\n");
         break;
     case OBRACT:
-        fprintf(symbtree, "[\n");
+        fprintf(listing, "[\n");
         break;
     case CBRACT:
-        fprintf(symbtree, "]\n");
+        fprintf(listing, "]\n");
         break;
     case OBRACE:
-        fprintf(symbtree, "{\n");
+        fprintf(listing, "{\n");
         break;
     case CBRACE:
-        fprintf(symbtree, "}\n");
+        fprintf(listing, "}\n");
         break;
     case OCOM:
-        fprintf(symbtree, "OCOM\n");
+        fprintf(listing, "OCOM\n");
         break;
     case CCOM:
-        fprintf(symbtree, "CCOM\n");
+        fprintf(listing, "CCOM\n");
         break;
     case SEMICOLON:
-        fprintf(symbtree, ";\n");
+        fprintf(listing, ";\n");
         break;
     case COMMA:
-        fprintf(symbtree, ",\n");
+        fprintf(listing, ",\n");
         break;
     case ADD:
-        fprintf(symbtree, "+\n");
+        fprintf(listing, "+\n");
         break;
     case SUB:
-        fprintf(symbtree, "-\n");
+        fprintf(listing, "-\n");
         break;
     case MULT:
-        fprintf(symbtree, "*\n");
+        fprintf(listing, "*\n");
         break;
     case DIV:
-        fprintf(symbtree, "/\n");
+        fprintf(listing, "/\n");
         break;
     case ENDFILE:
-        fprintf(symbtree, "EOF\n");
+        fprintf(listing, "EOF\n");
         break;
     case NUM:
-        fprintf(symbtree, "NUM, val= %s\n", tokenString);
+        fprintf(listing, "NUM, val= %s\n", tokenString);
         break;
     case ID:
-        fprintf(symbtree, "ID, name= %s\n", tokenString);
+        fprintf(listing, "ID, name= %s\n", tokenString);
         break;
     case ERR:
-        fprintf(symbtree, "ERROR: %s\n", tokenString);
+        fprintf(listing, "ERROR: %s\n", tokenString);
         break;
     default: /* should never happen */
-        fprintf(symbtree, "Unknown token: %d\n", token);
+        fprintf(listing, "Unknown token: %d\n", token);
     }
 }
 

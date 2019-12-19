@@ -11,7 +11,6 @@
 #include <iostream>
 using namespace std;
 
-#include "utils/globals.hpp"
 #include "utils/Scanner.hpp"
 #include "utils/Parser.hpp"
 #include "utils/SymbolTable.hpp"
@@ -19,13 +18,13 @@ using namespace std;
 #include "utils/CodeGenerator.hpp"
 
 /* allocate global variables */
-Scanner *scan = NULL;
-Parser *parser = NULL;
-FILE * source = NULL;
-FILE * listing = stdout;
-FILE * symbtab = stdout;
-FILE * symbtree = stdout;
-FILE * code = stdout;
+Scanner *scan = NULL; /**< Analisador léxico. */
+Parser *parser = NULL; /**< Analisador sintático. */
+FILE * source = NULL; /**< Arquivo do código fonte. */
+FILE * listing = stdout; /**< Arquivo de saída padrão. */
+FILE * symbtab = stdout; /**< Arquivo para impressão da tabela de simbolos. */
+FILE * symbtree = stdout; /**< Arquivo para impressão da árvore sintática. */
+FILE * code = stdout; /**< Arquivo para impressão do código intermediário. */
 
 /* allocate and set tracing flags */
 bool TraceScan = false;
@@ -45,11 +44,11 @@ int main(int argc, char **argv){
         symbtab = fopen(argv[3], "w");
     if(argc > 4)
         code = fopen(argv[4], "w");
-    scan = new Scanner(TraceScan);
-    parser = new Parser(TraceParse);
+    scan = new Scanner(source, listing, TraceScan);
+    parser = new Parser(symbtree, TraceParse);
     erro = parser->parse(&raiz);
     if(!erro){
-        SymbolTable *table = new SymbolTable(TraceAnalyze);
+        SymbolTable *table = new SymbolTable(symbtab, TraceAnalyze);
         table->build(raiz);
         Semantic *semantic = new Semantic(table, listing);
         erro = semantic->analyze();

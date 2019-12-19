@@ -9,7 +9,6 @@
  * 
  */
 
-#include "globals.hpp"
 #include "SymbolTable.hpp"
 
 using namespace std;
@@ -18,9 +17,10 @@ using namespace std;
 na função de hash.  */
 #define SHIFT 4
 
-SymbolTable::SymbolTable(bool trace){
+SymbolTable::SymbolTable(FILE *listing, bool trace){
     this->table = new BucketList*[SIZE];
     this->trace = trace;
+    this->listing = listing;
 }
 
 int SymbolTable::hash(const char *key){
@@ -234,7 +234,7 @@ void SymbolTable::build(TreeNode *syntaxTree){
     this->insert(new string("GLOBAL output"), new string("output"), 0, 0, Void, 1, -1, location++);
     traverse(syntaxTree);
     if (this->trace){ 
-        fprintf(symbtab, "\nSymbol table:\n\n");
-        this->print(symbtab);
+        fprintf(this->listing, "\nSymbol table:\n\n");
+        this->print(this->listing);
     }
 }

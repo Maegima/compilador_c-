@@ -12,6 +12,27 @@
 #ifndef _PARSER_HPP_
 #define _PARSER_HPP_
 
+/* Yacc/Bison generates internally its own values
+ * for the tokens. Other files can access these values
+ * by including the tab.h file generated using the
+ * Yacc/Bison option -d ("generate header").
+ *
+ * The YYPARSER flag prevents inclusion of the tab.h
+ * into the Yacc/Bison output itself.
+ */
+
+#ifndef YYPARSER
+
+/* Nome do header do parser criado pelo bison. */
+#include "../parser.h"
+
+/** ENDFILE é definido implicitamente pelo Yacc/Bison,
+ * mas não é icluido no arquivo tab.h.
+ */
+#define ENDFILE 0
+
+#endif
+
 #include "TreeNode.hpp"
 
 class Parser{
@@ -22,14 +43,17 @@ private:
     bool trace;
     ///  Indica se houve erro no parser.
     bool error;
+    /// Arquivo para impressão da árvore sintática.
+    FILE *listing;
 public:
     /**
      * @brief O método Parser inicializa as váriaveis 
      * do analisador sintático.
      * 
+     * @param listing Arquivo para impressão da árvore sintática.
      * @param trace Rastrear ou não.
      */
-    Parser(bool trace);
+    Parser(FILE *lisiting, bool trace);
 
     /**
      * @brief O método parse faz a análise sintática

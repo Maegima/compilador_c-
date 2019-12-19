@@ -22,20 +22,17 @@ private:
     int line_number; /**< Linha atual do arquivo de origem. */
     bool trace; /**< Caso tenha valor true imprime no arquivo 
     de saída do scanner os tokens lidos. */
+    FILE *listing; /**< Arquivo de saída do scanner. */
 public:
     /**
      * @brief O método Scanner inicializa as 
      * váriaveis do analisador léxico.
      * 
-     */
-    Scanner();
-
-    /**
-     * @brief O método Scanner inicializa as 
-     * váriaveis do analisador léxico.
+     * @param source Arquivo de entrada do scanner.
+     * @param listing Arquivo de saída do scanner.
      * @param trace Rastrear ou não.
      */
-    Scanner(bool trace);
+    Scanner(FILE *source, FILE *listing, bool trace);
 
     /**
      * @brief O método getToken retorna o próximo token
@@ -68,10 +65,11 @@ public:
      * @brief O método printToken imprime um token 
      * e seu lexema no arquivo de listagem.
      * 
+     * @param lisiting Arquivo de saída.
      * @param token Identificador do token.
      * @param tokenString Descrição textual do token.
      */
-    void printToken(TokenType token, const char* tokenString);
+    void printToken(FILE *listing, TokenType token, const char* tokenString);
 };
 
 #endif

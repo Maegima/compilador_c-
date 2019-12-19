@@ -67,8 +67,9 @@ public:
      * @brief O método print imprime a árvore sintática
      * no arquivo symbtree usando identação para indicar sub-árvores.
      * 
+     * @param lisiting Arquivo para impressão da árvore.
      */
-    void print();
+    void print(FILE *listing);
     /**
      * @brief Get the Child object
      * 

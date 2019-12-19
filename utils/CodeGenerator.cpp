@@ -9,7 +9,8 @@
  * 
  */
 
-#include "globals.hpp"
+#include "string.h"
+#include "Parser.hpp"
 #include "CodeGenerator.hpp"
 
 using namespace std;

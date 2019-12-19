@@ -9,8 +9,10 @@
  * 
  */
 
-#include "globals.hpp"
 #include "TreeNode.hpp"
+#include "Scanner.hpp"
+
+extern Scanner *scan;
 
 TreeNode::TreeNode(StmtKind kind){
     int i;
@@ -57,61 +59,61 @@ static int indentno = 0;
  * espaços.
  * 
  */
-static void printSpaces(void){
+static void printSpaces(FILE *listing){
     int i;
     for (i = 0; i < indentno; i++)
-        fprintf(symbtree, " ");
+        fprintf(listing, " ");
 }
 
-void TreeNode::print(){
+void TreeNode::print(FILE *listing){
     int i;
     INDENT;
     TreeNode *tree = this;
     while (tree != NULL){
-        printSpaces();
+        printSpaces(listing);
         if (tree->nodekind == StmtK){
             switch (tree->kind.stmt){
             case IfK:
-                fprintf(symbtree, "If\n");
+                fprintf(listing, "If\n");
                 break;
             case WhileK:
-                fprintf(symbtree, "While\n");
+                fprintf(listing, "While\n");
                 break;
             case AssignK:
-                fprintf(symbtree, "Assign to: %s\n", tree->attr.name->c_str());
+                fprintf(listing, "Assign to: %s\n", tree->attr.name->c_str());
                 break;
             case ReturnK:
-                fprintf(symbtree, "Return\n");
+                fprintf(listing, "Return\n");
                 break;
             default:
-                fprintf(symbtree, "Unknown ExpNode kind\n");
+                fprintf(listing, "Unknown ExpNode kind\n");
                 break;
             }
         }
         else if (tree->nodekind == ExpK){
             switch (tree->kind.exp){
             case OpK:
-                fprintf(symbtree, "Op: ");
-                scan->printToken(tree->attr.op, "\0");
+                fprintf(listing, "Op: ");
+                scan->printToken(listing, tree->attr.op, "\0");
                 break;
             case ConstK:
-                fprintf(symbtree, "Const: %d\n", tree->attr.val);
+                fprintf(listing, "Const: %d\n", tree->attr.val);
                 break;
             case IdK:
-                fprintf(symbtree, "Id: %s\n", tree->attr.name->c_str());
+                fprintf(listing, "Id: %s\n", tree->attr.name->c_str());
                 break;
             case TypeK:
-                fprintf(symbtree, "Type: %s\n", tree->attr.name->c_str());
+                fprintf(listing, "Type: %s\n", tree->attr.name->c_str());
                 break;
             default:
-                fprintf(symbtree, "Unknown ExpNode kind\n");
+                fprintf(listing, "Unknown ExpNode kind\n");
                 break;
             }
         }
         else
-            fprintf(symbtree, "Unknown node kind\n");
+            fprintf(listing, "Unknown node kind\n");
         for (i = 0; i < MAXCHILDREN; i++)
-            tree->child[i]->print();
+            tree->child[i]->print(listing);
         tree = tree->sibling;
     }
     UNINDENT;

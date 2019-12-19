@@ -502,25 +502,19 @@ char *yytext;
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include "parser.h"
-#include "utils/globals.hpp"
+#include "utils/Parser.hpp"
 #include "utils/Scanner.hpp"
 
 extern YYSTYPE yylval;
 extern "C" int yylex(void);
+extern Scanner *scan;
 
-Scanner::Scanner(){
-    yyin = source;
-    yyout = listing;
-    this->line_number = 1;
-    this->trace = false;
-}
-
-Scanner::Scanner(bool trace){
+Scanner::Scanner(FILE *source, FILE *listing, bool trace){
     yyin = source;
     yyout = listing;
     this->line_number = 1;
     this->trace = trace;
+    this->listing = listing;
 }
 
 TokenType Scanner::getToken(void)
@@ -529,7 +523,7 @@ TokenType Scanner::getToken(void)
     currentToken = yylex();
     if (this->trace) {
         fprintf(listing,"\t%d: ", this->line_number);
-        printToken(currentToken, yytext);
+        printToken(this->listing, currentToken, yytext);
     }
     return currentToken;
 }
@@ -539,7 +533,7 @@ TokenType Scanner::lexicalError(){
     return ERR;
 }
 
-void Scanner::printToken(TokenType token, const char *tokenString){
+void Scanner::printToken(FILE *listing, TokenType token, const char *tokenString){
     switch (token){
     case IF:
     case ELSE:
@@ -547,85 +541,85 @@ void Scanner::printToken(TokenType token, const char *tokenString){
     case WHILE:
     case VOID:
     case INT:
-        fprintf(symbtree,"reserved word: %s\n", tokenString);
+        fprintf(listing,"reserved word: %s\n", tokenString);
         break;
     case ATRIB:
-        fprintf(symbtree, "=\n");
+        fprintf(listing, "=\n");
         break;
     case SLT:
-        fprintf(symbtree, "<\n");
+        fprintf(listing, "<\n");
         break;
     case SLTE:
-        fprintf(symbtree, "<=\n");
+        fprintf(listing, "<=\n");
         break;
     case SGT:
-        fprintf(symbtree, ">\n");
+        fprintf(listing, ">\n");
         break;
     case SGTE:
-        fprintf(symbtree, "<=\n");
+        fprintf(listing, "<=\n");
         break;
     case EQUAL:
-        fprintf(symbtree, "=\n");
+        fprintf(listing, "=\n");
         break;
     case DIFFERENT:
-        fprintf(symbtree, "!=\n");
+        fprintf(listing, "!=\n");
         break;
     case OPAREN:
-        fprintf(symbtree, "(\n");
+        fprintf(listing, "(\n");
         break;
     case CPAREN:
-        fprintf(symbtree, ")\n");
+        fprintf(listing, ")\n");
         break;
     case OBRACT:
-        fprintf(symbtree, "[\n");
+        fprintf(listing, "[\n");
         break;
     case CBRACT:
-        fprintf(symbtree, "]\n");
+        fprintf(listing, "]\n");
         break;
     case OBRACE:
-        fprintf(symbtree, "{\n");
+        fprintf(listing, "{\n");
         break;
     case CBRACE:
-        fprintf(symbtree, "}\n");
+        fprintf(listing, "}\n");
         break;
     case OCOM:
-        fprintf(symbtree, "OCOM\n");
+        fprintf(listing, "OCOM\n");
         break;
     case CCOM:
-        fprintf(symbtree, "CCOM\n");
+        fprintf(listing, "CCOM\n");
         break;
     case SEMICOLON:
-        fprintf(symbtree, ";\n");
+        fprintf(listing, ";\n");
         break;
     case COMMA:
-        fprintf(symbtree, ",\n");
+        fprintf(listing, ",\n");
         break;
     case ADD:
-        fprintf(symbtree, "+\n");
+        fprintf(listing, "+\n");
         break;
     case SUB:
-        fprintf(symbtree, "-\n");
+        fprintf(listing, "-\n");
         break;
     case MULT:
-        fprintf(symbtree, "*\n");
+        fprintf(listing, "*\n");
         break;
     case DIV:
-        fprintf(symbtree, "/\n");
+        fprintf(listing, "/\n");
         break;
     case ENDFILE:
-        fprintf(symbtree, "EOF\n");
+        fprintf(listing, "EOF\n");
         break;
     case NUM:
-        fprintf(symbtree, "NUM, val= %s\n", tokenString);
+        fprintf(listing, "NUM, val= %s\n", tokenString);
         break;
     case ID:
-        fprintf(symbtree, "ID, name= %s\n", tokenString);
+        fprintf(listing, "ID, name= %s\n", tokenString);
         break;
     case ERR:
-        fprintf(symbtree, "ERROR: %s\n", tokenString);
+        fprintf(listing, "ERROR: %s\n", tokenString);
         break;
     default: /* should never happen */
-        fprintf(symbtree, "Unknown token: %d\n", token);
+        fprintf(listing, "Unknown token: %d\n", token);
     }
 }
 
@@ -636,8 +630,8 @@ int Scanner::getLineNumber(){
 void Scanner::incrementLine(){
     this->line_number++;
 }
-#line 640 "Scanner.cpp"
-#line 641 "Scanner.cpp"
+#line 634 "Scanner.cpp"
+#line 635 "Scanner.cpp"
 
 #define INITIAL 0
 
@@ -859,9 +853,9 @@ YY_DECL
 		}
 
 	{
-#line 153 "Scanner.l"
+#line 147 "Scanner.l"
 
-#line 860 "Scanner.cpp"
+#line 854 "Scanner.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -920,148 +914,148 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 154 "Scanner.l"
+#line 148 "Scanner.l"
 return IF;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 155 "Scanner.l"
+#line 149 "Scanner.l"
 return ELSE;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 156 "Scanner.l"
+#line 150 "Scanner.l"
 return INT;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 157 "Scanner.l"
+#line 151 "Scanner.l"
 return RETURN;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 158 "Scanner.l"
+#line 152 "Scanner.l"
 return VOID;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 159 "Scanner.l"
+#line 153 "Scanner.l"
 return WHILE;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 160 "Scanner.l"
+#line 154 "Scanner.l"
 return ID;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 161 "Scanner.l"
+#line 155 "Scanner.l"
 return NUM;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 162 "Scanner.l"
+#line 156 "Scanner.l"
 return ADD;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 163 "Scanner.l"
+#line 157 "Scanner.l"
 return SUB;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 164 "Scanner.l"
+#line 158 "Scanner.l"
 return MULT;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 165 "Scanner.l"
+#line 159 "Scanner.l"
 return DIV;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 166 "Scanner.l"
+#line 160 "Scanner.l"
 return SLT;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 167 "Scanner.l"
+#line 161 "Scanner.l"
 return SLTE;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 168 "Scanner.l"
+#line 162 "Scanner.l"
 return SGT;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 169 "Scanner.l"
+#line 163 "Scanner.l"
 return SGTE;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 170 "Scanner.l"
+#line 164 "Scanner.l"
 return EQUAL;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 171 "Scanner.l"
+#line 165 "Scanner.l"
 return DIFFERENT;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 172 "Scanner.l"
+#line 166 "Scanner.l"
 return ATRIB;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 173 "Scanner.l"
+#line 167 "Scanner.l"
 return SEMICOLON;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 174 "Scanner.l"
+#line 168 "Scanner.l"
 return COMMA;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 175 "Scanner.l"
+#line 169 "Scanner.l"
 return OBRACE;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 176 "Scanner.l"
+#line 170 "Scanner.l"
 return CBRACE;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 177 "Scanner.l"
+#line 171 "Scanner.l"
 return OPAREN;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 178 "Scanner.l"
+#line 172 "Scanner.l"
 return CPAREN;
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 179 "Scanner.l"
+#line 173 "Scanner.l"
 return OBRACT;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 180 "Scanner.l"
+#line 174 "Scanner.l"
 return CBRACT;
 	YY_BREAK
 case 28:
 /* rule 28 can match eol */
 YY_RULE_SETUP
-#line 181 "Scanner.l"
+#line 175 "Scanner.l"
 scan->incrementLine();
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 182 "Scanner.l"
+#line 176 "Scanner.l"
 {
                                         char c;
                                         int state = 0;
@@ -1078,40 +1072,40 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 195 "Scanner.l"
+#line 189 "Scanner.l"
 
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 196 "Scanner.l"
+#line 190 "Scanner.l"
 
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 197 "Scanner.l"
+#line 191 "Scanner.l"
 
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 198 "Scanner.l"
+#line 192 "Scanner.l"
 return scan->lexicalError();
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 199 "Scanner.l"
+#line 193 "Scanner.l"
 return scan->lexicalError();
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 200 "Scanner.l"
+#line 194 "Scanner.l"
 return scan->lexicalError();
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 201 "Scanner.l"
+#line 195 "Scanner.l"
 ECHO;
 	YY_BREAK
-#line 1110 "Scanner.cpp"
+#line 1104 "Scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2116,5 +2110,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 201 "Scanner.l"
+#line 195 "Scanner.l"
 

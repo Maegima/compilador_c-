@@ -14,7 +14,6 @@ using namespace std;
 
 #define YYPARSER /* distinguishes Yacc output from other code files */
 
-#include "utils/globals.hpp"
 #include "utils/Scanner.hpp"
 #include "utils/Parser.hpp"
 
@@ -29,6 +28,8 @@ static string *scope;
 int yylex(void);
 void yyerror(const char *msg);
 extern char* yytext;
+extern Parser *parser;
+extern Scanner *scan;
 %}
 
 %start programa
@@ -418,7 +419,7 @@ int yylex(void){
     return scan->getToken(); 
 }
 
-Parser::Parser(bool trace){
+Parser::Parser(FILE *listing, bool trace){
     sc = 1;
     func = new string*[256];
     type = new ExpType[256];
@@ -428,6 +429,7 @@ Parser::Parser(bool trace){
     type[1] = Void;
     func_id = 2;
     str_global = new string("GLOBAL");
+    this->listing = listing;
     this->trace = trace;
     this->error = false;
 }
@@ -435,7 +437,7 @@ Parser::Parser(bool trace){
 bool Parser::parse(TreeNode **tree){ 
     yyparse();
     *tree = this->savedTree;
-    if(this->trace) this->savedTree->print();
+    if(this->trace) this->savedTree->print(this->listing);
     return this->error;
 }
 
