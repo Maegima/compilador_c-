@@ -431,8 +431,22 @@ Parser::Parser(){
     str_global = new string("GLOBAL");
 }
 
+Parser::Parser(bool trace){
+    sc = 1;
+    func = new string*[256];
+    type = new ExpType[256];
+    func[0] = new string("input");
+    func[1] = new string("output");
+    type[0] = Integer;
+    type[1] = Void;
+    func_id = 2;
+    str_global = new string("GLOBAL");
+    this->trace = trace;
+}
+
 TreeNode *Parser::parse(void){ 
     yyparse();
+    if(this->trace) this->savedTree->print();
     return this->savedTree;
 }
 

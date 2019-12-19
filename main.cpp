@@ -28,8 +28,8 @@ FILE * symbtree = stdout;
 FILE * code = stdout;
 
 /* allocate and set tracing flags */
-bool TraceScan = true;
-int TraceParse = TRUE;
+bool TraceScan = false;
+bool TraceParse = true;
 int TraceAnalyze = TRUE;
 int TraceCode = FALSE;
 int Error = FALSE;
@@ -48,10 +48,9 @@ int main(int argc, char **argv){
     if(argc > 4)
         code = fopen(argv[4], "w");
     scan = new Scanner(TraceScan);
-    parser = new Parser();
+    parser = new Parser(TraceParse);
     raiz = parser->parse();
     if(!erro){
-        raiz->print();
         SymbolTable *table = new SymbolTable();
         table->build(raiz);
         Semantic *semantic = new Semantic(table, listing);

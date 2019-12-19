@@ -17,14 +17,24 @@
 class Parser{
 private:
     /// Raiz da árvore sintática.
-    TreeNode * savedTree; 
+    TreeNode * savedTree;
+    ///  Imprimir ou não a árvore sintática após sua construção.
+    bool trace;
 public:
     /**
      * @brief O método Parser inicializa as váriaveis 
      * do analisador sintático.
      * 
      */
-    Parser(void);
+    Parser();
+
+    /**
+     * @brief O método Parser inicializa as váriaveis 
+     * do analisador sintático.
+     * 
+     * @param trace Rastrear ou não.
+     */
+    Parser(bool trace);
 
     /**
      * @brief O método parse faz a análise sintática

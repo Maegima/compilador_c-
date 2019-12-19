@@ -63,12 +63,6 @@ extern Parser *parser; /**< Analisador sintático */
 /***********   Flags para o rastreamento   ********/
 /**************************************************/
 
-/** TraceParse = TRUE causes the syntax tree to be
- * printed to the listing file in linearized form
- * (using indents for children).
- */
-extern int TraceParse;
-
 /** TraceAnalyze = TRUE causes symbol table inserts
  * and lookups to be reported to the listing file.
  */
