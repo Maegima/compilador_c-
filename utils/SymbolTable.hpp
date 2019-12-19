@@ -27,6 +27,8 @@ class SymbolTable{
 private:
     /// A tabela hash.
     BucketList **table;
+    /// Imprimir ou não a tabela de simbolos após sua construção.
+    bool trace;
     /**
      * @brief A função hash.
      * 
@@ -54,8 +56,9 @@ public:
     /**
      * @brief Construct a new Symbol Table object.
      * 
+     * @param trace Rastrear ou não.
      */
-    SymbolTable();
+    SymbolTable(bool trace);
     /**
      * @brief O método insert insere ou 
      * atualiza um dado na tabela de simbolos.

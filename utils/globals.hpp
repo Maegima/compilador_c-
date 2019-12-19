@@ -63,11 +63,6 @@ extern Parser *parser; /**< Analisador sintático */
 /***********   Flags para o rastreamento   ********/
 /**************************************************/
 
-/** TraceAnalyze = TRUE causes symbol table inserts
- * and lookups to be reported to the listing file.
- */
-extern int TraceAnalyze;
-
 /** TraceCode = TRUE causes comments to be written
  * to the TM code file as code is generated.
  */

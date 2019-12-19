@@ -30,7 +30,7 @@ FILE * code = stdout;
 /* allocate and set tracing flags */
 bool TraceScan = false;
 bool TraceParse = true;
-int TraceAnalyze = TRUE;
+bool TraceAnalyze = true;
 int TraceCode = FALSE;
 int Error = FALSE;
 
@@ -51,7 +51,7 @@ int main(int argc, char **argv){
     parser = new Parser(TraceParse);
     raiz = parser->parse();
     if(!erro){
-        SymbolTable *table = new SymbolTable();
+        SymbolTable *table = new SymbolTable(TraceAnalyze);
         table->build(raiz);
         Semantic *semantic = new Semantic(table, listing);
         erro = semantic->analyze();

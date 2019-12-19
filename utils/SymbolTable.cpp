@@ -18,8 +18,9 @@ using namespace std;
 na função de hash.  */
 #define SHIFT 4
 
-SymbolTable::SymbolTable(){
+SymbolTable::SymbolTable(bool trace){
     this->table = new BucketList*[SIZE];
+    this->trace = trace;
 }
 
 int SymbolTable::hash(const char *key){
@@ -232,7 +233,7 @@ void SymbolTable::build(TreeNode *syntaxTree){
     this->insert(new string("GLOBAL input"), new string("input"), 0, 0, Integer, 1, -1, location++);
     this->insert(new string("GLOBAL output"), new string("output"), 0, 0, Void, 1, -1, location++);
     traverse(syntaxTree);
-    if (TraceAnalyze){ 
+    if (this->trace){ 
         fprintf(symbtab, "\nSymbol table:\n\n");
         this->print(symbtab);
     }
