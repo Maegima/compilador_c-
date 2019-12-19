@@ -31,7 +31,7 @@ FILE * code = stdout;
 bool TraceScan = false;
 bool TraceParse = true;
 bool TraceAnalyze = true;
-int TraceCode = FALSE;
+bool TraceCode = false;
 int Error = FALSE;
 
 int erro = 0; /**< Variável que indica erro na compilação. */
@@ -57,7 +57,7 @@ int main(int argc, char **argv){
         erro = semantic->analyze();
     }
     if(!erro){
-        CodeGenerator *codeGen = new CodeGenerator(code);
+        CodeGenerator *codeGen = new CodeGenerator(code, TraceCode);
         codeGen->generate(raiz);
     }
     fclose(source);

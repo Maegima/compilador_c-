@@ -55,7 +55,7 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
     char *label1, *label2;
     switch (tree->getStmt()){
     case IfK:
-        if (TraceCode)
+        if (this->trace)
             emitComment("-> if");
         p1 = tree->getChild(0);
         p2 = tree->getChild(1);
@@ -79,12 +79,12 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
             this->cGen(p3, &op[1]);
             emitQuadruple("LABEL", label2, "-", "-");
         }
-        if (TraceCode)
+        if (this->trace)
             emitComment("<- if");
         break; /* if_k */
 
     case WhileK:
-        if (TraceCode)
+        if (this->trace)
             emitComment("-> repeat");
         p1 = tree->getChild(0);
         p2 = tree->getChild(1);
@@ -101,12 +101,12 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         this->cGen(p2, &op[1]);
         emitQuadruple("JUMP", label1, "-", "-");
         emitQuadruple("LABEL", label2, "-", "-");
-        if (TraceCode)
+        if (this->trace)
             emitComment("<- repeat");
         break; /* repeat */
 
     case AssignK:
-        if (TraceCode)
+        if (this->trace)
             emitComment("-> assign");
         /* generate code for rhs */
         this->cGen(tree->getChild(0), &op[0]);
@@ -114,16 +114,16 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         this->cGen(tree->getChild(1), &op[1]);
         if (op[0]->compare(*op[1]) != 0)
             emitQuadruple("ASSIGN", op[0]->c_str(), op[1]->c_str(), "-");
-        if (TraceCode)
+        if (this->trace)
             emitComment("<- assign");
         *operate = op[0];
         break; /* assign_k */
     case ReturnK:
-        if (TraceCode)
+        if (this->trace)
             emitComment("-> return");
         this->cGen(tree->getChild(0), &op[0]);
         emitQuadruple("JR", op[0]->c_str(), "-", "-");
-        if (TraceCode)
+        if (this->trace)
             emitComment("<- return");
     default:
         break;
@@ -135,16 +135,16 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
     string *op[3] = {NULL, NULL, NULL};
     switch (tree->getExp()){
     case ConstK:
-        if (TraceCode)
+        if (this->trace)
             emitComment("-> Const");
         this->intToString(number, tree->getVal(), 10);
         *operate = new string(number);
-        if (TraceCode)
+        if (this->trace)
             emitComment("<- Const");
         break; /* ConstK */
 
     case IdK:
-        if (TraceCode)
+        if (this->trace)
             emitComment("-> Id");
         *operate = tree->getName();
         if (tree->getFunc()){
@@ -188,12 +188,12 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
                 }
             }
         }
-        if (TraceCode)
+        if (this->trace)
             emitComment("<- Id");
         break; /* IdK */
 
     case OpK:
-        if (TraceCode)
+        if (this->trace)
             emitComment("-> Op");
         p1 = tree->getChild(0);
         p2 = tree->getChild(1);
@@ -237,11 +237,11 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
             break;
         } /* case op */
         *operate = op[0];
-        if (TraceCode)
+        if (this->trace)
             emitComment("<- Op");
         break; /* OpK */
     case TypeK:
-        if (TraceCode)
+        if (this->trace)
             emitComment("-> type");
         /* generate code for rhs */
         if (tree->getDecl()){
@@ -256,7 +256,7 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
             this->cGen(tree->getChild(0), &op[1]);
         }
         /* now store value */
-        if (TraceCode)
+        if (this->trace)
             emitComment("<- type");
         break;
     default:
@@ -296,7 +296,7 @@ void CodeGenerator::ccGen(TreeNode *tree, string **operate){
 }
 
 void CodeGenerator::emitComment(const char *c){
-    if (TraceCode)
+    if (this->trace)
         fprintf(this->code, "* %s\n", c);
 }
 
@@ -304,8 +304,9 @@ void CodeGenerator::emitQuadruple(const char *op, const char *first, const char 
     fprintf(this->code, "(%s, %s, %s, %s)\n", op, first, second, third);
 }
 
-CodeGenerator::CodeGenerator(FILE *code){ 
+CodeGenerator::CodeGenerator(FILE *code, bool trace){ 
     this->code = code;
+    this->trace = trace;
 }
 
 void CodeGenerator::generate(TreeNode *syntaxTree){

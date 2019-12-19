@@ -23,6 +23,8 @@ class CodeGenerator{
 private:
     /// Arquivo para saída do código intermediário.
     FILE *code;
+    /// imprimir ou não comentários na geração do código.
+    bool trace;
     /**
      * @brief O método intToString converte um 
      * inteiro em uma string.
@@ -103,8 +105,9 @@ public:
      * @brief Construct a new Code Generator object.
      * 
      * @param code Arquivo para saída do código intermediário.
+     * @param trace Rastrear ou não.
      */
-    CodeGenerator(FILE *code);
+    CodeGenerator(FILE *code, bool trace);
     /**
      * @brief O método generate gera o código
      * intermediário.
