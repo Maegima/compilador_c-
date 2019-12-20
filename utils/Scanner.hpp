@@ -1,5 +1,5 @@
 /**
- * @file scan.h
+ * @file Scanner.hpp
  * @author André Lucas Maegima
  * @brief Definição da classe utilizada para a analise léxica.
  * @version 1.0

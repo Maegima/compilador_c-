@@ -35,6 +35,10 @@
 
 #include "TreeNode.hpp"
 
+/**
+ * @brief Classe responsável pela análise sintática. 
+ * 
+ */
 class Parser{
 private:
     /// Raiz da árvore sintática.
