@@ -20,7 +20,7 @@ typedef enum {StmtK,ExpK} NodeKind;
 /// Enum de tipos de declarações.
 typedef enum {IfK,WhileK,AssignK,ReturnK} StmtKind;
 /// Enum de tipos de expressões. 
-typedef enum {OpK,ConstK,IdK,TypeK} ExpKind; 
+typedef enum {OpK,ConstK,IdK,FuncK,TypeK,DeclK,FuncDeclK} ExpKind; 
 /// ExpType é usado para verificar o tipo da expressão.
 typedef enum {Void,Integer} ExpType; 
 
@@ -36,8 +36,7 @@ private:
     TreeNode *child[MAXCHILDREN];
     /// Próximo irmão.
     TreeNode *sibling;
-    int lineno /** @brief Número da linha. */, decl_line /** @brief Linha de declaração. */; 
-    int func /** @brief Se for função. */, atrib /** @brief Se for atribuição. */, decl /** @brief Se for declaração. */;
+    int lineno; /**< @brief Número da linha. */
     NodeKind nodekind; /**< @brief Tipo de Nó. */
     std::string *scope; /**< @brief Escopo do Nó. */
     /// Tipo de um nó.
@@ -113,54 +112,6 @@ public:
      * 
      * @return int 
      */
-    int getDeclLine();
-    /**
-     * @brief Set the Decl Line object
-     * 
-     * @param decl_line 
-     */
-    void setDeclLine(int decl_line);
-    /**
-     * @brief Get the Func object
-     * 
-     * @return int 
-     */
-    int getFunc();
-    /**
-     * @brief Set the Func object
-     * 
-     * @param func 
-     */
-    void setFunc(int func);
-    /**
-     * @brief Get the Atrib object
-     * 
-     * @return int 
-     */
-    int getAtrib();
-    /**
-     * @brief Set the Atrib object
-     * 
-     * @param atrib 
-     */
-    void setAtrib(int atrib);
-    /**
-     * @brief Get the Decl object
-     * 
-     * @return int 
-     */
-    int getDecl();
-    /**
-     * @brief Set the Decl object
-     * 
-     * @param decl 
-     */
-    void setDecl(int decl);
-    /**
-     * @brief Get the Nodekind object
-     * 
-     * @return NodeKind 
-     */
     NodeKind getNodekind();
     /**
      * @brief Set the Nodekind object
@@ -198,6 +149,11 @@ public:
      * @return ExpKind 
      */
     ExpKind getExp();
+    /**
+     * @brief Set the Stmt object
+     * 
+     * @param exp 
+     */
     void setExp(ExpKind exp);
     /**
      * @brief Get the Op object

@@ -23,10 +23,6 @@ TreeNode::TreeNode(StmtKind kind){
     this->kind.stmt = kind;
     this->lineno = scan->getLineNumber();
     this->type = Void;
-    this->decl_line = -1;
-    this->func = 0;
-    this->atrib = 0;
-    this->decl = 0;
 }
 
 TreeNode::TreeNode(ExpKind kind){
@@ -38,10 +34,6 @@ TreeNode::TreeNode(ExpKind kind){
     this->kind.exp = kind;
     this->lineno = scan->getLineNumber();
     this->type = Void;
-    this->decl_line = -1;
-    this->func = 0;
-    this->atrib = 0;
-    this->decl = 0;
 }
 
 /** A Variável indentno é usada pelo printTree para 
@@ -105,6 +97,15 @@ void TreeNode::print(FILE *listing){
             case TypeK:
                 fprintf(listing, "Type: %s\n", tree->attr.name->c_str());
                 break;
+            case FuncK:
+                fprintf(listing, "Func: %s\n", tree->attr.name->c_str());
+                break;
+            case DeclK:
+                fprintf(listing, "Decl: %s\n", tree->attr.name->c_str());
+                break;
+            case FuncDeclK:
+                fprintf(listing, "FuncDecl: %s\n", tree->attr.name->c_str());
+                break;
             default:
                 fprintf(listing, "Unknown ExpNode kind\n");
                 break;
@@ -141,38 +142,6 @@ int TreeNode::getLineno(){
 
 void TreeNode::setLineno(int lineno){
     this->lineno = lineno;
-}
-
-int TreeNode::getDeclLine(){
-    return this->decl_line;
-}
-
-void TreeNode::setDeclLine(int decl_line){
-    this->decl_line = decl_line;
-}
-
-int TreeNode::getFunc(){
-    return this->func;
-}
-
-void TreeNode::setFunc(int func){
-    this->func = func;
-}
-
-int TreeNode::getAtrib(){
-    return this->atrib;
-}
-
-void TreeNode::setAtrib(int atrib){
-    this->atrib = atrib;
-}
-
-int TreeNode::getDecl(){
-    return this->decl;
-}
-
-void TreeNode::setDecl(int decl){
-    this->decl = decl;
 }
 
 NodeKind TreeNode::getNodekind(){
