@@ -70,21 +70,17 @@ declaracao: var_declaracao { sc = 1; $$ = $1; } | fun_declaracao { sc = 1; $$ = 
 var_declaracao: tipo_especificador identificador SEMICOLON 
 {
     $$ = $1;
+    $2->setExp(DeclK);
     $$->setChild($2, 0);
-    $2->setDeclLine($2->getLineno());
     $2->setType($1->getType());
-    $2->setDecl(1);
-    $1->setDecl(1);
 } 
 | tipo_especificador identificador OBRACT numero CBRACT SEMICOLON 
 { 
     $$ = $1;
+    $2->setExp(DeclK);
     $$->setChild($2, 0);
     $$->getChild(0)->setChild($4, 0);
-    $2->setDeclLine($2->getLineno());
     $2->setType($1->getType());
-    $2->setDecl(1);
-    $1->setDecl(1);
 } 
 ;
 identificador: ID 
@@ -125,10 +121,9 @@ fun_declaracao: tipo_especificador identificador OPAREN params CPAREN composto_d
     $$->setChild($2, 0);
     $$->getChild(0)->setChild($4, 0);
     $$->getChild(0)->setChild($6, 1);
-    $2->setDeclLine($2->getLineno());
+    $2->setLineno($2->getLineno());
     $2->setType($1->getType());
-    $2->setFunc(1);
-    $2->setDecl(1);
+    $2->setExp(FuncDeclK);
     func[func_id] = $2->getName();
     type[func_id] = $2->getType();
     func_id++;
@@ -152,20 +147,16 @@ param_lista: param_lista COMMA param
 param: tipo_especificador identificador 
 {  
     $$ = $1;
+    $2->setExp(DeclK);
     $$->setChild($2, 0);
-    $2->setDeclLine($2->getLineno());
     $2->setType($1->getType());
-    $2->setDecl(1);
-    $1->setDecl(1);
 } 
 | tipo_especificador identificador OBRACT CBRACT
 { 
     $$ = $1;
+    $2->setExp(DeclK);
     $$->setChild($2, 0);
-    $2->setDeclLine($2->getLineno());
     $2->setType($1->getType());
-    $2->setDecl(1);
-    $1->setDecl(1);
 }
 ;
 composto_decl: OBRACE local_declaracoes statement_lista CBRACE
@@ -246,7 +237,6 @@ expressao: var ATRIB expressao
 {
     $$ = new TreeNode(AssignK);
     $$->setName($1->getName());
-    $$->setAtrib(1);
     $$->setType(($1->getType() == $3->getType()) ? $3->getType() : Void);
     $$->setScope(scope);
     $$->setChild($1, 0);
@@ -354,8 +344,8 @@ fator: OPAREN expressao CPAREN { $$ = $2; }
 ativacao: identificador OPAREN simples_expressao CPAREN 
 { 
     $$ = $1;
+    $$->setExp(FuncK);
     $$->setChild($3, 0);
-    $1->setFunc(1);
     ExpType t = Void;
     for(int i = 0; i < func_id; i++){
         if( func[i]->compare(*($1->getName())) == 0 ) {
@@ -368,8 +358,8 @@ ativacao: identificador OPAREN simples_expressao CPAREN
 | identificador OPAREN args CPAREN 
 { 
     $$ = $1;
+    $$->setExp(FuncK);
     $$->setChild($3, 0);
-    $1->setFunc(1);
     ExpType t = Void;
     for(int i = 0; i < func_id; i++){
         if( func[i]->compare(*($1->getName())) == 0 ){

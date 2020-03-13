@@ -60,11 +60,11 @@ void SymbolTable::insertNode(TreeNode *t){
                     name = new string(*r->getScope() + " " + *r->getName());
                     if (this->lookup(name) == -1)
                     /* not yet in table, so treat as new definition */
-                        this->insert(name,r->getName(),r->getLineno(),-1,t->getType(),r->getFunc(),t->getAtrib(),location++);
+                        this->insert(name,r->getName(),r->getLineno(),-1,t->getType(),(r->getExp() == FuncK),r->getLineno(),location++);
                     else{
                     /* alrady in table, so ignore location, 
                         add line number of use only */ 
-                        this->insert(name,r->getName(),r->getLineno(),-1,t->getType(),r->getFunc(),t->getAtrib(),0);
+                        this->insert(name,r->getName(),r->getLineno(),-1,t->getType(),(r->getExp() == FuncK),r->getLineno(),0);
                         delete name;
                     }
                 }
@@ -81,14 +81,50 @@ void SymbolTable::insertNode(TreeNode *t){
                 name = new string(*t->getScope()  + " " + *t->getName());
                 if (this->lookup(name) == -1)
                 /* not yet in table, so treat as new definition */
-                    this->insert(name,t->getName(),t->getLineno(),t->getDeclLine(),t->getType(),t->getFunc(),-1,location++);
+                    this->insert(name,t->getName(),t->getLineno(),-1,t->getType(),0,-1,location++);
                 else{
                 /* already in table, so ignore location, 
                     add line number of use only */ 
-                    this->insert(name,t->getName(),t->getLineno(),t->getDeclLine(),t->getType(),t->getFunc(),-1,0);
+                    this->insert(name,t->getName(),t->getLineno(),-1,t->getType(),0,-1,0);
                     delete name;
                 }
-            break;
+                break;
+            case DeclK:
+                name = new string(*t->getScope()  + " " + *t->getName());
+                if (this->lookup(name) == -1)
+                /* not yet in table, so treat as new definition */
+                    this->insert(name,t->getName(),t->getLineno(),t->getLineno(),t->getType(),0,-1,location++);
+                else{
+                /* already in table, so ignore location, 
+                    add line number of use only */ 
+                    this->insert(name,t->getName(),t->getLineno(),t->getLineno(),t->getType(),0,-1,0);
+                    delete name;
+                }
+               break;
+            case FuncDeclK:
+                name = new string(*t->getScope()  + " " + *t->getName());
+                if (this->lookup(name) == -1)
+                /* not yet in table, so treat as new definition */
+                    this->insert(name,t->getName(),t->getLineno(),t->getLineno(),t->getType(),1,-1,location++);
+                else{
+                /* already in table, so ignore location, 
+                    add line number of use only */ 
+                    this->insert(name,t->getName(),t->getLineno(),t->getLineno(),t->getType(),1,-1,0);
+                    delete name;
+                }
+                break;
+            case FuncK:
+                name = new string(*t->getScope()  + " " + *t->getName());
+                if (this->lookup(name) == -1)
+                /* not yet in table, so treat as new definition */
+                    this->insert(name,t->getName(),t->getLineno(),-1,t->getType(),1,-1,location++);
+                else{
+                /* already in table, so ignore location, 
+                    add line number of use only */ 
+                    this->insert(name,t->getName(),t->getLineno(),-1,t->getType(),1,-1,0);
+                    delete name;
+                }
+                break;
             case ConstK:
             case TypeK:
             case OpK:
