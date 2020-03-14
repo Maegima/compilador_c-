@@ -20,7 +20,7 @@ typedef enum {StmtK,ExpK} NodeKind;
 /// Enum de tipos de declarações.
 typedef enum {IfK,WhileK,AssignK,ReturnK} StmtKind;
 /// Enum de tipos de expressões. 
-typedef enum {OpK,ConstK,IdK,FuncK,TypeK,DeclK,FuncDeclK} ExpKind; 
+typedef enum {OpK,ConstK,IdK,FuncK,TypeK,DeclK,FuncDeclK,ParamK} ExpKind; 
 /// ExpType é usado para verificar o tipo da expressão.
 typedef enum {Void,Integer} ExpType; 
 

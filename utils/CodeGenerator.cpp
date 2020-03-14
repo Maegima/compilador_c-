@@ -132,8 +132,9 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
 }
 
 void CodeGenerator::genExp(TreeNode *tree, string **operate){
-    TreeNode *p1, *p2;
+    TreeNode *p1, *p2, *p;
     string *op[3] = {NULL, NULL, NULL};
+    int cont;
     switch (tree->getExp()){
     case ConstK:
         if (this->trace)
@@ -147,51 +148,82 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
     case IdK:
         if (this->trace)
             emitComment("-> Id");
-        *operate = tree->getName();
-        if (tree->getFunc()){
-            if (tree->getDecl()){
-                op[0] = tree->getName();
-                emitQuadruple("LABEL", op[0]->c_str(), "-", "-");
-                TreeNode *p = tree->getChild(0);
-                while (p){
-                    this->ccGen(p->getChild(0), &op[0]);
-                    emitQuadruple("LOAD", op[0]->c_str(), "-", "-");
-                    p = p->getSibling();
-                }
-                this->cGen(tree->getChild(1), &op[1]);
-            }
-            else{
-                TreeNode *p = tree->getChild(0);
-                int cont = 0;
-                while (p){
-                    this->ccGen(p, &op[0]);
-                    emitQuadruple("PARAM", op[0]->c_str(), "-", "-");
-                    p = p->getSibling();
-                    cont++;
-                }
-                this->intToString(number, cont, 10);
-                op[0] = tree->getName();
-                op[1] = new string(number);
-                emitQuadruple("CALL", op[0]->c_str(), op[1]->c_str(), "-");
-                delete op[1];
-            }
+        if (tree->getChild(0) != NULL){
+            this->cGen(tree->getChild(0), &op[2]);
+            op[0] = new string(this->strNumber("VET", cont_vet));
+            op[1] = tree->getName();
+            cont_vet++;
+            emitQuadruple("ADD", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
+            emitQuadruple("LOAD_ADRESS", op[0]->c_str(), op[0]->c_str(), "-");
+            *operate = op[0];
         }
-        else{
-            if (!tree->getDecl()){
-                this->cGen(tree->getChild(0), &op[2]);
-                if (tree->getChild(0) != NULL){
-                    op[0] = new string(this->strNumber("VET", cont_vet));
-                    op[1] = tree->getName();
-                    cont_vet++;
-                    emitQuadruple("ADD", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
-                    emitQuadruple("LOAD_ADRESS", op[0]->c_str(), op[0]->c_str(), "-");
-                    *operate = op[0];
-                }
-            }
-        }
+        else
+            *operate = tree->getName();
         if (this->trace)
             emitComment("<- Id");
         break; /* IdK */
+
+    case ParamK:
+        if (this->trace)
+            emitComment("-> Param");
+        *operate = tree->getName();;
+        if (this->trace)
+            emitComment("<- Param");
+        break; /* ParamK */
+
+    case DeclK:
+        if (this->trace)
+            emitComment("-> Decl");
+        op[0] = tree->getName();
+        if(tree->getChild(0)){
+            cGen(tree->getChild(0), &op[1]);
+            emitQuadruple("ALOC_MEN", op[0]->c_str(), op[1]->c_str(), "-");
+        }
+        else{
+            emitQuadruple("ALOC_MEN", op[0]->c_str(), "1", "-");
+        }
+        *operate = op[0];
+        if (this->trace)
+            emitComment("<- Decl");
+        break; /* DeclK */
+
+    case FuncK:
+        *operate = tree->getName();
+        if (this->trace)
+            emitComment("-> Func");
+        cont = 0;
+        p = tree->getChild(0);
+        while (p){
+            this->ccGen(p, &op[0]);
+            emitQuadruple("PARAM", op[0]->c_str(), "-", "-");
+            p = p->getSibling();
+            cont++;
+        }
+        this->intToString(number, cont, 10);
+        op[0] = tree->getName();
+        op[1] = new string(number);
+        emitQuadruple("CALL", op[0]->c_str(), op[1]->c_str(), "-");
+        delete op[1];
+        if (this->trace)
+            emitComment("<- Func");
+    break; /* FuncK */
+
+    case FuncDeclK:
+        if (this->trace)
+            emitComment("-> FuncDecl");
+        op[0] = tree->getName();
+        emitQuadruple("LABEL", op[0]->c_str(), "-", "-");
+        p = tree->getChild(0);
+        while (p){
+            this->ccGen(p, &op[0]);
+            emitQuadruple("LOAD", op[0]->c_str(), "-", "-");
+            p = p->getSibling();
+        }
+        this->cGen(tree->getChild(1), &op[1]);
+        if (this->trace)
+            emitComment("<- FuncDecl");
+        break; /* FuncDeclK */
+
 
     case OpK:
         if (this->trace)
@@ -241,22 +273,11 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         if (this->trace)
             emitComment("<- Op");
         break; /* OpK */
+        
     case TypeK:
         if (this->trace)
             emitComment("-> type");
-        /* generate code for rhs */
-        if (tree->getDecl()){
-            op[0] = tree->getChild(0)->getName();
-            if (tree->getChild(0)->getChild(0)){
-                this->cGen(tree->getChild(0)->getChild(0), &op[1]);
-                emitQuadruple("ALOC_MEN", op[0]->c_str(), op[1]->c_str(), "-");
-            }
-            else{
-                emitQuadruple("ALOC_MEN", op[0]->c_str(), "1", "-");
-            }
-            this->cGen(tree->getChild(0), &op[1]);
-        }
-        /* now store value */
+        cGen(tree->getChild(0), operate);
         if (this->trace)
             emitComment("<- type");
         break;
@@ -272,6 +293,7 @@ void CodeGenerator::cGen(TreeNode *tree, string **operate){
             this->genStmt(tree, operate);
             break;
         case ExpK:
+            //printf("dentro do loop\n");
             this->genExp(tree, operate);
             break;
         default:
@@ -318,15 +340,9 @@ void CodeGenerator::generate(TreeNode *syntaxTree){
     emitComment("End of standard prelude.");
     /* generate code for TINY program */
     TreeNode *tr = syntaxTree;
-    while (tr != NULL){
-        if (tr->getChild(0)->getFunc()){
-            this->cGen(tr->getChild(0), &pointer);
-            fprintf(code,"\n");
-        }
-        else{
-            this->cGen(tr, &pointer);
-            fprintf(code,"\n");
-        }
+    while(tr != NULL){
+        this->ccGen(tr, &pointer);
+        fprintf(code, "\n");
         tr = tr->getSibling();
     }
     emitComment("End of execution.");

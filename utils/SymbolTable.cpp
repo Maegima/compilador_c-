@@ -90,6 +90,7 @@ void SymbolTable::insertNode(TreeNode *t){
                 }
                 break;
             case DeclK:
+            case ParamK:
                 name = new string(*t->getScope()  + " " + *t->getName());
                 if (this->lookup(name) == -1)
                 /* not yet in table, so treat as new definition */

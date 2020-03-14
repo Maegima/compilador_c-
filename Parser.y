@@ -147,14 +147,14 @@ param_lista: param_lista COMMA param
 param: tipo_especificador identificador 
 {  
     $$ = $1;
-    $2->setExp(DeclK);
+    $2->setExp(ParamK);
     $$->setChild($2, 0);
     $2->setType($1->getType());
 } 
 | tipo_especificador identificador OBRACT CBRACT
 { 
     $$ = $1;
-    $2->setExp(DeclK);
+    $2->setExp(ParamK);
     $$->setChild($2, 0);
     $2->setType($1->getType());
 }

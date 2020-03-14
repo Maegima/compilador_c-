@@ -106,6 +106,9 @@ void TreeNode::print(FILE *listing){
             case FuncDeclK:
                 fprintf(listing, "FuncDecl: %s\n", tree->attr.name->c_str());
                 break;
+            case ParamK:
+                fprintf(listing, "Param: %s\n", tree->attr.name->c_str());
+                break;
             default:
                 fprintf(listing, "Unknown ExpNode kind\n");
                 break;
