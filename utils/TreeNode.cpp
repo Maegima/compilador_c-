@@ -100,13 +100,13 @@ void TreeNode::print(FILE *listing){
             case FuncK:
                 fprintf(listing, "Func: %s\n", tree->attr.name->c_str());
                 break;
-            case DeclK:
-                fprintf(listing, "Decl: %s\n", tree->attr.name->c_str());
+            case IdK | DeclK:
+                fprintf(listing, "IdDecl: %s\n", tree->attr.name->c_str());
                 break;
-            case FuncDeclK:
+            case FuncK | DeclK:
                 fprintf(listing, "FuncDecl: %s\n", tree->attr.name->c_str());
                 break;
-            case ParamK:
+            case ParamK | DeclK:
                 fprintf(listing, "Param: %s\n", tree->attr.name->c_str());
                 break;
             default:

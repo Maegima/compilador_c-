@@ -16,13 +16,13 @@
 #include "TokenType.hpp"
 
 /// Enum de tipos de Nós.
-typedef enum {StmtK,ExpK} NodeKind; 
+typedef enum NodeKind {StmtK,ExpK} NodeKind; 
 /// Enum de tipos de declarações.
-typedef enum {IfK,WhileK,AssignK,ReturnK} StmtKind;
+typedef enum StmtKind {IfK,WhileK,AssignK,ReturnK} StmtKind;
 /// Enum de tipos de expressões. 
-typedef enum {OpK,ConstK,IdK,FuncK,TypeK,DeclK,FuncDeclK,ParamK} ExpKind; 
+typedef enum ExpKind {OpK = 0,ConstK = 1,IdK = 2,ParamK = 3,FuncK = 4,DeclK = 8, AtribK = 16, TypeK = 32} ExpKind; 
 /// ExpType é usado para verificar o tipo da expressão.
-typedef enum {Void,Integer} ExpType; 
+typedef enum ExpType {Void,Integer} ExpType; 
 
 #define MAXCHILDREN 3 /**< Número máximo de filhos para um nó da árvore sintática. */
 

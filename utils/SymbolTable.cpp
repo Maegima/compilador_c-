@@ -21,6 +21,7 @@ SymbolTable::SymbolTable(FILE *listing, bool trace){
     this->table = new BucketList*[SIZE];
     this->trace = trace;
     this->listing = listing;
+    this->location = 0;
 }
 
 int SymbolTable::hash(const char *key){
@@ -34,9 +35,6 @@ int SymbolTable::hash(const char *key){
     return temp;
 }
 
-/// @brief Contador para o local das variáveis na memória. 
-static int location = 0;
-
 void SymbolTable::traverse(TreeNode *t){ 
     if (t != NULL){ 
         this->insertNode(t);
@@ -48,26 +46,14 @@ void SymbolTable::traverse(TreeNode *t){
 }
 
 void SymbolTable::insertNode(TreeNode *t){ 
-    string *name;
-    int n;
     TreeNode *r;
     switch (t->getNodekind()){ 
         case StmtK:
         switch (t->getStmt()){ 
             case AssignK:
                 r = t->getChild(0);
-                if(r){
-                    name = new string(*r->getScope() + " " + *r->getName());
-                    if (this->lookup(name) == -1)
-                    /* not yet in table, so treat as new definition */
-                        this->insert(name,r->getName(),r->getLineno(),-1,t->getType(),(r->getExp() == FuncK),r->getLineno(),location++);
-                    else{
-                    /* alrady in table, so ignore location, 
-                        add line number of use only */ 
-                        this->insert(name,r->getName(),r->getLineno(),-1,t->getType(),(r->getExp() == FuncK),r->getLineno(),0);
-                        delete name;
-                    }
-                }
+                if(r)
+                    this->insert(r->getName(),r->getScope(),r->getLineno(),(ExpKind)(r->getExp() | AtribK),r->getType());
                 break;
             case ReturnK:
             case IfK:
@@ -76,89 +62,48 @@ void SymbolTable::insertNode(TreeNode *t){
         }
         break;
         case ExpK:
-        switch (t->getExp()){ 
-            case IdK:
-                name = new string(*t->getScope()  + " " + *t->getName());
-                if (this->lookup(name) == -1)
-                /* not yet in table, so treat as new definition */
-                    this->insert(name,t->getName(),t->getLineno(),-1,t->getType(),0,-1,location++);
-                else{
-                /* already in table, so ignore location, 
-                    add line number of use only */ 
-                    this->insert(name,t->getName(),t->getLineno(),-1,t->getType(),0,-1,0);
-                    delete name;
-                }
-                break;
-            case DeclK:
-            case ParamK:
-                name = new string(*t->getScope()  + " " + *t->getName());
-                if (this->lookup(name) == -1)
-                /* not yet in table, so treat as new definition */
-                    this->insert(name,t->getName(),t->getLineno(),t->getLineno(),t->getType(),0,-1,location++);
-                else{
-                /* already in table, so ignore location, 
-                    add line number of use only */ 
-                    this->insert(name,t->getName(),t->getLineno(),t->getLineno(),t->getType(),0,-1,0);
-                    delete name;
-                }
-               break;
-            case FuncDeclK:
-                name = new string(*t->getScope()  + " " + *t->getName());
-                if (this->lookup(name) == -1)
-                /* not yet in table, so treat as new definition */
-                    this->insert(name,t->getName(),t->getLineno(),t->getLineno(),t->getType(),1,-1,location++);
-                else{
-                /* already in table, so ignore location, 
-                    add line number of use only */ 
-                    this->insert(name,t->getName(),t->getLineno(),t->getLineno(),t->getType(),1,-1,0);
-                    delete name;
-                }
-                break;
-            case FuncK:
-                name = new string(*t->getScope()  + " " + *t->getName());
-                if (this->lookup(name) == -1)
-                /* not yet in table, so treat as new definition */
-                    this->insert(name,t->getName(),t->getLineno(),-1,t->getType(),1,-1,location++);
-                else{
-                /* already in table, so ignore location, 
-                    add line number of use only */ 
-                    this->insert(name,t->getName(),t->getLineno(),-1,t->getType(),1,-1,0);
-                    delete name;
-                }
-                break;
-            case ConstK:
-            case TypeK:
-            case OpK:
-            default: break;
-        }
-        break;
+            switch(t->getExp()){
+                case IdK:
+                case IdK | DeclK:
+                case FuncK:
+                case FuncK | DeclK:
+                case ParamK | DeclK:
+                    this->insert(t->getName(),t->getScope(),t->getLineno(),t->getExp(),t->getType());
+                    break;
+                default: break;
+            }
+            break;
         default: break;
     }
 }
 
-void SymbolTable::insert(string *name, string *idName, int lineno, int decl_line, int type, int func, int atrib, int loc){
-    int h = this->hash(name->c_str());
+void SymbolTable::insert(string *name, string *scope, int lineno, ExpKind flags, ExpType type){
+    string *idName = new string(*scope  + " " + *name);
+    /*if not yet in table, so treat as new definition */
+    int loc = (this->lookup(idName) == -1) ? this->location : -1;
+    int h = this->hash(idName->c_str());
     BucketList *l = this->table[h];
-    while ((l != NULL) && (name->compare(*l->getName()) != 0))
+    while ((l != NULL) && (idName->compare(*l->getName()) != 0))
         l = l->getNext();
     if (l == NULL){ /* variable not yet in table */
-        l = new BucketList(name, idName, loc);
-        l->setFunc(func);
+        l = new BucketList(idName, name, loc);
+        l->setFunc(flags & FuncK);
         l->setLines(new LineList(lineno, 0));
-        if (decl_line > -1)
-            l->setDeclLine(new LineList(decl_line, type));
+        if (flags &  DeclK)
+            l->setDeclLine(new LineList(lineno, type));
         else
             l->setDeclLine(NULL);
-        if (atrib > -1)
+        if (flags & AtribK)
             l->setAtrib(new LineList(lineno, type));
         else
             l->setAtrib(NULL);
         l->setNext(this->table[h]);
         this->table[h] = l;
+        this->location++;
     }
     else{ /* found in table, so just add line number */
         LineList *t;
-        if(atrib > -1){
+        if(flags & AtribK){
             LineList *p;
             p = new LineList(lineno, type);
             t = l->getAtrib();
@@ -170,9 +115,9 @@ void SymbolTable::insert(string *name, string *idName, int lineno, int decl_line
             else
                 l->setAtrib(p);
         }
-        else if(decl_line > -1){
+        else if(flags & DeclK){
             LineList *p;
-            p = new LineList(decl_line, type);
+            p = new LineList(lineno, type);
             t = l->getDeclLine();
             if (t != NULL){
                 while (t->getNext() != NULL)
@@ -267,8 +212,8 @@ BucketList **SymbolTable::getHashTable(){
 }
 
 void SymbolTable::build(TreeNode *syntaxTree){ 
-    this->insert(new string("GLOBAL input"), new string("input"), 0, 0, Integer, 1, -1, location++);
-    this->insert(new string("GLOBAL output"), new string("output"), 0, 0, Void, 1, -1, location++);
+    this->insert(new string("input"), new string("GLOBAL"), 0, (ExpKind)(FuncK | DeclK), Integer);
+    this->insert(new string("output"), new string("GLOBAL"), 0, (ExpKind)(FuncK | DeclK), Void);
     traverse(syntaxTree);
     if (this->trace){ 
         fprintf(this->listing, "\nSymbol table:\n\n");

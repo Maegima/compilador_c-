@@ -1380,7 +1380,7 @@ yyreduce:
 #line 71 "Parser.y" /* yacc.c:1652  */
     {
     yyval = yyvsp[-2];
-    yyvsp[-1]->setExp(DeclK);
+    yyvsp[-1]->setExp((ExpKind)(DeclK | IdK));
     yyval->setChild(yyvsp[-1], 0);
     yyvsp[-1]->setType(yyvsp[-2]->getType());
 }
@@ -1391,7 +1391,7 @@ yyreduce:
 #line 78 "Parser.y" /* yacc.c:1652  */
     { 
     yyval = yyvsp[-5];
-    yyvsp[-4]->setExp(DeclK);
+    yyvsp[-4]->setExp((ExpKind)(DeclK | IdK));
     yyval->setChild(yyvsp[-4], 0);
     yyval->getChild(0)->setChild(yyvsp[-2], 0);
     yyvsp[-4]->setType(yyvsp[-5]->getType());
@@ -1453,7 +1453,7 @@ yyreduce:
     yyval->getChild(0)->setChild(yyvsp[0], 1);
     yyvsp[-4]->setLineno(yyvsp[-4]->getLineno());
     yyvsp[-4]->setType(yyvsp[-5]->getType());
-    yyvsp[-4]->setExp(FuncDeclK);
+    yyvsp[-4]->setExp((ExpKind)(FuncK | DeclK));
     func[func_id] = yyvsp[-4]->getName();
     type[func_id] = yyvsp[-4]->getType();
     func_id++;
@@ -1498,7 +1498,7 @@ yyreduce:
 #line 148 "Parser.y" /* yacc.c:1652  */
     {  
     yyval = yyvsp[-1];
-    yyvsp[0]->setExp(ParamK);
+    yyvsp[0]->setExp((ExpKind)(ParamK | DeclK));
     yyval->setChild(yyvsp[0], 0);
     yyvsp[0]->setType(yyvsp[-1]->getType());
 }
@@ -1509,7 +1509,7 @@ yyreduce:
 #line 155 "Parser.y" /* yacc.c:1652  */
     { 
     yyval = yyvsp[-3];
-    yyvsp[-2]->setExp(ParamK);
+    yyvsp[-2]->setExp((ExpKind)(ParamK | DeclK));
     yyval->setChild(yyvsp[-2], 0);
     yyvsp[-2]->setType(yyvsp[-3]->getType());
 }

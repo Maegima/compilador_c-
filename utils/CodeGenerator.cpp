@@ -163,7 +163,7 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
             emitComment("<- Id");
         break; /* IdK */
 
-    case ParamK:
+    case ParamK | DeclK:
         if (this->trace)
             emitComment("-> Param");
         *operate = tree->getName();;
@@ -171,7 +171,7 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
             emitComment("<- Param");
         break; /* ParamK */
 
-    case DeclK:
+    case IdK | DeclK:
         if (this->trace)
             emitComment("-> Decl");
         op[0] = tree->getName();
@@ -208,7 +208,7 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
             emitComment("<- Func");
     break; /* FuncK */
 
-    case FuncDeclK:
+    case FuncK | DeclK:
         if (this->trace)
             emitComment("-> FuncDecl");
         op[0] = tree->getName();

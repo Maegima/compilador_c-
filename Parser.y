@@ -70,14 +70,14 @@ declaracao: var_declaracao { sc = 1; $$ = $1; } | fun_declaracao { sc = 1; $$ = 
 var_declaracao: tipo_especificador identificador SEMICOLON 
 {
     $$ = $1;
-    $2->setExp(DeclK);
+    $2->setExp((ExpKind)(DeclK | IdK));
     $$->setChild($2, 0);
     $2->setType($1->getType());
 } 
 | tipo_especificador identificador OBRACT numero CBRACT SEMICOLON 
 { 
     $$ = $1;
-    $2->setExp(DeclK);
+    $2->setExp((ExpKind)(DeclK | IdK));
     $$->setChild($2, 0);
     $$->getChild(0)->setChild($4, 0);
     $2->setType($1->getType());
@@ -123,7 +123,7 @@ fun_declaracao: tipo_especificador identificador OPAREN params CPAREN composto_d
     $$->getChild(0)->setChild($6, 1);
     $2->setLineno($2->getLineno());
     $2->setType($1->getType());
-    $2->setExp(FuncDeclK);
+    $2->setExp((ExpKind)(FuncK | DeclK));
     func[func_id] = $2->getName();
     type[func_id] = $2->getType();
     func_id++;
@@ -147,14 +147,14 @@ param_lista: param_lista COMMA param
 param: tipo_especificador identificador 
 {  
     $$ = $1;
-    $2->setExp(ParamK);
+    $2->setExp((ExpKind)(ParamK | DeclK));
     $$->setChild($2, 0);
     $2->setType($1->getType());
 } 
 | tipo_especificador identificador OBRACT CBRACT
 { 
     $$ = $1;
-    $2->setExp(ParamK);
+    $2->setExp((ExpKind)(ParamK | DeclK));
     $$->setChild($2, 0);
     $2->setType($1->getType());
 }

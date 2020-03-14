@@ -29,6 +29,8 @@ private:
     BucketList **table;
     /// Imprimir ou não a tabela de simbolos após sua construção.
     bool trace;
+    /// Contador para o local das variáveis na memória. 
+    int location;
     /// Arquivo para impressão da tabela de simbolos.
     FILE *listing;
     /**
@@ -67,15 +69,12 @@ public:
      * atualiza um dado na tabela de simbolos.
      * 
      * @param name Nome.
-     * @param idName Escopo.
+     * @param scope Escopo.
      * @param lineno Linha.
-     * @param decl_line Linha de declaração.
+     * @param flags flags para o identificador.
      * @param type Tipo.
-     * @param func Se é função.
-     * @param atrib Se é atribuição.
-     * @param loc Localização na memória.
      */
-    void insert(std::string *name, std::string *idName, int lineno, int decl_line, int type, int func, int atrib, int loc);
+    void insert(std::string *name, std::string *scope, int lineno, ExpKind flags, ExpType type);
 
     /**
      * @brief O método lookup procura na tabela
