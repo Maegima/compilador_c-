@@ -29,20 +29,10 @@ private:
      * @brief O método intToString converte um 
      * inteiro em uma string.
      * 
-     * @param str Buffer onde o número será armazenado.
-     * @param v Número.
-     * @param n Tamanho do buffer.
-     */
-    void intToString(char *str, int v, int n);
-
-    /**
-     * @brief O método strNumber concatena uma string com um número.
-     * 
-     * @param str String base.
      * @param number Número.
-     * @return char* Endereço da nova string.
+     * @return std::string Número no formato string.
      */
-    char *strNumber(const char *str, int number);
+    std::string intToString(int number);
 
     /**
      * @brief O método cGen gera o código intermediário

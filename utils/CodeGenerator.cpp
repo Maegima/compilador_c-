@@ -12,48 +12,28 @@
 #include "string.h"
 #include "Parser.hpp"
 #include "CodeGenerator.hpp"
+#define REG_NUM 21
 
 using namespace std;
 
 static char number[11]; /**< Utilizado na conversão de número para string. */
-static int cont_aux = 0, cont_lab = 0, cont_vet = 0;
+static int cont_lab = 0, next_reg = 0;
+static string *types[] = {new string("void"), new string("int")};
 
-void CodeGenerator::intToString(char *str, int v, int n){
-    int i, value, cont = 0;
-    value = v;
-    str[0] = '0';
-    str[1] = '\0';
-    for (i = 0; i < n; i++){
-        if (value == 0)
-            break;
-        value /= 10;
-        cont++;
-    }
-    for (i = cont - 1; i > -1; i--){
-        str[i] = '0' + (v % 10);
-        v /= 10;
-    }
-    if (cont > 0)
-        str[cont] = '\0';
-}
-
-char *CodeGenerator::strNumber(const char *str, int number){
-    char num[11];
-    char *rt;
-    int a, b;
-    a = strlen(str);
-    this->intToString(num, number, 10);
-    b = strlen(num);
-    rt = (char *)malloc(sizeof(char) * (a + b));
-    memcpy(rt, str, a * sizeof(char));
-    memcpy(rt + a * sizeof(char), num, b * sizeof(char));
-    return rt;
+string CodeGenerator::intToString(int number){
+    string str = "";
+    do{
+        str = (char)('0' + (number % 10)) + str;
+        number /= 10;
+    }while(number > 0);
+    cout << "num " + str << endl;
+    return str;
 }
 
 void CodeGenerator::genStmt(TreeNode *tree, string **operate){
     TreeNode *p1, *p2, *p3;
     string *op[3] = {NULL, NULL, NULL};
-    char *label1, *label2;
+    string label1, label2;
     switch (tree->getStmt()){
     case IfK:
         if (this->trace)
@@ -62,23 +42,23 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         p2 = tree->getChild(1);
         p3 = tree->getChild(2);
         /* generate code for test expression */
-        label1 = this->strNumber("LABEL", cont_lab);
+        label1 = "LABEL" + this->intToString(cont_lab);
         cont_lab++;
         this->cGen(p1, &op[0]);
-        emitQuadruple("IF_NOT", op[0]->c_str(), label1, "-");
+        emitQuadruple("IF_NOT", op[0]->c_str(), label1.c_str(), "-");
         /* recurse on then part */
         this->cGen(p2, &op[1]);
         if(p3){
-            label2 = this->strNumber("LABEL", cont_lab);
+            label2 = "LABEL" + this->intToString(cont_lab);
             cont_lab++;
             emitComment("if: jump to end belongs here");
-            emitQuadruple("JUMP", label2, "-", "-");
+            emitQuadruple("JUMP", label2.c_str(), "-", "-");
         }
-        emitQuadruple("LABEL", label1, "-", "-");
+        emitQuadruple("LABEL", label1.c_str(), "-", "-");
         if(p3){
             /* recurse on else part */
             this->cGen(p3, &op[1]);
-            emitQuadruple("LABEL", label2, "-", "-");
+            emitQuadruple("LABEL", label2.c_str(), "-", "-");
         }
         if (this->trace)
             emitComment("<- if");
@@ -91,17 +71,17 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         p2 = tree->getChild(1);
         emitComment("repeat: jump after body comes back here");
         /* generate code for body */
-        label1 = this->strNumber("LABEL", cont_lab);
+        label1 = "LABEL" + this->intToString(cont_lab);
         cont_lab++;
-        label2 = this->strNumber("LABEL", cont_lab);
+        label2 = "LABEL" + this->intToString(cont_lab);
         cont_lab++;
-        emitQuadruple("LABEL", label1, "-", "-");
+        emitQuadruple("LABEL", label1.c_str(), "-", "-");
         this->cGen(p1, &op[0]);
-        emitQuadruple("IF_NOT", op[0]->c_str(), label2, "-");
+        emitQuadruple("IF_NOT", op[0]->c_str(), label2.c_str(), "-");
         /* generate code for test */
         this->cGen(p2, &op[1]);
-        emitQuadruple("JUMP", label1, "-", "-");
-        emitQuadruple("LABEL", label2, "-", "-");
+        emitQuadruple("JUMP", label1.c_str(), "-", "-");
+        emitQuadruple("LABEL", label2.c_str(), "-", "-");
         if (this->trace)
             emitComment("<- repeat");
         break; /* repeat */
@@ -110,11 +90,15 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         if (this->trace)
             emitComment("-> assign");
         /* generate code for rhs */
-        this->cGen(tree->getChild(0), &op[0]);
-        op[1] = op[0];
+        op[0] = new string("$t" + intToString(next_reg)); 
+        next_reg = (next_reg + 1) % REG_NUM;
         this->cGen(tree->getChild(1), &op[1]);
-        if (op[0]->compare(*op[1]) != 0)
+        emitQuadruple("ASSIGN", op[0]->c_str(), op[1]->c_str(), "-"); 
             emitQuadruple("ASSIGN", op[0]->c_str(), op[1]->c_str(), "-");
+        emitQuadruple("ASSIGN", op[0]->c_str(), op[1]->c_str(), "-"); 
+        op[1] = NULL;
+        this->cGen(tree->getChild(0), &op[1]);
+        emitQuadruple("STORE", op[0]->c_str(), op[1]->c_str(), "-");
         if (this->trace)
             emitComment("<- assign");
         *operate = op[0];
@@ -139,8 +123,7 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
     case ConstK:
         if (this->trace)
             emitComment("-> Const");
-        this->intToString(number, tree->getVal(), 10);
-        *operate = new string(number);
+        *operate = new string(this->intToString(tree->getVal()));
         if (this->trace)
             emitComment("<- Const");
         break; /* ConstK */
@@ -148,17 +131,18 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
     case IdK:
         if (this->trace)
             emitComment("-> Id");
+        op[0] = new string("$t" + intToString(next_reg));
+        op[1] = tree->getName();
+        next_reg = (next_reg + 1) % REG_NUM;
         if (tree->getChild(0) != NULL){
-            this->cGen(tree->getChild(0), &op[2]);
-            op[0] = new string(this->strNumber("VET", cont_vet));
-            op[1] = tree->getName();
-            cont_vet++;
-            emitQuadruple("ADD", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
-            emitQuadruple("LOAD_ADRESS", op[0]->c_str(), op[0]->c_str(), "-");
-            *operate = op[0];
+            op[1] = NULL;
+            this->cGen(tree->getChild(0), &op[1]);
+            op[2] = tree->getName();
+            emitQuadruple("LOAD_ADDR", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
         }
         else
-            *operate = tree->getName();
+            emitQuadruple("LOAD", op[0]->c_str(), op[1]->c_str(), "-");
+        *operate = op[0];
         if (this->trace)
             emitComment("<- Id");
         break; /* IdK */
@@ -175,14 +159,14 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         if (this->trace)
             emitComment("-> Decl");
         op[0] = tree->getName();
+        op[2] = *operate;
         if(tree->getChild(0)){
             cGen(tree->getChild(0), &op[1]);
-            emitQuadruple("ALOC_MEN", op[0]->c_str(), op[1]->c_str(), "-");
+            emitQuadruple("ALOC_MEN", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
         }
         else{
-            emitQuadruple("ALOC_MEN", op[0]->c_str(), "1", "-");
+            emitQuadruple("ALOC_MEN", op[0]->c_str(), "1", op[2]->c_str());
         }
-        *operate = op[0];
         if (this->trace)
             emitComment("<- Decl");
         break; /* DeclK */
@@ -194,15 +178,18 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         cont = 0;
         p = tree->getChild(0);
         while (p){
+            op[0] = NULL;
             this->ccGen(p, &op[0]);
             emitQuadruple("PARAM", op[0]->c_str(), "-", "-");
             p = p->getSibling();
             cont++;
         }
-        this->intToString(number, cont, 10);
         op[0] = tree->getName();
-        op[1] = new string(number);
-        emitQuadruple("CALL", op[0]->c_str(), op[1]->c_str(), "-");
+        op[1] = new string(this->intToString(cont));
+        op[2] = new string("$t" + intToString(next_reg));
+        next_reg = (next_reg + 1) % REG_NUM;
+        emitQuadruple("CALL", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
+        *operate = op[2];
         delete op[1];
         if (this->trace)
             emitComment("<- Func");
@@ -211,12 +198,15 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
     case FuncK | DeclK:
         if (this->trace)
             emitComment("-> FuncDecl");
-        op[0] = tree->getName();
-        emitQuadruple("LABEL", op[0]->c_str(), "-", "-");
+        op[0] = types[tree->getType()];
+        op[1] = tree->getName();
+        emitQuadruple("FUNC", op[0]->c_str(), op[1]->c_str(), "-");
+        op[2] = op[1];
         p = tree->getChild(0);
         while (p){
-            this->ccGen(p, &op[0]);
-            emitQuadruple("LOAD", op[0]->c_str(), "-", "-");
+            this->ccGen(p, &op[1]);
+            op[0] = types[p->getType()];
+            emitQuadruple("ARG", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             p = p->getSibling();
         }
         this->cGen(tree->getChild(1), &op[1]);
@@ -234,8 +224,8 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         this->cGen(p1, &op[1]);
         this->cGen(p2, &op[2]);
         if (op[0] == NULL){
-            op[0] = new string(this->strNumber("AUX", cont_aux));
-            cont_aux++;
+            op[0] = new string("$t" + intToString(next_reg));
+            next_reg = (next_reg + 1) % REG_NUM;
         }
         switch (tree->getOp()){
         case ADD:
