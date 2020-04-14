@@ -26,7 +26,6 @@ string CodeGenerator::intToString(int number){
         str = (char)('0' + (number % 10)) + str;
         number /= 10;
     }while(number > 0);
-    cout << "num " + str << endl;
     return str;
 }
 
@@ -36,8 +35,7 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
     string label1, label2;
     switch (tree->getStmt()){
     case IfK:
-        if (this->trace)
-            emitComment("-> if");
+        emitComment("-> if");
         p1 = tree->getChild(0);
         p2 = tree->getChild(1);
         p3 = tree->getChild(2);
@@ -60,13 +58,11 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
             this->cGen(p3, &op[1]);
             emitQuadruple("LABEL", label2.c_str(), "-", "-");
         }
-        if (this->trace)
-            emitComment("<- if");
+        emitComment("<- if");
         break; /* if_k */
 
     case WhileK:
-        if (this->trace)
-            emitComment("-> repeat");
+        emitComment("-> repeat");
         p1 = tree->getChild(0);
         p2 = tree->getChild(1);
         emitComment("repeat: jump after body comes back here");
@@ -82,13 +78,11 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         this->cGen(p2, &op[1]);
         emitQuadruple("JUMP", label1.c_str(), "-", "-");
         emitQuadruple("LABEL", label2.c_str(), "-", "-");
-        if (this->trace)
-            emitComment("<- repeat");
+        emitComment("<- repeat");
         break; /* repeat */
 
     case AssignK:
-        if (this->trace)
-            emitComment("-> assign");
+        emitComment("-> assign");
         /* generate code for rhs */
         op[0] = new string("$t" + intToString(next_reg)); 
         next_reg = (next_reg + 1) % REG_NUM;
@@ -99,17 +93,14 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         op[1] = NULL;
         this->cGen(tree->getChild(0), &op[1]);
         emitQuadruple("STORE", op[0]->c_str(), op[1]->c_str(), "-");
-        if (this->trace)
-            emitComment("<- assign");
+        emitComment("<- assign");
         *operate = op[0];
         break; /* assign_k */
     case ReturnK:
-        if (this->trace)
-            emitComment("-> return");
+        emitComment("-> return");
         this->cGen(tree->getChild(0), &op[0]);
         emitQuadruple("JR", op[0]->c_str(), "-", "-");
-        if (this->trace)
-            emitComment("<- return");
+        emitComment("<- return");
     default:
         break;
     }
@@ -121,16 +112,13 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
     int cont;
     switch (tree->getExp()){
     case ConstK:
-        if (this->trace)
-            emitComment("-> Const");
+        emitComment("-> Const");
         *operate = new string(this->intToString(tree->getVal()));
-        if (this->trace)
-            emitComment("<- Const");
+        emitComment("<- Const");
         break; /* ConstK */
 
     case IdK:
-        if (this->trace)
-            emitComment("-> Id");
+        emitComment("-> Id");
         op[0] = new string("$t" + intToString(next_reg));
         op[1] = tree->getName();
         next_reg = (next_reg + 1) % REG_NUM;
@@ -143,21 +131,17 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         else
             emitQuadruple("LOAD", op[0]->c_str(), op[1]->c_str(), "-");
         *operate = op[0];
-        if (this->trace)
-            emitComment("<- Id");
+        emitComment("<- Id");
         break; /* IdK */
 
     case ParamK | DeclK:
-        if (this->trace)
-            emitComment("-> Param");
+        emitComment("-> Param");
         *operate = tree->getName();;
-        if (this->trace)
-            emitComment("<- Param");
+        emitComment("<- Param");
         break; /* ParamK */
 
     case IdK | DeclK:
-        if (this->trace)
-            emitComment("-> Decl");
+        emitComment("-> Decl");
         op[0] = tree->getName();
         op[2] = *operate;
         if(tree->getChild(0)){
@@ -167,14 +151,12 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         else{
             emitQuadruple("ALOC_MEN", op[0]->c_str(), "1", op[2]->c_str());
         }
-        if (this->trace)
-            emitComment("<- Decl");
+        emitComment("<- Decl");
         break; /* DeclK */
 
     case FuncK:
         *operate = tree->getName();
-        if (this->trace)
-            emitComment("-> Func");
+        emitComment("-> Func");
         cont = 0;
         p = tree->getChild(0);
         while (p){
@@ -191,13 +173,11 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         emitQuadruple("CALL", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
         *operate = op[2];
         delete op[1];
-        if (this->trace)
-            emitComment("<- Func");
+        emitComment("<- Func");
     break; /* FuncK */
 
     case FuncK | DeclK:
-        if (this->trace)
-            emitComment("-> FuncDecl");
+        emitComment("-> FuncDecl");
         op[0] = types[tree->getType()];
         op[1] = tree->getName();
         emitQuadruple("FUNC", op[0]->c_str(), op[1]->c_str(), "-");
@@ -210,14 +190,12 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
             p = p->getSibling();
         }
         this->cGen(tree->getChild(1), &op[1]);
-        if (this->trace)
-            emitComment("<- FuncDecl");
+        emitComment("<- FuncDecl");
         break; /* FuncDeclK */
 
 
     case OpK:
-        if (this->trace)
-            emitComment("-> Op");
+        emitComment("-> Op");
         p1 = tree->getChild(0);
         p2 = tree->getChild(1);
         op[0] = *operate;
@@ -260,16 +238,13 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
             break;
         } /* case op */
         *operate = op[0];
-        if (this->trace)
-            emitComment("<- Op");
+        emitComment("<- Op");
         break; /* OpK */
         
     case TypeK:
-        if (this->trace)
-            emitComment("-> type");
+        emitComment("-> type");
         cGen(tree->getChild(0), operate);
-        if (this->trace)
-            emitComment("<- type");
+        emitComment("<- type");
         break;
     default:
         break;
