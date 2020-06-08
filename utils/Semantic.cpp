@@ -26,22 +26,18 @@ void Semantic::notUniqueVariable(){
     BucketList **hashTable = this->table->getHashTable();
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
-            BucketList* l = hashTable[i];
-            while (l != NULL){
-                LineList *s = l->getDeclLine();
-                while (s != NULL){
+            for (BucketList list : *hashTable[i]){
+                for (LineList decl : *list.getDeclLine()){
                     count++;
                     if (count > 1){
                         fprintf(this->listing, "Erro semantico no escopo ");
-                        printScope(l->getName()->c_str());
+                        printScope(list.getName()->c_str());
                         fprintf(this->listing, " na linha %d: declaração inválida de variável %s, já foi declarada previamente.\n",
-                                s->getLineno(), l->getIdName()->c_str());
+                                decl.getLineno(), list.getIdName()->c_str());
                         this->error = true;
                     }
-                    s = s->getNext();
                 }
                 count = 0;
-                l = l->getNext();
             }
         }
     }
@@ -52,20 +48,16 @@ void Semantic::notVoidVariable(){
     BucketList **hashTable = this->table->getHashTable();
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
-            BucketList* l = hashTable[i];
-            while (l != NULL){
-                LineList *s = l->getDeclLine();
-                while (s != NULL){
-                    if (!l->getFunc() && !s->getType()){
+            for (BucketList list : *hashTable[i]){
+                for (LineList decl : *list.getDeclLine()){
+                    if (!list.getFunc() && !decl.getType()){
                         fprintf(this->listing, "Erro semantico no escopo ");
-                        printScope(l->getName()->c_str());
+                        printScope(list.getName()->c_str());
                         fprintf(this->listing, " na linha %d: declaração inválida de variável %s, void só pode ser usado para declaração de função.\n",
-                                s->getLineno(), l->getIdName()->c_str());
+                                decl.getLineno(), list.getIdName()->c_str());
                         this->error = true;
                     }
-                    s = s->getNext();
                 }
-                l = l->getNext();
             }
         }
     }
@@ -77,23 +69,19 @@ void Semantic::variableNotDeclared(){
     BucketList **hashTable = this->table->getHashTable();
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
-            BucketList* l = hashTable[i];
-            while (l != NULL){
-                LineList *s = l->getLines();
-                while (s != NULL){
-                    name = new string("GLOBAL " + *l->getIdName());
-                    if (!l->getDeclLine() && !l->getFunc()){
+            for (BucketList list : *hashTable[i]){
+                for (LineList line : *list.getLines()){
+                    name = new string("GLOBAL " + *list.getIdName());
+                    if (!list.getDeclLine() && !list.getFunc()){
                         if (table->lookup(name) == -1){
                             fprintf(this->listing, "Erro semantico no escopo ");
-                            printScope(l->getName()->c_str());
+                            printScope(list.getName()->c_str());
                             fprintf(this->listing, " na linha %d: variável %s não declarada.\n",
-                                    s->getLineno(), l->getIdName()->c_str());
+                                    line.getLineno(), list.getIdName()->c_str());
                             this->error = true;
                         }
                     }
-                    s = s->getNext();
                 }
-                l = l->getNext();
             }
         }
     }
@@ -105,22 +93,18 @@ void Semantic::functionNotDeclared(){
     BucketList **hashTable = this->table->getHashTable();
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
-            BucketList* l = hashTable[i];
-            while (l != NULL){
-                LineList *s = l->getLines();
-                name = new string("GLOBAL " + *l->getIdName());
-                while (s != NULL){
-                    if (l->getFunc() && table->lookup(name) == -1 && name->compare(*l->getName()) != 0){
+            for (BucketList list : *hashTable[i]){
+                name = new string("GLOBAL " + *list.getIdName());
+                for (LineList line : *list.getLines()){
+                    if (list.getFunc() && table->lookup(name) == -1 && name->compare(*list.getName()) != 0){
                         fprintf(this->listing, "Erro semantico no escopo ");
-                        printScope(l->getName()->c_str());
+                        printScope(list.getName()->c_str());
                         fprintf(this->listing, " na linha %d: função %s não declarada.\n",
-                                s->getLineno(), l->getIdName()->c_str());
+                                line.getLineno(), list.getIdName()->c_str());
                         this->error = true;
                     }
-                    s = s->getNext();
                 }
                 delete name;
-                l = l->getNext();
             }
         }
     }
@@ -131,13 +115,11 @@ void Semantic::mainNotDeclared(){
     BucketList **hashTable = this->table->getHashTable();
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
-            BucketList* l = hashTable[i];
-            while (l != NULL){
-                if (l->getName()->compare("GLOBAL main") == 0 || !error){
+            for (BucketList list : *hashTable[i]){
+                if (list.getName()->compare("GLOBAL main") == 0 || !error){
                     error = 0;
                     break;
                 }
-                l = l->getNext();
             }
         }
     }
@@ -155,32 +137,28 @@ void Semantic::variableIsFunction(){
     BucketList* var[2 * SIZE];
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
-            BucketList* l = hashTable[i];
-            while (l != NULL){
-                name = new string("GLOBAL" + *l->getIdName());
-                if (name->compare(*l->getName()) == 0 && l->getFunc()){
-                    func[j] = l;
+            for (BucketList& list : *hashTable[i]){
+                name = new string("GLOBAL" + *list.getIdName());
+                if (name->compare(*list.getName()) == 0 && list.getFunc()){
+                    func[j] = &list;
                     j++;
                 }
-                else if (!l->getFunc()){
-                    var[k] = l;
+                else if (!list.getFunc()){
+                    var[k] = &list;
                     k++;
                 }
                 delete name;
-                l = l->getNext();
             }
         }
     }
     for (i = 0; i < j; i++){
         for (m = 0; m < k; m++){
             if (var[m]->getIdName()->compare(*func[i]->getIdName()) == 0){
-                LineList *s = var[m]->getDeclLine();
-                while (s){
+                for (LineList decl : *var[m]->getDeclLine()){
                     fprintf(this->listing, "Erro semantico no escopo ");
                     printScope(var[m]->getName()->c_str());
                     fprintf(this->listing, " na linha %d: %s já foi declarada como nome de função.\n",
-                            s->getLineno(), var[m]->getIdName());
-                    s = s->getNext();
+                            decl.getLineno(), var[m]->getIdName());
                     this->error = true;
                 }
             }
@@ -193,20 +171,16 @@ void Semantic::voidAtribuition(){
     BucketList **hashTable = this->table->getHashTable();
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
-            BucketList* l = hashTable[i];
-            while (l != NULL){
-                LineList *s = l->getAtrib();
-                while (s != NULL){
-                    if (!s->getType()){
+            for (BucketList list : *hashTable[i]){
+                for (LineList atrib : *list.getAtrib()){
+                    if (!atrib.getType()){
                         fprintf(this->listing, "Erro semantico no escopo ");
-                        printScope(l->getName()->c_str());
+                        printScope(list.getName()->c_str());
                         fprintf(this->listing, " na linha %d: atribuição void em %s.\n",
-                                s->getLineno(), l->getIdName()->c_str());
+                                atrib.getLineno(), list.getIdName()->c_str());
                         this->error = true;
                     }
-                    s = s->getNext();
                 }
-                l = l->getNext();
             }
         }
     }

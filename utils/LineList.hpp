@@ -53,7 +53,37 @@ public:
      * @param next Próxima linha.
      */
     void setNext(LineList *next);
-
+    /** @brief Interator class for LineList */
+    class iterator{
+        public:
+        typedef LineList* pointer;
+        typedef LineList& reference;
+        iterator(pointer ptr) : ptr(ptr) { }
+        iterator& operator++() { ptr = ptr->next; return *this; }
+        iterator operator++(int) { iterator temp = *this; ptr = ptr->next; return temp; }
+        reference operator*() { return *ptr; }
+        pointer operator->() { return ptr; }
+        bool operator==(const iterator& rhs) { return ptr == rhs.ptr; }
+        bool operator!=(const iterator& rhs) { return ptr != rhs.ptr; }
+        private:
+        pointer ptr;
+    };
+    /**
+     * @brief Return iterator for last item in LineList
+     * 
+     * @return iterator 
+     */
+    iterator begin(){
+        return iterator(this);
+    }
+    /**
+     * @brief Return iterator for last item in LineList
+     * 
+     * @return iterator 
+     */
+    iterator end(){
+        return iterator(nullptr);
+    }
 };
 
 #endif

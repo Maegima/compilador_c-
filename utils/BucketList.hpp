@@ -54,13 +54,13 @@ public:
     /**
      * @brief Get the Func object.
      * 
-     * @return int 1 se o for função e o caso contrário.
+     * @return int 1 caso objeto for uma função ou 0 caso contrário.
      */
     int getFunc();
     /**
      * @brief Set the Func object.
      * 
-     * @param func Se o identificador é uma função.
+     * @param func 1 caso identificador seja uma função.
      */
     void setFunc(int func);
     /**
@@ -117,6 +117,37 @@ public:
      * @param next Próximo item.
      */
     void setNext(BucketList *next);
+    /** @brief Iterator class for BucketList */
+    class iterator{
+        public:
+        typedef BucketList* pointer;
+        typedef BucketList& reference;
+        iterator(pointer ptr) : ptr(ptr) { }
+        iterator& operator++() { ptr = ptr->next; return *this; }
+        iterator operator++(int) { iterator temp = *this; ptr = ptr->next; return temp; }
+        reference operator*() { return *ptr; }
+        pointer operator->() { return ptr; }
+        bool operator==(const iterator& rhs) { return ptr == rhs.ptr; }
+        bool operator!=(const iterator& rhs) { return ptr != rhs.ptr; }
+        private:
+        pointer ptr;
+    };
+    /**
+     * @brief Return iterator for first item in BucketList
+     * 
+     * @return iterator 
+     */
+    iterator begin(){
+        return iterator(this);
+    }
+    /**
+     * @brief Return iterator for last item in BucketList
+     * 
+     * @return iterator 
+     */
+    iterator end(){
+        return iterator(nullptr);
+    }
 };
 
 #endif
