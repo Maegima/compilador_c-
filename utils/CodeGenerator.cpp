@@ -146,10 +146,10 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         op[2] = *operate;
         if(tree->getChild(0)){
             cGen(tree->getChild(0), &op[1]);
-            emitQuadruple("ALOC_MEN", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
+            emitQuadruple("ALOC_MEN", op[0]->c_str(), op[1]->c_str(), "-");
         }
         else{
-            emitQuadruple("ALOC_MEN", op[0]->c_str(), "1", op[2]->c_str());
+            emitQuadruple("ALOC_MEN", op[0]->c_str(), "1", "-");
         }
         emitComment("<- Decl");
         break; /* DeclK */
@@ -190,6 +190,8 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
             p = p->getSibling();
         }
         this->cGen(tree->getChild(1), &op[1]);
+        op[0] = tree->getName();
+        emitQuadruple("END", op[0]->c_str(), "-", "-");
         emitComment("<- FuncDecl");
         break; /* FuncDeclK */
 
