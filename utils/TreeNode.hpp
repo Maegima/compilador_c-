@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Definição da árvore sintática.
  * @version 1.0
- * @date 2019-12-11
+ * @date 2020-03-14
  * 
  * @copyright Copyright (c) 2019
  * 

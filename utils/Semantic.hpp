@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Definição da classe Semantic.
  * @version 1.0
- * @date 2019-12-16
+ * @date 2019-12-20
  * 
  * @copyright Copyright (c) 2019
  * 

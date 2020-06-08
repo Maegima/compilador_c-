@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Implementação da classe LineList.
  * @version 1.0 
- * @date 2019-12-14
+ * @date 2020-06-04
  * 
  * @copyright Copyright (c) 2019
  * 

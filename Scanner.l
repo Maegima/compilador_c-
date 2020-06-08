@@ -4,7 +4,7 @@
  * @author André Lucas Maegima
  * @brief Implementação do analisador léxico.
  * @version 1.0
- * @date 2019-12-10
+ * @date 2019-12-20
  * 
  * @copyright Copyright (c) 2019
  * 

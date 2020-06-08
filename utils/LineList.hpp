@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Definição da classe LineList.
  * @version 1.0
- * @date 2019-12-14
+ * @date 2020-06-08
  * 
  * @copyright Copyright (c) 2019
  * 

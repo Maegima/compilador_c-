@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Implementação da classe SymbolTable.
  * @version 1.0
- * @date 2019-12-15
+ * @date 2020-06-04
  * 
  * @copyright Copyright (c) 2019
  * 

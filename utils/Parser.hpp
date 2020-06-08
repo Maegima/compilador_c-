@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Definição da classe utilizada para a análise sintática.
  * @version 1.0
- * @date 2019-12-06
+ * @date 2019-12-20
  * 
  * @copyright Copyright (c) 2019
  * 

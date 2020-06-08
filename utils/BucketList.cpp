@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Implementação da classe BucketList.
  * @version 1.0
- * @date 2019-12-15
+ * @date 2019-12-20
  * 
  * @copyright Copyright (c) 2019
  * 
