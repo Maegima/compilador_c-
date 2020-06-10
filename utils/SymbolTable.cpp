@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Implementação da classe SymbolTable.
  * @version 1.0
- * @date 2020-06-04
+ * @date 2020-06-10
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -62,7 +62,7 @@ void SymbolTable::insertNode(TreeNode *t){
         }
         break;
         case ExpK:
-            switch(t->getExp()){
+            switch((int)t->getExp()){
                 case IdK:
                 case IdK | DeclK:
                 case FuncK:
@@ -82,9 +82,13 @@ void SymbolTable::insert(string *name, string *scope, int lineno, ExpKind flags,
     /*if not yet in table, so treat as new definition */
     int loc = (this->lookup(idName) == -1) ? this->location : -1;
     int h = this->hash(idName->c_str());
-    BucketList *l = this->table[h];
-    while ((l != NULL) && (idName->compare(*l->getName()) != 0))
-        l = l->getNext();
+    BucketList *l = NULL;
+    for(BucketList& list : *this->table[h]){
+        if(idName->compare(*list.getName()) == 0){
+            l = &list;
+            break;
+        } 
+    }
     if (l == NULL){ /* variable not yet in table */
         l = new BucketList(idName, name, loc);
         l->setFunc(flags & FuncK);
@@ -107,66 +111,46 @@ void SymbolTable::insert(string *name, string *scope, int lineno, ExpKind flags,
             LineList *p;
             p = new LineList(lineno, type);
             t = l->getAtrib();
-            if (t != NULL){
-                while (t->getNext() != NULL)
-                    t = t->getNext();
-                t->setNext(p);
-            }
-            else
-                l->setAtrib(p);
+            p->setNext(t);
+            l->setAtrib(p);
         }
         else if(flags & DeclK){
             LineList *p;
             p = new LineList(lineno, type);
             t = l->getDeclLine();
-            if (t != NULL){
-                while (t->getNext() != NULL)
-                    t = t->getNext();
-                t->setNext(p);
-            }
-            else
-                l->setDeclLine(p);
+            p->setNext(t);
+            l->setDeclLine(p);
         }
         else{
             LineList *p;
             p = new LineList(lineno, 0);
             t = l->getLines();
-            if (t != NULL){
-                while (t->getNext() != NULL)
-                    t = t->getNext();
-                t->setNext(p);
-            }
-            else
-                l->setLines(p);
+            p->setNext(t);
+            l->setLines(p);
         }
     }
 }
 
 int SymbolTable::lookup(std::string *name){
     int h = this->hash(name->c_str());
-    BucketList* l = this->table[h];
-    while ((l != NULL) && (name->compare(*l->getName()) != 0))
-        l = l->getNext();
-    if (l == NULL)
-        return -1;
-    else
-        return l->getMemloc();
+    if(this->table[h] == NULL) return -1;
+    for(BucketList list : *this->table[h]){
+        if(name->compare(*list.getName()) == 0){
+            return list.getMemloc();
+        }
+    }
+    return -1;
 }
 
 void SymbolTable::print(FILE *listing){
     int i, padding = 2, count;
     for (i = 0; i < SIZE; ++i){
         if (this->table[i] != NULL){
-            BucketList* l = this->table[i];
-            while (l != NULL){
+            for(BucketList list : *this->table[i]){
                 count = 0;
-                LineList *s = l->getDeclLine();
-                while (s != NULL){
-                    count++;
-                    s = s->getNext();
-                }
+                LineList *decl = list.getDeclLine();
+                for(LineList::iterator l = decl->begin();l != decl->end(); l++) count++;
                 padding = (count > padding) ? count : padding;
-                l = l->getNext();
             }
         }
     }
@@ -180,28 +164,22 @@ void SymbolTable::print(FILE *listing){
     fprintf(listing, "  -------------\n");
     for (i = 0; i < SIZE; ++i){
         if (this->table[i] != NULL){
-            BucketList* l = this->table[i];
-            while (l != NULL){
-                LineList *t = l->getLines();
-                LineList *r = l->getDeclLine();
-                fprintf(listing, "%-20s ", l->getName()->c_str());
-                fprintf(listing, "%-8d  ", l->getMemloc());
-                for (int j = 0; j < padding; j++){
-                    if (r != NULL){
-                        fprintf(listing, "%-4d(%d)|", r->getLineno(), r->getType());
-                        r = r->getNext();
-                    }
-                    else{
-                        fprintf(listing, "       |");
-                    }
+            for (BucketList list : *this->table[i]){
+                fprintf(listing, "%-20s ", list.getName()->c_str());
+                fprintf(listing, "%-8d  ", list.getMemloc());
+                count = 0;
+                for (LineList decl : *list.getDeclLine()){
+                    fprintf(listing, "%-4d(%d)|", decl.getLineno(), decl.getType());
+                    count++;
+                }
+                for (int j = count; j < padding; j++){
+                    fprintf(listing, "       |");
                 }
                 fprintf(listing, " ");
-                while (t != NULL){
-                    fprintf(listing, "%4d ", t->getLineno());
-                    t = t->getNext();
+                for (LineList line : *list.getLines()){
+                    fprintf(listing, "%4d ", line.getLineno());
                 }
                 fprintf(listing, "\n");
-                l = l->getNext();
             }
         }
     }

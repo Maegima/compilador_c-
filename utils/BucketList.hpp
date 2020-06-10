@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Definição da classe BucketList.
  * @version 1.0
- * @date 2020-06-08
+ * @date 2020-06-10
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -105,12 +105,6 @@ public:
      * @return int Localização da linha na memória.
      */
     int getMemloc();
-    /**
-     * @brief Get the Next object.
-     * 
-     * @return BucketList* P
-     */
-    BucketList *getNext();
     /**
      * @brief Set the Next object.
      * 

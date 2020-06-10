@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Implementação da classe BucketList.
  * @version 1.0
- * @date 2019-12-20
+ * @date 2020-06-10
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -51,9 +51,6 @@ void BucketList::setDeclLine(LineList *decl_line){
 }
 int BucketList::getMemloc(){
     return this->memloc;
-}
-BucketList *BucketList::getNext(){
-    return this->next;
 }
 void BucketList::setNext(BucketList *next){
     this->next = next;

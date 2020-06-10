@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Definição da classe LineList.
  * @version 1.0
- * @date 2020-06-08
+ * @date 2020-06-10
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -41,12 +41,6 @@ public:
      * @return int Tipo.
      */
     int getType();
-    /**
-     * @brief Get the Next object.
-     * 
-     * @return LineList* Próxima linha.
-     */
-    LineList *getNext();
     /**
      * @brief Set the Next object.
      * 
