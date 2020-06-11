@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Implementação da classe CodeGenerator.
  * @version 1.0
- * @date 2020-06-08
+ * @date 2020-06-11
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -12,11 +12,9 @@
 #include "string.h"
 #include "Parser.hpp"
 #include "CodeGenerator.hpp"
-#define REG_NUM 21
 
 using namespace std;
 
-static char number[11]; /**< Utilizado na conversão de número para string. */
 static int cont_lab = 0, next_reg = 0;
 static string *types[] = {new string("void"), new string("int")};
 
@@ -85,10 +83,8 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         emitComment("-> assign");
         /* generate code for rhs */
         op[0] = new string("$t" + intToString(next_reg)); 
-        next_reg = (next_reg + 1) % REG_NUM;
+        next_reg++;
         this->cGen(tree->getChild(1), &op[1]);
-        emitQuadruple("ASSIGN", op[0]->c_str(), op[1]->c_str(), "-"); 
-            emitQuadruple("ASSIGN", op[0]->c_str(), op[1]->c_str(), "-");
         emitQuadruple("ASSIGN", op[0]->c_str(), op[1]->c_str(), "-"); 
         op[1] = NULL;
         this->cGen(tree->getChild(0), &op[1]);
@@ -110,7 +106,7 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
     TreeNode *p1, *p2, *p;
     string *op[3] = {NULL, NULL, NULL};
     int cont;
-    switch (tree->getExp()){
+    switch ((int)tree->getExp()){
     case ConstK:
         emitComment("-> Const");
         *operate = new string(this->intToString(tree->getVal()));
@@ -121,7 +117,7 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         emitComment("-> Id");
         op[0] = new string("$t" + intToString(next_reg));
         op[1] = tree->getName();
-        next_reg = (next_reg + 1) % REG_NUM;
+        next_reg++;
         if (tree->getChild(0) != NULL){
             op[1] = NULL;
             this->cGen(tree->getChild(0), &op[1]);
@@ -169,7 +165,7 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         op[0] = tree->getName();
         op[1] = new string(this->intToString(cont));
         op[2] = new string("$t" + intToString(next_reg));
-        next_reg = (next_reg + 1) % REG_NUM;
+        next_reg++;
         emitQuadruple("CALL", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
         *operate = op[2];
         delete op[1];
@@ -205,7 +201,7 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         this->cGen(p2, &op[2]);
         if (op[0] == NULL){
             op[0] = new string("$t" + intToString(next_reg));
-            next_reg = (next_reg + 1) % REG_NUM;
+            next_reg++;
         }
         switch (tree->getOp()){
         case ADD:
@@ -260,7 +256,6 @@ void CodeGenerator::cGen(TreeNode *tree, string **operate){
             this->genStmt(tree, operate);
             break;
         case ExpK:
-            //printf("dentro do loop\n");
             this->genExp(tree, operate);
             break;
         default:
