@@ -2,8 +2,8 @@
  * @file Semantic.cpp
  * @author André Lucas Maegima
  * @brief Implementação da classe Semantic.
- * @version 1.0
- * @date 2020-06-08
+ * @version 1.1
+ * @date 2020-06-12
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -138,7 +138,7 @@ void Semantic::variableIsFunction(){
     for (i = 0; i < SIZE; i++){
         if (hashTable[i] != NULL){
             for (BucketList& list : *hashTable[i]){
-                name = new string("GLOBAL" + *list.getIdName());
+                name = new string("GLOBAL " + *list.getIdName());
                 if (name->compare(*list.getName()) == 0 && list.getFunc()){
                     func[j] = &list;
                     j++;
@@ -158,7 +158,7 @@ void Semantic::variableIsFunction(){
                     fprintf(this->listing, "Erro semantico no escopo ");
                     printScope(var[m]->getName()->c_str());
                     fprintf(this->listing, " na linha %d: %s já foi declarada como nome de função.\n",
-                            decl.getLineno(), var[m]->getIdName());
+                            decl.getLineno(), var[m]->getIdName()->c_str());
                     this->error = true;
                 }
             }
