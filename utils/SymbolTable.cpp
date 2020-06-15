@@ -2,8 +2,8 @@
  * @file SymbolTable.cpp
  * @author André Lucas Maegima
  * @brief Implementação da classe SymbolTable.
- * @version 1.0
- * @date 2020-06-10
+ * @version 1.1
+ * @date 2020-06-15
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -51,9 +51,9 @@ void SymbolTable::insertNode(TreeNode *t){
         case StmtK:
         switch (t->getStmt()){ 
             case AssignK:
-                r = t->getChild(0);
+                r = t->getChild(1);
                 if(r)
-                    this->insert(r->getName(),r->getScope(),r->getLineno(),(ExpKind)(r->getExp() | AtribK),r->getType());
+                    this->insert(t->getName(),t->getScope(),t->getLineno(),(ExpKind)(t->getExp() | AtribK),r->getType());
                 break;
             case ReturnK:
             case IfK:
