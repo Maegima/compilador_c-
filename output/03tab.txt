@@ -1,0 +1,31 @@
+
+Symbol table:
+
+Variable Name        Location  Declaration      Line Numbers
+-------------------  --------  ---------------  -------------
+main a               25               |       |   50 
+GLOBAL a             2         5   (1)|       |    5 
+main input           22               |       |   44 
+sort low             12        25  (1)|       |   27   25 
+main i               20        40  (1)|       |   51   51   49   48   45   45   44   43   42   40 
+GLOBAL main          19        38  (0)|       |   38 
+main output          24               |       |   50 
+GLOBAL sort          10        25  (0)|       |   25 
+GLOBAL minloc        3         7   (1)|       |    7 
+GLOBAL input         0         0   (1)|       |    0 
+sort minloc          17               |       |   30 
+minloc high          6         7   (1)|       |   12    7 
+GLOBAL output        1         0   (0)|       |    0 
+minloc a             4         7   (1)|       |   14   13   10    7 
+sort a               18               |       |   33   32   32   32   31   30 
+sort b               11        25  (1)|       |   25 
+minloc i             7         8   (1)|       |   20   20   15   14   13   12   11    8 
+main sort            23               |       |   47 
+minloc k             9         8   (1)|       |   22   15    9    8 
+sort i               14        26  (1)|       |   34   34   33   32   30   28   27   26 
+sort k               15        26  (1)|       |   32   32   31   30   26 
+minloc low           5         7   (1)|       |   11   10    9    7 
+minloc x             8         8   (1)|       |   18   18   18   14   13   10    8 
+sort t               16        29  (1)|       |   33   31   29 
+main vet             21        41  (1)|       |   47   44   41 
+sort high            13        25  (1)|       |   30   28   25 

@@ -2,8 +2,8 @@
  * @file VariablesTable.cpp
  * @author André Lucas Maegima
  * @brief Implementação da classe VariablesTable.
- * @version 1.1
- * @date 2020-06-15
+ * @version 1.2
+ * @date 2020-06-16
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -16,32 +16,50 @@ using namespace std;
 
 VariablesTable::VariablesTable(){
     this->_data = new Variable[10];
-    this->_regs = new Register[10];
-    this->_size = 0;
+    this->_lcsize = 0;
+    this->_lksize = 0;
     this->_maxsize = 10;
-    this->_lastreg = 0;
+    this->_lastreg = 10;
 }
 
 VariablesTable::VariablesTable(size_t size){
     this->_data = new Variable[size];
-    this->_regs = new Register[size];
-    this->_size = 0;
+    this->_lcsize = 0;
+    this->_lksize = 0;
     this->_maxsize = size;
+    this->_lastreg = size;
+}
+
+VariablesTable::VariablesTable(VariablesTable *vartable){
+    this->_data = new Variable[vartable->_maxsize];
+    this->_lcsize = 0;
+    this->_lksize = 0;
+    this->_maxsize = vartable->_maxsize;
     this->_lastreg = 0;
+    for(size_t i = 0; i < _maxsize; i++){
+        if(vartable->_data[i].linked){
+            _data[i].name = vartable->_data[i].name;
+            _data[i].linked = true;
+            _lksize++;
+        }
+    }
 }
 
 VariablesTable::~VariablesTable(){
     delete[] this->_data;
-    delete[] this->_regs;
 }
 
 Register VariablesTable::linkRegister(string id){
     size_t key = 0;
-    if(_size == _maxsize) return Register::nreg;
+    if(_lcsize == _maxsize) return Register::nreg;
     while(key < _maxsize && _data[key].name.compare(id) != 0) key++;
     if(key == _maxsize){
+        if(_lksize == _maxsize){
+            cout << "TODO: tratar erro" << endl;
+            return Register::nreg;
+        }
         key = 0;
-        while(_data[key].name.size() > 0) key++;
+        while(_data[key].linked) key++;
         _data[key].name = id;
     }
     return linkRegister(key);
@@ -49,78 +67,117 @@ Register VariablesTable::linkRegister(string id){
 
 Register VariablesTable::linkRegister(){
     size_t key = 0;
-    if(_size == _maxsize) return Register::nreg;
-    while(key < _maxsize && _data[key].name.size() > 0) key++;
-    if(key == _maxsize){
+    if(_lcsize == _maxsize) return Register::nreg;
+    if(_lksize == _maxsize){
         cout << "TODO: tratar erro" << endl;
         return Register::nreg;
     }
+    while(_data[key].linked) key++;
     _data[key].name = "$";
     return linkRegister(key);
 }
 
 Register VariablesTable::linkRegister(size_t key){
-    size_t regId;
     if(key >= _maxsize) return Register::nreg;
-    if(_data[key].regId == Register::nreg)
-        _data[key].regId = _lastreg;
-    regId = _data[key].regId;
-    _data[key].loaded = true;
-    _regs[regId] = key;
-    _size++;
-    //cout << _size << "  " << _data[key].name << "(" << key << ") last " << (int)_lastreg << " reg " << regId << endl;
-    while(_lastreg < _maxsize && _regs[_lastreg] != Register::nreg) _lastreg++;
-    if(_lastreg == _maxsize){
-        /*for(size_t i = 0; i < _maxsize; i++) cout << (int) _regs[i] << " ";
-        cout << endl;
-        for(size_t i = 0; i < _maxsize; i++) cout << _data[i].name << "(" << (int)_data[i].regId << ") ";
-        cout << endl;*/
-        _lastreg = 0;
-        do{
-            key = _regs[_lastreg++];
-            /*cout << "id:" << (int)_data[key].regId << " key:" << key 
-            << " ld:" << _data[key].loaded << " " << _data[key].name << endl;*/
-        }while(_lastreg < _maxsize && _data[key].loaded); 
-        _lastreg--;
-        if(!_data[key].loaded){
-            /*cout << "limpando " << key << " " << (int)_lastreg << " " << Register::nreg << endl;*/
-            _data[key].name = "";
-            _data[key].regId = Register::nreg;
-            _regs[_lastreg] = Register::nreg;
-        }
-        /*for(size_t i = 0; i < _maxsize; i++) cout << (int) _regs[i] << " ";
-        cout << endl;
-        for(size_t i = 0; i < _maxsize; i++) cout << _data[i].name << "(" << (int)_data[i].regId << ") ";
-        cout << endl;*/    
+    if(!_data[key].linked){
+        _data[key].linked = true;
+        _lksize++;
     }
-    return regId;
+    if(!_data[key].locked){
+        _data[key].locked = true;
+        _lcsize++;
+    }
+    _data[key].loaded = true;
+    if(_lksize == _maxsize){
+        unlinkRegister(_lastreg);
+        if(_lcsize == _maxsize) 
+            _lastreg = _maxsize;
+        else
+            while(_data[_lastreg].locked) _lastreg++;
+    }
+    return key;
 }
 
 Register VariablesTable::unlinkRegister(string id){
     size_t key = 0;
-    if(id[0] == '$' && id[1] == 't')
+    if(id.size() > 2 && id[0] == '$' && id[1] == 't')
         key = stoll(id.substr(2));
-    else{
+    else
         while(key < _maxsize && _data[key].name.compare(id) != 0) key++;
-        if(key == _maxsize) return Register::nreg;
-        key =_data[key].regId;
-    } 
     return unlinkRegister(key);
 }
 
-Register VariablesTable::unlinkRegister(Register reg){    
-    size_t key, regId;
-    if(reg > _maxsize) return Register::nreg;
-    key = _regs[reg];
-    if(key == Register::nreg) return Register::nreg;
-    regId = _data[key].regId;
-    if(_data[key].name[0] == '$'){
-        _data[key].name = "";
-        _data[key].regId = Register::nreg;
-        _regs[regId] = Register::nreg;
-        if(regId < _lastreg) _lastreg = regId;
-    }
+Register VariablesTable::unlinkRegister(size_t key){    
+    if(key >= _maxsize) return Register::nreg;
+    if(!_data[key].linked) return Register::nreg;
+    _lksize--;
+    _data[key].name = "";
+    _data[key].linked = false;
     _data[key].loaded = false;
-    _size--;
-    return regId;
+    if(_data[key].locked){
+        _lcsize--;
+        _data[key].locked = false;
+        if(key < _lastreg) _lastreg = key;
+    }
+    return key;
+}
+
+Register VariablesTable::unlockRegister(string id){
+    size_t key = 0;
+    if(id.size() > 2 && id[0] == '$' && id[1] == 't')
+        key = stoll(id.substr(2));
+    else
+        while(key < _maxsize && _data[key].name.compare(id) != 0) key++;
+    return unlockRegister(key);
+}
+
+Register VariablesTable::unlockRegister(size_t key){
+    if(key >= _maxsize) return Register::nreg;
+    if(!_data[key].locked) return Register::nreg;
+    if(_data[key].name[0] == '$'){
+        return unlinkRegister(key);
+    } 
+    _lcsize--;
+    _data[key].locked = false;
+    if(key < _lastreg) _lastreg = key;
+    return key;
+}
+
+Register VariablesTable::unloadRegister(string id){
+    size_t key = 0;
+    if(id.size() > 2 && id[0] == '$' && id[1] == 't')
+        key = stoll(id.substr(2));
+    else
+        while(key < _maxsize && _data[key].name.compare(id) != 0) key++;
+    return unloadRegister(key);
+}
+
+Register VariablesTable::unloadRegister(size_t key){
+    if(key >= _maxsize) return Register::nreg;
+    _data[key].loaded = false;
+    return unlockRegister(key);
+}
+
+bool VariablesTable::isLinked(string id){
+    size_t key = 0;
+    if(id.size() == 0) return false;
+    while(key < _maxsize && _data[key].name.compare(id) != 0) key++;
+    if(key == _maxsize) return false;
+    return _data[key].linked;
+}
+
+bool VariablesTable::isLocked(string id){
+    size_t key = 0;
+    if(id.size() == 0) return false;
+    while(key < _maxsize && _data[key].name.compare(id) != 0) key++;
+    if(key == _maxsize) return false;
+    return _data[key].locked;
+}
+
+bool VariablesTable::isLoaded(string id){
+    size_t key = 0;
+    if(id.size() == 0) return false;
+    while(key < _maxsize && _data[key].name.compare(id) != 0) key++;
+    if(key == _maxsize) return false;
+    return _data[key].loaded;
 }

@@ -2,8 +2,8 @@
  * @file VariablesTable.hpp
  * @author André Lucas Maegima
  * @brief Definição da classe VariablesTable.
- * @version 1.1
- * @date 2020-06-15
+ * @version 1.2
+ * @date 2020-06-16
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -24,13 +24,13 @@ class VariablesTable{
     class Variable{
         public:
         std::string name;
-        Register regId;
+        bool linked;
+        bool locked;
         bool loaded;
-        Variable() : name(""), regId(Register::nreg), loaded(false) {}
+        Variable() : name(""), linked(false), locked(false), loaded(false) {}
     };
     Variable *_data;
-    Register *_regs, _lastreg;
-    size_t _maxsize, _size;
+    size_t _maxsize, _lcsize, _lksize, _lastreg;
     /**
      * @brief Construct a new Variables Table object.
      * 
@@ -47,6 +47,12 @@ class VariablesTable{
      * @param size Table size.
      */
     VariablesTable(size_t size);
+    /**
+     * @brief Construct a new Variables Table copying the given Variables table.
+     * 
+     * @param size Table size.
+     */
+    VariablesTable(VariablesTable *vartable);
     /**
      * @brief Destroy the Variables Table object
      * 
@@ -67,12 +73,18 @@ class VariablesTable{
      */
     Register linkRegister();
     /**
+     * @brief Vincula um registrador uma posição da tabela e retorna o número do registrador.
+     * 
+     * @param key Posição da tabela. 
+     * @return Register Registrador associado.
+     */
+    Register linkRegister(size_t key);
+    /**
      * @brief Desvincula o identificador do registrador e retorna o registrador.
      * 
      * @param id Identificador.
      * @return Register Registrador ou -1 caso o identificador não possua registrador vinculado.
      */
-    Register linkRegister(size_t key);
     Register unlinkRegister(std::string id);
     /**
      * @brief Desvincula o registrador especificado através do valor key informado.
@@ -80,7 +92,59 @@ class VariablesTable{
      * @param key Registrador a ser desvinculado.
      * @return Register Registrador ou -1 caso o registrador não esteja vinculado.
      */
-    Register unlinkRegister(Register key);
+    Register unlinkRegister(size_t key);
+    /**
+     * @brief Descarrega o registrador do identificador especificado.
+     * 
+     * @param key Registrador associado.
+     * @return Register Registrador ou -1 caso o registrador já esteja descarregado.
+     */
+    Register unloadRegister(std::string id);
+    /**
+     * @brief Descarrega o registrador através do valor de key informado.
+     * 
+     * @param key Registrador associado.
+     * @return Register Registrador ou -1 caso o registrador já esteja descarregado.
+     */
+    Register unloadRegister(size_t key);
+    /**
+     * @brief Libera o registrador do identificador e retorna o registrador.
+     * 
+     * @param id Identificador.
+     * @return Register Registrador ou -1 caso o registrador já esteja liberado.
+     */
+    Register unlockRegister(std::string id);
+    /**
+     * @brief Libera o registrador através do valor de key informado.
+     * 
+     * @param key Registrador associado.
+     * @return Register Registrador ou -1 caso o registrador já esteja liberado.
+     */
+    Register unlockRegister(size_t key);
+    /**
+     * @brief Testa se o identificador informado possui um registrador associado.
+     * 
+     * @param id Identificador.
+     * @return true Caso o identificador possua um registrador associado.
+     * @return false Caso o identificador não possua um registrador associado.
+     */
+    bool isLinked(std::string id);
+    /**
+     * @brief Testa se o identificador informado possui um registrador reservado.
+     * 
+     * @param id Identificador.
+     * @return true Caso o identificador possua um registrador reservado.
+     * @return false Caso o identificador não possua um registrador reservado.
+     */
+    bool isLocked(std::string id);
+    /**
+     * @brief Testa se o identificador informado possui um registrador carregado.
+     * 
+     * @param id Identificador.
+     * @return true Caso o identificador possua um registrador carregado.
+     * @return false Caso o identificador não possua um registrador carregado.
+     */
+    bool isLoaded(std::string id); 
     /**
      * @brief Retorna quantidade de elementos na tabela.
      * 

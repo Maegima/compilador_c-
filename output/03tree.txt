@@ -1,0 +1,185 @@
+  Type: INT
+    IdDecl: a
+      Const: 12345
+  Type: INT
+    FuncDecl: minloc
+      Type: INT
+        Param: a
+      Type: INT
+        Param: low
+      Type: INT
+        Param: high
+      Type: INT
+        IdDecl: i
+      Type: INT
+        IdDecl: x
+      Type: INT
+        IdDecl: k
+      Assign to: k
+        Id: k
+        Id: low
+      Assign to: x
+        Id: x
+        Id: a
+          Id: low
+      Assign to: i
+        Id: i
+        Op: +
+          Id: low
+          Const: 1
+      While
+        Op: <
+          Id: i
+          Id: high
+        If
+          Op: <
+            Id: a
+              Id: i
+            Id: x
+          Assign to: x
+            Id: x
+            Id: a
+              Id: i
+          Assign to: k
+            Id: k
+            Id: i
+          Assign to: x
+            Id: x
+            Op: +
+              Id: x
+              Id: x
+        Assign to: i
+          Id: i
+          Op: +
+            Id: i
+            Const: 1
+      Return
+        Id: k
+  Type: VOID
+    FuncDecl: sort
+      Type: INT
+        Param: b
+      Type: INT
+        Param: low
+      Type: INT
+        Param: high
+      Type: INT
+        IdDecl: i
+      Type: INT
+        IdDecl: k
+      Assign to: i
+        Id: i
+        Id: low
+      While
+        Op: <=
+          Id: i
+          Op: -
+            Id: high
+            Const: 1
+        Type: INT
+          IdDecl: t
+        Assign to: k
+          Id: k
+          Func: minloc
+            Id: a
+            Id: i
+            Id: high
+        Assign to: t
+          Id: t
+          Id: a
+            Id: k
+        Assign to: a
+          Id: a
+            Id: k
+          Op: +
+            Id: a
+              Id: i
+            Id: a
+              Id: k
+        Assign to: a
+          Id: a
+            Id: i
+          Id: t
+        Assign to: i
+          Id: i
+          Op: +
+            Id: i
+            Const: 1
+  Type: VOID
+    FuncDecl: main
+      Type: INT
+        IdDecl: i
+      Type: INT
+        IdDecl: vet
+          Const: 10
+      Assign to: i
+        Id: i
+        Op: +
+          Op: +
+            Op: +
+              Op: +
+                Op: +
+                  Op: +
+                    Op: +
+                      Op: +
+                        Op: +
+                          Op: +
+                            Op: +
+                              Op: +
+                                Op: +
+                                  Op: +
+                                    Const: 0
+                                    Const: 1
+                                  Const: 2
+                                Const: 3
+                              Const: 4
+                            Const: 5
+                          Const: 6
+                        Const: 7
+                      Const: 8
+                    Const: 9
+                  Op: *
+                    Const: 10
+                    Const: 11
+                Op: *
+                  Const: 12
+                  Const: 13
+              Const: 14
+            Op: *
+              Const: 15
+              Const: 16
+          Op: *
+            Const: 17
+            Const: 18
+      While
+        Op: <
+          Id: i
+          Const: 10
+        Assign to: vet
+          Id: vet
+            Id: i
+          Func: input
+        Assign to: i
+          Id: i
+          Op: +
+            Id: i
+            Const: 1
+      Func: sort
+        Id: vet
+        Const: 0
+        Const: 10
+      Assign to: i
+        Id: i
+        Const: 0
+      While
+        Op: <
+          Id: i
+          Const: 10
+        Func: output
+          Id: a
+            Const: 2
+        Assign to: i
+          Id: i
+          Op: +
+            Id: i
+            Const: 1

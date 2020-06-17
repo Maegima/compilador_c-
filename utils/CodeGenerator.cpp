@@ -2,8 +2,8 @@
  * @file CodeGenerator.cpp
  * @author André Lucas Maegima
  * @brief Implementação da classe CodeGenerator.
- * @version 1.1
- * @date 2020-06-15
+ * @version 1.2
+ * @date 2020-06-16
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -15,7 +15,7 @@
 
 using namespace std;
 
-static int cont_lab = 0, tab = 0;
+static int cont_lab = 0;
 static string *types[] = {new string("void"), new string("int")};
 
 static VariablesTable *var_table;
@@ -39,7 +39,7 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         cont_lab++;
         this->cGen(p1, &op[0]);
         emitQuadruple("IF_NOT", op[0]->c_str(), label1.c_str(), "-");
-        var_table->unlinkRegister(*op[0]);
+        var_table->unlockRegister(*op[0]);
         /* recurse on then part */
         this->cGen(p2, &op[1]);
         if(p3){
@@ -59,6 +59,7 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
 
     case WhileK:
         emitComment("-> repeat");
+        var_table = new VariablesTable(var_table);
         p1 = tree->getChild(0);
         p2 = tree->getChild(1);
         emitComment("repeat: jump after body comes back here");
@@ -70,7 +71,7 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         emitQuadruple("LABEL", label1.c_str(), "-", "-");
         this->cGen(p1, &op[0]);
         emitQuadruple("IF_NOT", op[0]->c_str(), label2.c_str(), "-");
-        var_table->unlinkRegister(*op[0]);
+        var_table->unlockRegister(*op[0]);
         /* generate code for test */
         this->cGen(p2, &op[1]);
         emitQuadruple("JUMP", label1.c_str(), "-", "-");
@@ -87,12 +88,13 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
             op[2] = op[1];
             this->cGen(tree->getChild(0)->getChild(0), &op[1]);
             emitQuadruple("STORE_ADDR", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
-            var_table->unlinkRegister(*op[0]);
-            var_table->unlinkRegister(*op[1]);
+            var_table->unlockRegister(*op[0]);
+            var_table->unlockRegister(*op[1]);
         }
         else{
             emitQuadruple("STORE", op[0]->c_str(), op[1]->c_str(), "-");
-            var_table->unlinkRegister(*op[0]);
+            var_table->unlockRegister(*op[0]);
+            var_table->unloadRegister(*op[1]);
         }
         emitComment("<- assign");
         *operate = op[0];
@@ -101,7 +103,7 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         emitComment("-> return");
         this->cGen(tree->getChild(0), &op[0]);
         emitQuadruple("RETURN", op[0]->c_str(), "-", "-");
-        var_table->unlinkRegister(*op[0]);
+        var_table->unlockRegister(*op[0]);
         emitComment("<- return");
     default:
         break;
@@ -127,12 +129,15 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
             op[2] = tree->getName();
             this->cGen(tree->getChild(0), &op[1]);
             emitQuadruple("LOAD_ADDR", op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
-            var_table->unlinkRegister(*op[1]);
+            var_table->unlockRegister(*op[1]);
         }
-        else{
+        else if(!var_table->isLoaded(*tree->getName())){
             op[0] = var_table->linkRegister(*tree->getName());
             op[1] = tree->getName();
             emitQuadruple("LOAD", op[0]->c_str(), op[1]->c_str(), "-");
+        }
+        else{
+            op[0] = var_table->linkRegister(*tree->getName());
         }
         *operate = op[0];
         emitComment("<- Id");
@@ -167,7 +172,7 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
             op[0] = NULL;
             this->ccGen(p, &op[0]);
             emitQuadruple("PARAM", op[0]->c_str(), "-", "-");
-            var_table->unlinkRegister(*op[0]);
+            var_table->unlockRegister(*op[0]);
             p = p->getSibling();
             cont++;
         }
@@ -249,8 +254,8 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
             break;
         } /* case op */
         *operate = op[0];
-        if(op[0]->compare(*op[1]) != 0) var_table->unlinkRegister(*op[1]);
-        if(op[0]->compare(*op[2]) != 0) var_table->unlinkRegister(*op[2]);
+        if(op[0]->compare(*op[1]) != 0) var_table->unlockRegister(*op[1]);
+        if(op[0]->compare(*op[2]) != 0) var_table->unlockRegister(*op[2]);
         emitComment("<- Op");
         break; /* OpK */
         
