@@ -2,8 +2,8 @@
  * @file CodeGenerator.hpp
  * @author André Lucas Maegima
  * @brief Definição da classe CodeGenerator. 
- * @version 1.0 
- * @date 2020-04-14
+ * @version 1.3
+ * @date 2020-06-19
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -13,6 +13,8 @@
 #define _CODEGENERATOR_HPP_
 
 #include "TreeNode.hpp"
+#include "LinkedList.hpp"
+#include "Code.hpp"
 
 /**
  * @brief Classe responsável por gerar o código
@@ -25,6 +27,8 @@ private:
     FILE *code;
     /// imprimir ou não comentários na geração do código.
     bool trace;
+    /// lista com as linhas do código intermediário.
+    LinkedList<Code> *clist; 
     /**
      * @brief O método intToString converte um 
      * inteiro em uma string.
@@ -104,7 +108,7 @@ public:
      * 
      * @param syntaxTree Árvore sintática. 
      */
-    void generate(TreeNode * syntaxTree);
+    LinkedList<Code> *generate(TreeNode * syntaxTree);
 };
 
 #endif
