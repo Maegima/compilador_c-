@@ -2,8 +2,8 @@
  * @file LinkedList.hpp
  * @author André Lucas Maegima
  * @brief Definição do template LinkedList.
- * @version 1.3
- * @date 2020-06-19
+ * @version 1.4
+ * @date 2020-06-22
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -21,10 +21,11 @@ private:
     public:
         T data;
         Node *next;
+        Node() : data() , next(nullptr) {}
         Node(const T& data) : data(data) , next(nullptr) {} 
     };
-    Node *_first, *_last;
-    size_t _size;
+    Node *_head, *_last, *_find;
+    size_t _size, _find_index;
 public:
     /**
      * @brief Construct a new Linked List object.
@@ -54,6 +55,13 @@ public:
      */
     bool remove(size_t index);
     /**
+     * @brief Remove the item apointed by last successful find call.
+     * 
+     * @return true if the item was removed from list.
+     * @return false if the item wasn't removed from list.
+     */
+    bool remove();
+    /**
      * @brief Find item in the list.
      * 
      * @return size_t position of the item in the list or nllist if the item is not in the list.
@@ -82,6 +90,7 @@ public:
      * @brief Iterator class for LinkedList.
      * 
      */
+    LinkedList<T>& operator=(LinkedList<T>& llist);
     class iterator{
     public:
         typedef T* pointer;
@@ -103,7 +112,7 @@ public:
      * @return iterator
      */
     iterator begin(){
-        return iterator(this->_first);
+        return iterator(this->_head->next);
     }
     /**
      * @brief Return iterator for last item in T.

@@ -2,8 +2,8 @@
  * @file Code.cpp
  * @author André Lucas Maegima
  * @brief Implementação da classe Code.
- * @version 1.3
- * @date 2020-06-20
+ * @version 1.4
+ * @date 2020-06-22
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -68,6 +68,7 @@ namespace OP{
 
 using namespace std;
 
+Code::Code() : _op(), _first(), _second(), _third() {}
 Code::Code(const char *op, const char *first, const char *second, const char *third) : 
 _op(op), _first(first), _second(second), _third(third) {} 
 

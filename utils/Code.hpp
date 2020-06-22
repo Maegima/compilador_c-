@@ -2,8 +2,8 @@
  * @file Code.hpp
  * @author André Lucas Maegima
  * @brief Definição da classe Code.
- * @version 1.3
- * @date 2020-06-20
+ * @version 1.4
+ * @date 2020-06-22
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -31,6 +31,7 @@ class Code{
 private:
     std::string _op, _first, _second, _third;
 public:
+    Code();
     Code(const char *_op, const char *_first, const char *_second, const char *_third);
     std::string op();
     std::string first();
