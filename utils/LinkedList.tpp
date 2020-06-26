@@ -3,7 +3,7 @@
  * @author André Lucas Maegima
  * @brief Implementação do template LinkedList.
  * @version 1.4
- * @date 2020-06-22
+ * @date 2020-06-24
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -50,6 +50,7 @@ bool LinkedList<T>::remove(){
     delete item;
     _find_index = nllist;
     _find = nullptr;
+    _size--;
     return true;
 }
 

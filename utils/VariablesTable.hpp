@@ -2,8 +2,8 @@
  * @file VariablesTable.hpp
  * @author André Lucas Maegima
  * @brief Definição da classe VariablesTable.
- * @version 1.2
- * @date 2020-06-16
+ * @version 1.4
+ * @date 2020-06-22
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -14,6 +14,7 @@
 
 #include <string>
 #include "Register.hpp"
+#include "LinkedList.hpp"
 
 /**
  * @brief Classe VariablesTable armazena uma tabela de identificadores e seus respectivos registradores.
@@ -28,8 +29,16 @@ class VariablesTable{
         bool locked;
         bool loaded;
         Variable() : name(""), linked(false), locked(false), loaded(false) {}
+        Variable& operator=(const Variable &var){
+            this->name = var.name;
+            this->linked = var.linked;
+            this->locked = var.locked;
+            this->loaded = var.loaded;
+            return *this;
+        }
     };
     Variable *_data;
+    LinkedList<std::string> _pointers;
     size_t _maxsize, _lcsize, _lksize, _lastreg;
     /**
      * @brief Construct a new Variables Table object.
@@ -66,6 +75,13 @@ class VariablesTable{
      * @return Register Registrador associado.
      */
     Register linkRegister(std::string id);
+    /**
+     * @brief Aumenta o tamanho da lista para max_size + size.
+     * 
+     * @param size Quantidade o qual deseja aumentar a lista.
+     * @return size_t Novo tamanho maximo da lista.
+     */
+    size_t expand(size_t size);
     /**
      * @brief Vincula um registrador a um id auxiliar e retorna o número do registrador.
      * 
@@ -122,6 +138,18 @@ class VariablesTable{
      */
     Register unlockRegister(size_t key);
     /**
+     * @brief Adiciona na lista de ponteiros o identificador (se não estiver).
+     * 
+     * @param id Identificador.
+     */
+    void addPointer(std::string id);
+    /**
+     * @brief Remove da lista de ponteiros o identificador.
+     * 
+     * @param id Identificador.
+     */
+    void removePointer(std::string id);
+    /**
      * @brief Testa se o identificador informado possui um registrador associado.
      * 
      * @param id Identificador.
@@ -145,6 +173,14 @@ class VariablesTable{
      * @return false Caso o identificador não possua um registrador carregado.
      */
     bool isLoaded(std::string id); 
+    /**
+     * @brief Testa se o identificador informado é um ponteiro.
+     * 
+     * @param id Identificador.
+     * @return true Caso o identificador seja um ponteiro.
+     * @return false Caso o identificador não seja um ponteiro.
+     */
+    bool isPointer(std::string id);
     /**
      * @brief Retorna quantidade de elementos na tabela.
      * 

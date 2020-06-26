@@ -2,8 +2,8 @@
  * @file CodeGenerator.cpp
  * @author André Lucas Maegima
  * @brief Implementação da classe CodeGenerator.
- * @version 1.3
- * @date 2020-06-20
+ * @version 1.4
+ * @date 2020-06-24
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -15,10 +15,10 @@
 
 using namespace std;
 
-static int cont_lab = 0;
+static int cont_lab = 0, cont_while = 0;
 static string *types[] = {new string("void"), new string("int")};
 
-static VariablesTable *var_table;
+static VariablesTable *var_table = new VariablesTable(100);
 
 string CodeGenerator::intToString(int number){
     return to_string(number);
@@ -28,6 +28,7 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
     TreeNode *p1, *p2, *p3;
     string *op[3] = {NULL, NULL, NULL};
     string label1, label2;
+    VariablesTable *local;
     switch (tree->getStmt()){
     case IfK:
         emitComment("-> if");
@@ -59,15 +60,20 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
 
     case WhileK:
         emitComment("-> repeat");
-        var_table = new VariablesTable(var_table);
+        local = var_table;
+        var_table = new VariablesTable(local);
+        delete local;
         p1 = tree->getChild(0);
         p2 = tree->getChild(1);
+        while(p2 && p2->getExp() == TypeK){
+            this->ccGen(p2, &op[0]);
+            p2 = p2->getSibling();
+        }
         emitComment("repeat: jump after body comes back here");
         /* generate code for body */
-        label1 = OP::LABEL + this->intToString(cont_lab);
-        cont_lab++;
-        label2 = OP::LABEL + this->intToString(cont_lab);
-        cont_lab++;
+        label1 = "WBEGIN" + this->intToString(cont_while);
+        label2 = "WEND" + this->intToString(cont_while);
+        cont_while++;
         emitQuadruple(OP::LABEL, label1.c_str(), "-", "-");
         this->cGen(p1, &op[0]);
         emitQuadruple(OP::IF_NOT, op[0]->c_str(), label2.c_str(), "-");
@@ -87,12 +93,18 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         if(tree->getChild(0)->getChild(0) != NULL){
             op[2] = op[1];
             this->cGen(tree->getChild(0)->getChild(0), &op[1]);
-            emitQuadruple(OP::STORE_ADDR, op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
+            if(var_table->isPointer(*op[2]))
+                emitQuadruple(OP::STORE, op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
+            else
+                emitQuadruple(OP::STORE_ADDR, op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             var_table->unlockRegister(*op[0]);
             var_table->unlockRegister(*op[1]);
         }
         else{
-            emitQuadruple(OP::STORE, op[0]->c_str(), op[1]->c_str(), "-");
+            if(var_table->isPointer(*op[1]))
+                emitQuadruple(OP::STORE_ADDR, op[0]->c_str(), op[1]->c_str(), "-");
+            else
+                emitQuadruple(OP::STORE, op[0]->c_str(), op[1]->c_str(), "-");
             var_table->unlockRegister(*op[0]);
             var_table->unloadRegister(*op[1]);
         }
@@ -114,6 +126,7 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
     TreeNode *p1, *p2, *p;
     string *op[3] = {NULL, NULL, NULL};
     int cont;
+    VariablesTable *local;
     switch ((int)tree->getExp()){
     case ConstK:
         emitComment("-> Const");
@@ -128,13 +141,19 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
             op[1] = NULL;
             op[2] = tree->getName();
             this->cGen(tree->getChild(0), &op[1]);
-            emitQuadruple(OP::LOAD_ADDR, op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
+            if(var_table->isPointer(*op[2]))
+                emitQuadruple(OP::LOAD, op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
+            else
+                emitQuadruple(OP::LOAD_ADDR, op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             var_table->unlockRegister(*op[1]);
         }
         else if(!var_table->isLoaded(*tree->getName())){
             op[0] = var_table->linkRegister(*tree->getName());
             op[1] = tree->getName();
-            emitQuadruple(OP::LOAD, op[0]->c_str(), op[1]->c_str(), "-");
+            if(var_table->isPointer(*op[1]))
+                emitQuadruple(OP::LOAD_ADDR, op[0]->c_str(), op[1]->c_str(), "-");
+            else
+                emitQuadruple(OP::LOAD, op[0]->c_str(), op[1]->c_str(), "-");
         }
         else{
             op[0] = var_table->linkRegister(*tree->getName());
@@ -156,9 +175,10 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         if(tree->getChild(0)){
             cGen(tree->getChild(0), &op[1]);
             emitQuadruple(OP::ALLOC_MEM, op[0]->c_str(), op[1]->c_str(), "-");
+            var_table->addPointer(*op[0]);
         }
         else{
-            emitQuadruple(OP::ALLOC_MEM, op[0]->c_str(), "1", "-");
+            emitQuadruple(OP::ALLOC_MEM, op[0]->c_str(), "-", "-");
         }
         emitComment("<- Decl");
         break; /* DeclK */
@@ -191,15 +211,25 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
 
     case FuncK | DeclK:
         emitComment("-> FuncDecl");
-        var_table = new VariablesTable(32);
+        local = var_table;
+        var_table = new VariablesTable(local);
         op[0] = types[tree->getType()];
         op[1] = tree->getName();
-        emitQuadruple(OP::FUNC, op[0]->c_str(), op[1]->c_str(), "-");
+        cont = 0;
+        p = tree->getChild(0);
+        while (p){
+            cont++;
+            p = p->getSibling();
+        }
+        op[2] = new string(this->intToString(cont));
+        emitQuadruple(OP::FUNC, op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
+        delete op[2];
         op[2] = op[1];
         p = tree->getChild(0);
         while (p){
             this->ccGen(p, &op[1]);
             op[0] = types[p->getType()];
+            var_table->removePointer(*op[1]);
             emitQuadruple(OP::ARG, op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             p = p->getSibling();
         }
@@ -207,6 +237,7 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         op[0] = tree->getName();
         emitQuadruple(OP::END, op[0]->c_str(), "-", "-");
         delete var_table;
+        var_table = local;
         emitComment("<- FuncDecl");
         break; /* FuncDeclK */
 

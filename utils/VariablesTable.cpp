@@ -2,8 +2,8 @@
  * @file VariablesTable.cpp
  * @author André Lucas Maegima
  * @brief Implementação da classe VariablesTable.
- * @version 1.2
- * @date 2020-06-16
+ * @version 1.4
+ * @date 2020-06-21
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -36,6 +36,7 @@ VariablesTable::VariablesTable(VariablesTable *vartable){
     this->_lksize = 0;
     this->_maxsize = vartable->_maxsize;
     this->_lastreg = 0;
+    this->_pointers = vartable->_pointers;
     for(size_t i = 0; i < _maxsize; i++){
         if(vartable->_data[i].linked){
             _data[i].name = vartable->_data[i].name;
@@ -47,6 +48,19 @@ VariablesTable::VariablesTable(VariablesTable *vartable){
 
 VariablesTable::~VariablesTable(){
     delete[] this->_data;
+}
+
+size_t VariablesTable::expand(size_t size){
+    Variable *data;
+    data = new Variable[size + _maxsize];
+    for(size_t i = 0; i < _maxsize; i++){
+        if(_data[i].linked)
+            data[i] = _data[i];    
+    }
+    delete[] this->_data;
+    this->_data = data;
+    this->_maxsize += size;
+    return this->_maxsize;
 }
 
 Register VariablesTable::linkRegister(string id){
@@ -89,11 +103,7 @@ Register VariablesTable::linkRegister(size_t key){
     }
     _data[key].loaded = true;
     if(_lksize == _maxsize){
-        unlinkRegister(_lastreg);
-        if(_lcsize == _maxsize) 
-            _lastreg = _maxsize;
-        else
-            while(_data[_lastreg].locked) _lastreg++;
+        this->expand(1000);
     }
     return key;
 }
@@ -158,6 +168,16 @@ Register VariablesTable::unloadRegister(size_t key){
     return unlockRegister(key);
 }
 
+void VariablesTable::addPointer(string id){
+    _pointers.push(id);
+}
+
+void VariablesTable::removePointer(string id){
+    size_t index = _pointers.find(id);
+    if(index != nllist)
+        _pointers.remove();
+}
+
 bool VariablesTable::isLinked(string id){
     size_t key = 0;
     if(id.size() == 0) return false;
@@ -180,4 +200,8 @@ bool VariablesTable::isLoaded(string id){
     while(key < _maxsize && _data[key].name.compare(id) != 0) key++;
     if(key == _maxsize) return false;
     return _data[key].loaded;
+}
+
+bool VariablesTable::isPointer(string id){
+    return (_pointers.find(id) != nllist);
 }
