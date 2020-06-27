@@ -1,0 +1,155 @@
+addi $sp $sp 12345
+move $fp $sp
+jump main
+minloc:
+addi $sp $sp 3
+load $t0 $fp -2
+store $t0 $fp 2
+load $t1 $fp -3
+add $t1 $t1 $t0
+load $t1 $t1
+store $t1 $fp 1
+addi $t1 $t0 1
+store $t1 $fp 0
+WBEGIN0:
+load $t1 $fp 0
+load $t2 $fp -1
+slt $t3 $t1 $t2
+not $t3
+beq WEND0
+load $t3 $fp -3
+add $t3 $t3 $t1
+load $t3 $t3
+load $t4 $fp 1
+slt $t5 $t3 $t4
+not $t5
+beq LABEL0
+load $t3 $fp -3
+add $t3 $t3 $t1
+load $t3 $t3
+store $t3 $fp 1
+store $t1 $fp 2
+jump LABEL1
+LABEL0:
+load $t4 $fp 1
+add $t3 $t4 $t4
+store $t3 $fp 1
+LABEL1:
+addi $t3 $t1 1
+store $t3 $fp 0
+jump WBEGIN0
+WEND0:
+load $t3 $fp 2
+subi $sp $sp 3
+push $t3
+jaunl
+subi $sp $sp 3
+jaunl
+sort:
+addi $sp $sp 2
+load $t0 $fp -2
+store $t0 $fp 0
+addi $sp $sp 1
+WBEGIN1:
+load $t1 $fp 0
+load $t2 $fp -1
+subi $t3 $t2 1
+sgte $t4 $t1 $t3
+not $t4
+beq WEND1
+addi $t3 $0 0
+push $t3
+push $t1
+push $t2
+move $fp $sp
+jal minloc
+pop $t4
+pop $0
+pop $0
+pop $0
+store $t4 $fp 1
+load $t5 $fp 1
+load $t4 $t5 0
+store $t4 $fp 2
+load $t4 $t1 0
+load $t6 $t5 0
+add $t7 $t4 $t6
+store $t7 $t5 0
+load $t4 $fp 2
+store $t4 $t1 0
+addi $t6 $t1 1
+store $t6 $fp 0
+jump WBEGIN1
+WEND1:
+subi $sp $sp 1
+subi $sp $sp 2
+jaunl
+main:
+addi $sp $sp 11
+set $t0 0
+addi $t0 $t0 1
+addi $t1 $t0 2
+addi $t0 $t1 3
+addi $t1 $t0 4
+addi $t0 $t1 5
+addi $t1 $t0 6
+addi $t0 $t1 7
+addi $t1 $t0 8
+addi $t0 $t1 9
+set $t1 10
+multi $t1 $t1 11
+add $t2 $t0 $t1
+set $t0 12
+multi $t0 $t0 13
+add $t1 $t2 $t0
+addi $t0 $t1 14
+set $t1 15
+multi $t1 $t1 16
+add $t2 $t0 $t1
+set $t0 17
+multi $t0 $t0 18
+add $t1 $t2 $t0
+store $t1 $fp 0
+WBEGIN2:
+load $t0 $fp 0
+slti $t1 $t0 10
+not $t1
+beq WEND2
+move $fp $sp
+jal input
+pop $t1
+add $t2 $fp $t0
+store $t1 $t2 1
+addi $t1 $t0 1
+store $t1 $fp 0
+jump WBEGIN2
+WEND2:
+addi $t1 $fp 1
+push $t1
+set $t1 0
+push $t1
+set $t1 10
+push $t1
+move $fp $sp
+jal sort
+pop $0
+pop $0
+pop $0
+set $t1 0
+store $t1 $fp 0
+WBEGIN3:
+load $t0 $fp 0
+slti $t2 $t0 10
+not $t2
+beq WEND3
+load $t2 2
+push $t2
+move $fp $sp
+jal output
+pop $0
+addi $t2 $t0 1
+store $t2 $fp 0
+jump WBEGIN3
+WEND3:
+subi $sp $sp 11
+jaunl

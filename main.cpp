@@ -2,8 +2,8 @@
  * @file main.cpp
  * @author André Lucas Maegima
  * @brief Compilador para a linguagem C-.
- * @version 1.0
- * @date 2020-03-14
+ * @version 1.5
+ * @date 2020-06-26
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -16,6 +16,7 @@ using namespace std;
 #include "utils/SymbolTable.hpp"
 #include "utils/Semantic.hpp"
 #include "utils/CodeGenerator.hpp"
+#include "utils/AssemblyGenerator.hpp"
 
 /* allocate global variables */
 Scanner *scan = NULL; /**< Analisador léxico. */
@@ -25,12 +26,14 @@ FILE * listing = stdout; /**< Arquivo de saída padrão. */
 FILE * symbtab = stdout; /**< Arquivo para impressão da tabela de simbolos. */
 FILE * symbtree = stdout; /**< Arquivo para impressão da árvore sintática. */
 FILE * code = stdout; /**< Arquivo para impressão do código intermediário. */
+FILE * assembly = stdout; /**< Arquivo para impressão do código assembly. */
 
 /* allocate and set tracing flags */
 bool TraceScan = false;
 bool TraceParse = true;
 bool TraceAnalyze = true;
 bool TraceCode = false;
+bool TraceAssembly = false;
 
 int main(int argc, char **argv){
     int erro = 0; /**< Variável que indica erro na compilação. */
@@ -44,6 +47,8 @@ int main(int argc, char **argv){
         symbtab = fopen(argv[3], "w");
     if(argc > 4)
         code = fopen(argv[4], "w");
+    if(argc > 5)
+        assembly = fopen(argv[5], "w");
     scan = new Scanner(source, listing, TraceScan);
     parser = new Parser(symbtree, TraceParse);
     erro = parser->parse(&raiz);
@@ -55,7 +60,9 @@ int main(int argc, char **argv){
     }
     if(!erro){
         CodeGenerator *codeGen = new CodeGenerator(code, TraceCode);
-        codeGen->generate(raiz);
+        LinkedList<Code> *clist = codeGen->generate(raiz);
+        AssemblyGenerator *asmbGen = new AssemblyGenerator(assembly, TraceAssembly);
+        asmbGen->generate(clist);
     }
     fclose(source);
     fclose(symbtab);
