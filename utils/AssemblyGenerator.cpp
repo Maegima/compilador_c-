@@ -34,19 +34,25 @@ AssemblyGenerator::~AssemblyGenerator(){
 }
 
 void AssemblyGenerator::generateArithmeticLogicOp(string op, Code c){
-    if(c.second()[0] == '$'){
-        if(c.third()[0] == '$')
-            *out << op << " " << c.first() << " " << c.second() << " " << c.third() << endl;
-        else
-            *out << op << "i " << c.first() << " " << c.second() << " " << c.third() << endl; 
+    string first = "", second = "", third = "";
+    first = c.first();
+    if(c.second()[0] != '$'){
+        op += 'i';
+        if(c.third()[0] != '$'){
+            emitAssembly(Code("set", first.c_str(), c.second().c_str(), ""));
+            second = first;
+        }
+        else{
+            second = c.third();
+            third = c.second();   
+        }
     }
-    else if(c.third()[0] == '$'){
-        *out << op << "i " << c.first() << " " << c.third() << " " << c.second() << endl;
-    }
-    else{
-        *out << "set " << c.first() << " " << c.second() << endl;
-        *out << op << "i " << c.first() << " " << c.first() << " " << c.third() << endl;
-    }
+    else if(c.third()[0] != '$') op += 'i';
+    if(second == "")
+        second = c.second();
+    if(third == "")
+        third = c.third();
+    emitAssembly(Code(op.c_str(), first.c_str(), second.c_str(), third.c_str()));
     var_table->unlockRegister(c.second());
     var_table->unlockRegister(c.third()); 
 }
@@ -69,7 +75,7 @@ void AssemblyGenerator::generateDirectMemoryOp(string op, Code c){
         first = c.first();
     else{
         first = *var_table->linkRegister();
-        *out << "set " << first << " " << c.first() << endl;
+        emitAssembly(Code("set", first.c_str(), c.first().c_str(), ""));
         var_table->unlinkRegister(first);
     }
     if(c.third()[0] == '-'){
@@ -200,20 +206,20 @@ LinkedList<Code> *AssemblyGenerator::generate(LinkedList<Code> *clist){
         i++;
     }
     if(local_var > 0)
-        *out << "addi $sp $sp " << local_var << endl;
-    *out << "move $fp $sp" << endl;
-    *out << "jump main" << endl;
+        emitAssembly(Code("addi", "$sp", "$sp", to_string(local_var).c_str()));
+    emitAssembly(Code("move", "$fp", "$sp", ""));
+    emitAssembly(Code("jump", "main", "", ""));
     global = addr;
     for(Code c : *clist){
         operation last;
         if(last == operation::alloc_mem){
             if(caseOp(c.op()) != last){
                 if(loop_var < 0){
-                    *out << "addi $sp $sp " << local_var << endl;
+                    emitAssembly(Code("addi", "$sp", "$sp", to_string(local_var).c_str()));
                     loop_var = 0;
                 }
                 else{
-                    *out << "addi $sp $sp " << loop_var << endl;
+                    emitAssembly(Code("addi", "$sp", "$sp", to_string(loop_var).c_str()));
                 }
             }
         }
@@ -253,7 +259,7 @@ LinkedList<Code> *AssemblyGenerator::generate(LinkedList<Code> *clist){
             addr = map<string, int>();
             delete var_table;
             var_table = new VariablesTable();
-            *out << c.second() << ":" << endl;
+            emitAssembly(Code((c.second()+":").c_str(), "", "", ""));
             break;
         case operation::arg:
             addr[c.second()] = -(args--);
@@ -261,42 +267,42 @@ LinkedList<Code> *AssemblyGenerator::generate(LinkedList<Code> *clist){
                 *out << "///alloc " << c.second() << "[" << addr[c.second()] << "]" << endl;
             break;
         case operation::ret:
-            *out << "subi $sp $sp " << local_var << endl;
+            emitAssembly(Code("subi", "$sp", "$sp", to_string(local_var).c_str()));
             if(c.first()[0] == '$'){
-                *out << "push " << c.first() << endl;
+                emitAssembly(Code("push", c.first().c_str(), "", ""));
                 var_table->unlinkRegister(c.first());
             }
             else{
                 reg = var_table->linkRegister();
-                *out << "set " << *reg << c.first() << endl;
-                *out << "push " << *reg << endl;
+                emitAssembly(Code("set", reg->c_str(), c.first().c_str(), ""));
+                emitAssembly(Code("push", reg->c_str(), "", ""));
                 var_table->unlinkRegister(*reg);
             }
-            *out << "jaunl" << endl;
+            emitAssembly(Code("jaunl", "", "", ""));
             break;
         case operation::end:
-            *out << "subi $sp $sp " << local_var << endl;
-            *out << "jaunl" << endl;
+            emitAssembly(Code("subi", "$sp", "$sp", to_string(local_var).c_str()));
+            emitAssembly(Code("jaunl", "", "", ""));
             break;
         case operation::param:
             if(c.first()[0] == '$')
-                *out << "push " << c.first() << endl;
+                emitAssembly(Code("push", c.first().c_str(), "", ""));
             else{
                 reg = var_table->linkRegister();
-                *out << "set " << *reg << " " << c.first() << endl;
-                *out << "push " << *reg << endl;
+                emitAssembly(Code("set", reg->c_str(), c.first().c_str(), ""));
+                emitAssembly(Code("push", reg->c_str(), "", ""));
                 var_table->unlinkRegister(*reg);
             }
             break;
         case operation::call:
-            *out << "move $fp $sp" << endl;
-            *out << "jal " << c.first() << endl;
+            emitAssembly(Code("move", "$fp", "$sp", ""));
+            emitAssembly(Code("jal", c.first().c_str(), "", ""));
             if(c.third()[0] == '$'){
-                *out << "pop " << c.third() << endl;
+                emitAssembly(Code("pop", c.third().c_str(), "", ""));
                 var_table->linkRegister();
             }
             for(i = 0; i < stoi(c.second()); i++){
-                *out << "pop $0" << endl;
+                emitAssembly(Code("pop", "$0", "", ""));
             }
             break;
         case operation::alloc_mem:
@@ -338,15 +344,15 @@ LinkedList<Code> *AssemblyGenerator::generate(LinkedList<Code> *clist){
         case operation::if_not:
             if(c.first()[0] == '$'){
                 var_table->unlockRegister(c.first());
-                *out << "not " << c.first() << endl;
-                *out << "beq " << c.second() << endl;
+                emitAssembly(Code("not", c.first().c_str(), "", ""));
+                emitAssembly(Code("beq", c.second().c_str(), "", ""));
             }
             else if(stoi(c.first()) == 0){
-                *out << "jump " << c.second() << endl;
+                emitAssembly(Code("jump", c.second().c_str(), "", ""));
             }
             break;
         case operation::label:
-            *out << c.first() << ":" << endl;
+            emitAssembly(Code((c.first()+":").c_str(), "", "", ""));
             if(c.first().find("WBEGIN") != string::npos){
                 loop.push(loop_var);
                 loop_var = 0;
@@ -356,16 +362,17 @@ LinkedList<Code> *AssemblyGenerator::generate(LinkedList<Code> *clist){
                 loop_var = loop[i];
                 loop.remove(i);
                 if(loop_var > 0){
-                    *out << "subi $sp $sp " << loop_var << endl;
+                    emitAssembly(Code("subi", "$sp", "$sp", to_string(loop_var).c_str()));
                     loop_var = 0;
                 }
             }
             break;
         case operation::jump:
-            *out << "jump " << c.first() << endl;
+            emitAssembly(Code("jump", c.first().c_str(), "", ""));
             break;
         case operation::noop:
-            *out << "noop" << endl;
+            emitAssembly(Code("noop", "", "", ""));
+            break;
         }
     }
     return this->alist;
