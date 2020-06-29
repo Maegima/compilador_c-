@@ -2,8 +2,8 @@
  * @file VariablesTable.cpp
  * @author André Lucas Maegima
  * @brief Implementação da classe VariablesTable.
- * @version 1.4
- * @date 2020-06-21
+ * @version 1.7
+ * @date 2020-06-29
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -105,6 +105,7 @@ Register VariablesTable::linkRegister(size_t key){
     if(_lksize == _maxsize){
         this->expand(1000);
     }
+    if(_highsize < _lksize) _highsize = _lksize;
     return key;
 }
 
@@ -204,4 +205,12 @@ bool VariablesTable::isLoaded(string id){
 
 bool VariablesTable::isPointer(string id){
     return (_pointers.find(id) != nllist);
+}
+
+const size_t VariablesTable::size(){
+    return _lksize;
+}
+
+const size_t VariablesTable::highSize(){
+    return _highsize;
 }

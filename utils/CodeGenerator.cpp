@@ -2,8 +2,8 @@
  * @file CodeGenerator.cpp
  * @author André Lucas Maegima
  * @brief Implementação da classe CodeGenerator.
- * @version 1.4
- * @date 2020-06-24
+ * @version 1.7
+ * @date 2020-06-29
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -12,6 +12,7 @@
 #include "Parser.hpp"
 #include "CodeGenerator.hpp"
 #include "VariablesTable.hpp"
+#include <map>
 
 using namespace std;
 
@@ -19,6 +20,7 @@ static int cont_lab = 0, cont_while = 0;
 static string *types[] = {new string("void"), new string("int")};
 
 static VariablesTable *var_table = new VariablesTable(100);
+static map<string, int> func;
 
 string CodeGenerator::intToString(int number){
     return to_string(number);
@@ -204,6 +206,8 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         }
         else
             emitQuadruple(OP::CALL, op[0]->c_str(), op[1]->c_str(), "-");
+        for(int i = 0; i < func[*op[0]]; i++)
+            var_table->unloadRegister(i);
         *operate = op[2];
         delete op[1];
         emitComment("<- Func");
@@ -236,6 +240,7 @@ void CodeGenerator::genExp(TreeNode *tree, string **operate){
         this->cGen(tree->getChild(1), &op[1]);
         op[0] = tree->getName();
         emitQuadruple(OP::END, op[0]->c_str(), "-", "-");
+        func[*op[0]] = var_table->highSize();
         delete var_table;
         var_table = local;
         emitComment("<- FuncDecl");

@@ -2,8 +2,8 @@
  * @file VariablesTable.hpp
  * @author André Lucas Maegima
  * @brief Definição da classe VariablesTable.
- * @version 1.4
- * @date 2020-06-22
+ * @version 1.7
+ * @date 2020-06-29
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -39,7 +39,7 @@ class VariablesTable{
     };
     Variable *_data;
     LinkedList<std::string> _pointers;
-    size_t _maxsize, _lcsize, _lksize, _lastreg;
+    size_t _maxsize, _lcsize, _lksize, _lastreg, _highsize;
     /**
      * @brief Construct a new Variables Table object.
      * 
@@ -187,6 +187,12 @@ class VariablesTable{
      * @return size_t Quantidade de elementos na tabela.
      */
     const size_t size();
+    /**
+     * @brief O maior valor de items que a tabela teve.
+     * 
+     * @return const size_t 
+     */
+    const size_t highSize();
     /** @brief Interator class for Variables Table */
     class iterator{
         public:
