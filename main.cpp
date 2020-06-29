@@ -2,8 +2,8 @@
  * @file main.cpp
  * @author André Lucas Maegima
  * @brief Compilador para a linguagem C-.
- * @version 1.5
- * @date 2020-06-26
+ * @version 1.6
+ * @date 2020-06-29
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -17,6 +17,7 @@ using namespace std;
 #include "utils/Semantic.hpp"
 #include "utils/CodeGenerator.hpp"
 #include "utils/AssemblyGenerator.hpp"
+#include "utils/Assembler.hpp"
 
 /* allocate global variables */
 Scanner *scan = NULL; /**< Analisador léxico. */
@@ -27,6 +28,7 @@ FILE * symbtab = stdout; /**< Arquivo para impressão da tabela de simbolos. */
 FILE * symbtree = stdout; /**< Arquivo para impressão da árvore sintática. */
 FILE * code = stdout; /**< Arquivo para impressão do código intermediário. */
 FILE * assembly = stdout; /**< Arquivo para impressão do código assembly. */
+FILE * machine = stdout; /**< Arquivo para impressão do código de máquina. */
 
 /* allocate and set tracing flags */
 bool TraceScan = false;
@@ -34,6 +36,7 @@ bool TraceParse = true;
 bool TraceAnalyze = true;
 bool TraceCode = false;
 bool TraceAssembly = false;
+bool TraceMachine = false;
 
 int main(int argc, char **argv){
     int erro = 0; /**< Variável que indica erro na compilação. */
@@ -49,6 +52,8 @@ int main(int argc, char **argv){
         code = fopen(argv[4], "w");
     if(argc > 5)
         assembly = fopen(argv[5], "w");
+    if(argc > 6)
+        machine = fopen(argv[6], "w");
     scan = new Scanner(source, listing, TraceScan);
     parser = new Parser(symbtree, TraceParse);
     erro = parser->parse(&raiz);
@@ -62,7 +67,9 @@ int main(int argc, char **argv){
         CodeGenerator *codeGen = new CodeGenerator(code, TraceCode);
         LinkedList<Code> *clist = codeGen->generate(raiz);
         AssemblyGenerator *asmbGen = new AssemblyGenerator(assembly, TraceAssembly);
-        asmbGen->generate(clist);
+        LinkedList<Code> *alist = asmbGen->generate(clist);
+        Assembler *machineGen = new Assembler(machine, TraceMachine);
+        LinkedList<unsigned int> mlist = machineGen->generate(alist);
     }
     fclose(source);
     fclose(symbtab);
