@@ -2,8 +2,8 @@
  * @file AssemblyGenerator.cpp
  * @author André Lucas Maegima
  * @brief Implementação da classe AssemblyGenerator.
- * @version 1.5
- * @date 2020-06-27
+ * @version 1.6
+ * @date 2020-06-29
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -108,7 +108,7 @@ void AssemblyGenerator::generateDirectMemoryOp(string op, Code c){
                 third = to_string(addr[c.third()] + stoi(c.second()));
             }
             else
-                third = to_string(global[c.third()] + stoi(c.second()));     
+                second = to_string(global[c.third()] + stoi(c.second()));     
         }
     }
     if(trace){
@@ -120,7 +120,7 @@ void AssemblyGenerator::generateDirectMemoryOp(string op, Code c){
                 *out << second << endl; 
         }
         else
-            *out << "///" << c.third() << ":" << third << endl;
+            *out << "///" << c.third() << ":" << (third == "" ? second : third) << endl;
     }
     emitAssembly(Code(op.c_str(), first.c_str(), second.c_str(), third.c_str()));
 }
@@ -153,7 +153,7 @@ void AssemblyGenerator::generateIndirectMemoryOp(string op, Code c){
             else
                 emitAssembly(Code("addi", first.c_str(), first.c_str(), c.second().c_str()));
             second = first;
-            third = "";
+            third = "0";
         }
         else{
             *out << "isso nao deveria estar acontecendo " << c.first() << " " << c.second() << " " << c.third() << endl;
@@ -240,13 +240,15 @@ LinkedList<Code> *AssemblyGenerator::generate(LinkedList<Code> *clist){
             generateArithmeticLogicOp("slt", c);
             break;
         case operation::slte:
-            generateArithmeticLogicOp("slte", c);
+            generateArithmeticLogicOp("sgt", c);
+            emitAssembly(Code("not", c.first().c_str(), c.first().c_str(), ""));
             break;
         case operation::sgt:
             generateArithmeticLogicOp("sgt", c);
             break;
         case operation::sgte:
-            generateArithmeticLogicOp("sgte", c);
+            generateArithmeticLogicOp("slt", c);
+            emitAssembly(Code("not", c.first().c_str(), c.first().c_str(), ""));
             break;
         case operation::equal:
             generateArithmeticLogicOp("equal", c);
@@ -295,14 +297,26 @@ LinkedList<Code> *AssemblyGenerator::generate(LinkedList<Code> *clist){
             }
             break;
         case operation::call:
-            emitAssembly(Code("move", "$fp", "$sp", ""));
-            emitAssembly(Code("jal", c.first().c_str(), "", ""));
-            if(c.third()[0] == '$'){
-                emitAssembly(Code("pop", c.third().c_str(), "", ""));
-                var_table->linkRegister();
+            if(c.first() == "input"){
+                reg = var_table->linkRegister();
+                emitAssembly(Code("input", reg->c_str(), "", ""));
             }
-            for(i = 0; i < stoi(c.second()); i++){
-                emitAssembly(Code("pop", "$0", "", ""));
+            else if(c.first() == "output"){
+                reg = var_table->linkRegister();
+                emitAssembly(Code("pop", reg->c_str(), "", ""));
+                emitAssembly(Code("output", reg->c_str(), "", ""));
+                var_table->unlinkRegister(*reg);
+            }
+            else{
+                emitAssembly(Code("move", "$fp", "$sp", ""));
+                emitAssembly(Code("jal", c.first().c_str(), "", ""));
+                if(c.third()[0] == '$'){
+                    emitAssembly(Code("pop", c.third().c_str(), "", ""));
+                    var_table->linkRegister();
+                }
+                for(i = 0; i < stoi(c.second()); i++){
+                    emitAssembly(Code("pop", "$0", "", ""));
+                }
             }
             break;
         case operation::alloc_mem:
@@ -344,7 +358,7 @@ LinkedList<Code> *AssemblyGenerator::generate(LinkedList<Code> *clist){
         case operation::if_not:
             if(c.first()[0] == '$'){
                 var_table->unlockRegister(c.first());
-                emitAssembly(Code("not", c.first().c_str(), "", ""));
+                emitAssembly(Code("equali2", c.first().c_str(), "0", ""));
                 emitAssembly(Code("beq", c.second().c_str(), "", ""));
             }
             else if(stoi(c.first()) == 0){
