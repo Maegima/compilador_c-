@@ -2,8 +2,8 @@
  * @file TokenType.hpp
  * @author André Lucas Maegima
  * @brief Definição da classe TokenType.
- * @version 1.0
- * @date 2019-12-20
+ * @version 2.0
+ * @date 2020-06-30
  * 
  * @copyright Copyright (c) 2019
  * 

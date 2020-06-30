@@ -2,8 +2,8 @@
  * @file main.cpp
  * @author André Lucas Maegima
  * @brief Compilador para a linguagem C-.
- * @version 1.6
- * @date 2020-06-29
+ * @version 2.0
+ * @date 2020-06-30
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -11,13 +11,13 @@
 #include <iostream>
 using namespace std;
 
-#include "utils/Scanner.hpp"
-#include "utils/Parser.hpp"
-#include "utils/SymbolTable.hpp"
-#include "utils/Semantic.hpp"
-#include "utils/CodeGenerator.hpp"
-#include "utils/AssemblyGenerator.hpp"
-#include "utils/Assembler.hpp"
+#include "analysis/Scanner.hpp"
+#include "analysis/Parser.hpp"
+#include "analysis/SymbolTable.hpp"
+#include "analysis/Semantic.hpp"
+#include "synthesis/CodeGenerator.hpp"
+#include "synthesis/AssemblyGenerator.hpp"
+#include "synthesis/Assembler.hpp"
 
 /* allocate global variables */
 Scanner *scan = NULL; /**< Analisador léxico. */

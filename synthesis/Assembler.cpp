@@ -2,8 +2,8 @@
  * @file Assembler.cpp
  * @author André Lucas Maegima
  * @brief Implementação da classe Assembler.
- * @version 1.6
- * @date 2020-06-29
+ * @version 2.0
+ * @date 2020-06-30
  * 
  * @copyright Copyright (c) 2019
  * 

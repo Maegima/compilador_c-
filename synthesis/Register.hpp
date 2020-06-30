@@ -2,8 +2,8 @@
  * @file Register.hpp
  * @author André Lucas Maegima
  * @brief Definição da classe Register.
- * @version 1.1
- * @date 2020-06-15
+ * @version 2.0
+ * @date 2020-06-30
  * 
  * @copyright Copyright (c) 2019
  * 

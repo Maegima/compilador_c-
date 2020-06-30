@@ -3,8 +3,8 @@
  * @file Parser.cpp
  * @author André Lucas Maegima
  * @brief Implementação do analisador sintático.
- * @version 1.0
- * @date 2020-03-14
+ * @version 2.0
+ * @date 2020-06-30
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -14,8 +14,8 @@ using namespace std;
 
 #define YYPARSER /* distinguishes Yacc output from other code files */
 
-#include "utils/Scanner.hpp"
-#include "utils/Parser.hpp"
+#include "Scanner.hpp"
+#include "Parser.hpp"
 
 #define YYSTYPE TreeNode *
 static int sc;

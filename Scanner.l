@@ -3,16 +3,16 @@
  * @file Scanner.cpp
  * @author André Lucas Maegima
  * @brief Implementação do analisador léxico.
- * @version 1.0
- * @date 2019-12-20
+ * @version 2.0
+ * @date 2020-06-30
  * 
  * @copyright Copyright (c) 2019
  * 
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include "utils/Parser.hpp"
-#include "utils/Scanner.hpp"
+#include "Parser.hpp"
+#include "Scanner.hpp"
 
 extern YYSTYPE yylval;
 extern "C" int yylex(void);

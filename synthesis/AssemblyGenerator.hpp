@@ -2,8 +2,8 @@
  * @file AssemblyGenerator.hpp
  * @author André Lucas Maegima
  * @brief Definição da classe AssemblyGenerator.
- * @version 1.5
- * @date 2020-06-26
+ * @version 2.0
+ * @date 2020-06-30
  * 
  * @copyright Copyright (c) 2019
  * 

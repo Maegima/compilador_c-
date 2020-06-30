@@ -2,8 +2,8 @@
  * @file VariablesTable.hpp
  * @author André Lucas Maegima
  * @brief Definição da classe VariablesTable.
- * @version 1.7
- * @date 2020-06-29
+ * @version 2.0
+ * @date 2020-06-30
  * 
  * @copyright Copyright (c) 2019
  * 
