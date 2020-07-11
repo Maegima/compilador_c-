@@ -1,6 +1,6 @@
-#line 2 "analysis/Scanner.cpp"
+#line 1 "analysis/Scanner.cpp"
 
-#line 4 "analysis/Scanner.cpp"
+#line 3 "analysis/Scanner.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -495,7 +495,7 @@ char *yytext;
  * @author André Lucas Maegima
  * @brief Implementação do analisador léxico.
  * @version 2.0
- * @date 2020-06-30
+ * @date 2020-07-11
  * 
  * @copyright Copyright (c) 2019
  * 
@@ -630,8 +630,8 @@ int Scanner::getLineNumber(){
 void Scanner::incrementLine(){
     this->line_number++;
 }
+#line 633 "analysis/Scanner.cpp"
 #line 634 "analysis/Scanner.cpp"
-#line 635 "analysis/Scanner.cpp"
 
 #define INITIAL 0
 
@@ -855,7 +855,7 @@ YY_DECL
 	{
 #line 147 "Scanner.l"
 
-#line 854 "analysis/Scanner.cpp"
+#line 853 "analysis/Scanner.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1105,7 +1105,7 @@ YY_RULE_SETUP
 #line 195 "Scanner.l"
 ECHO;
 	YY_BREAK
-#line 1104 "analysis/Scanner.cpp"
+#line 1103 "analysis/Scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

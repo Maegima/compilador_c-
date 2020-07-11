@@ -1,4 +1,9 @@
-rm bin/compilador.exe
+if [ -f "bin/compilador.exe" ] ; then
+    rm bin/compilador.exe
+fi
+if [ ! -d "bin" ] ; then
+    mkdir bin
+fi
 echo gerando Scanner.cpp ...
 prefix="analysis"
 flex -o $prefix/Scanner.cpp Scanner.l
