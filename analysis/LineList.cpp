@@ -3,13 +3,13 @@
  * @author André Lucas Maegima
  * @brief Implementação da classe LineList.
  * @version 2.0
- * @date 2020-06-30
+ * @date 2020-07-11
  * 
  * @copyright Copyright (c) 2019
  * 
  */
 
-#include "Linelist.hpp"
+#include "LineList.hpp"
 
 LineList::LineList(int lineno, int type){
     this->lineno = lineno;
