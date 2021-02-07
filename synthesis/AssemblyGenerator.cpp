@@ -43,8 +43,14 @@ void AssemblyGenerator::generateArithmeticLogicOp(string op, Code c){
             second = first;
         }
         else{
-            second = c.third();
-            third = c.second();   
+            if(op == "sub" || op == "div" || op == "slt" || op == "sgt"){
+                emitAssembly(Code("set", first.c_str(), c.second().c_str(), ""));
+                second = first;
+            }
+            else{
+                second = c.third();
+                third = c.second();
+            }
         }
     }
     else if(c.third()[0] != '$') op += 'i';
@@ -150,8 +156,9 @@ void AssemblyGenerator::generateIndirectMemoryOp(string op, Code c){
             emitAssembly(Code("load", first.c_str(), "$fp", third.c_str()));
             if(c.second()[0] == '$')
                 emitAssembly(Code("add", first.c_str(), first.c_str(), c.second().c_str()));
-            else
+            else{
                 emitAssembly(Code("addi", first.c_str(), first.c_str(), c.second().c_str()));
+            }
             second = first;
             third = "0";
         }

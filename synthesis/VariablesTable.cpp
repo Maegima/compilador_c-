@@ -47,7 +47,18 @@ VariablesTable::VariablesTable(VariablesTable *vartable){
 }
 
 VariablesTable::~VariablesTable(){
-    delete[] this->_data;
+    if(this->_data != nullptr){
+        delete[] this->_data;
+        this->_data = nullptr;
+    }
+}
+
+void VariablesTable::merge(VariablesTable *vartable){
+    for(size_t i = 0; i < _maxsize; i++){
+        if(this->_data[i].name == vartable->_data[i].name){
+            this->_data[i] = vartable->_data[i];
+        }
+    }
 }
 
 size_t VariablesTable::expand(size_t size){

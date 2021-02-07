@@ -30,7 +30,7 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
     TreeNode *p1, *p2, *p3;
     string *op[3] = {NULL, NULL, NULL};
     string label1, label2;
-    VariablesTable *local;
+    VariablesTable *local = NULL;
     switch (tree->getStmt()){
     case IfK:
         emitComment("-> if");
@@ -44,7 +44,13 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         emitQuadruple(OP::IF_NOT, op[0]->c_str(), label1.c_str(), "-");
         var_table->unlockRegister(*op[0]);
         /* recurse on then part */
+        local = var_table;
+        var_table = new VariablesTable(local);
         this->cGen(p2, &op[1]);
+        local->merge(var_table);
+        delete var_table;
+        var_table = local;
+        local = nullptr;
         if(p3){
             label2 = OP::LABEL + this->intToString(cont_lab);
             cont_lab++;
@@ -54,7 +60,13 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         emitQuadruple(OP::LABEL, label1.c_str(), "-", "-");
         if(p3){
             /* recurse on else part */
+            local = var_table;
+            var_table = new VariablesTable(local);
             this->cGen(p3, &op[1]);
+            local->merge(var_table);
+            delete var_table;
+            var_table = local;
+            local = nullptr;
             emitQuadruple(OP::LABEL, label2.c_str(), "-", "-");
         }
         emitComment("<- if");
@@ -65,6 +77,7 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         local = var_table;
         var_table = new VariablesTable(local);
         delete local;
+        local = nullptr;
         p1 = tree->getChild(0);
         p2 = tree->getChild(1);
         while(p2 && p2->getExp() == TypeK){
@@ -94,7 +107,7 @@ void CodeGenerator::genStmt(TreeNode *tree, string **operate){
         this->cGen(tree->getChild(1), &op[0]);
         if(tree->getChild(0)->getChild(0) != NULL){
             op[2] = op[1];
-            this->cGen(tree->getChild(0)->getChild(0), &op[1]);
+            this->cGen(tree->getChild(0), &op[1]);
             if(var_table->isPointer(*op[2]))
                 emitQuadruple(OP::STORE, op[0]->c_str(), op[1]->c_str(), op[2]->c_str());
             else

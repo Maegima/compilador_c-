@@ -68,6 +68,12 @@ class VariablesTable{
      */
     ~VariablesTable();
     /**
+     * @brief Merge with vartable.
+     * 
+     * @param vartable VariablesTable to merge with.
+     */
+    void merge(VariablesTable *vartable);
+    /**
      * @brief Vincula ,caso não esteja vinculado, um registrador ao identificador
      * e retorna o registrador.
      * 

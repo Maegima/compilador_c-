@@ -115,18 +115,36 @@ tipo_especificador: INT
     $$->setType(Void);
 }
 ;
-fun_declaracao: tipo_especificador identificador OPAREN params CPAREN composto_decl
+fun_declaracao: tipo_especificador identificador
 {
+    
     $$ = $1;
     $$->setChild($2, 0);
-    $$->getChild(0)->setChild($4, 0);
-    $$->getChild(0)->setChild($6, 1);
     $2->setLineno($2->getLineno());
     $2->setType($1->getType());
     $2->setExp((ExpKind)(FuncK | DeclK));
     func[func_id] = $2->getName();
     type[func_id] = $2->getType();
     func_id++;
+}
+OPAREN params CPAREN composto_decl
+{    
+    //printf("name %s\n" ,$$->getChild(0)->getName()->c_str());
+    //printf("name %s\n" ,$1->getName()->c_str());
+    /*if($1)
+        printf("name1 %s\n" ,$1->getName()->c_str());
+    if($2)
+        printf("name2 %s\n" ,$2->getName()->c_str());
+    if($3)
+        printf("name3 %s\n" ,$3->getChild(0)->getName()->c_str());
+    if($4)
+        printf("name4 %s\n" ,$4->getName()->c_str());
+    if($5)
+        printf("name5 %s\n" ,$5->getChild(0)->getName()->c_str());
+    if($6)
+        printf("name6 %s\n" ,$6->getName()->c_str());*/
+    $$->getChild(0)->setChild($5, 0);
+    $$->getChild(0)->setChild($7, 1);
 }
 ;
 params: param_lista { $$ = $1; } | VOID { $$ = NULL; }
